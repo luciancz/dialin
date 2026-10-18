@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": []
+  },
+  "include": [
+    "src/core/**/*",
+    "src/scale/protocol.ts",
+    "src/scale/transport.ts",
+    "src/shot/machine.ts",
+    "src/shot/ringBuffer.ts"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "dialin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Espresso dial-in assistant for a Bookoo Themis Mini scale, Varia VS6 grinder and Lelit Mara X",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/gen-sw.mjs",
+    "preview": "vite preview",
+    "lint": "biome ci .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.core.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@preact/signals": "1.3.4",
+    "idb": "8.0.4",
+    "preact": "10.29.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@types/web-bluetooth": "0.0.21",
+    "fake-indexeddb": "6.2.6",
+    "typescript": "6.0.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
+  }
+}

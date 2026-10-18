@@ -1,0 +1,6 @@
+node_modules/
+dist/
+fixtures/external/*
+!fixtures/external/.gitkeep
+*.log
+.DS_Store
