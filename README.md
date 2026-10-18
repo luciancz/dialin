@@ -94,25 +94,92 @@ site is served under `/dialin/`; hash routing keeps refreshes working.
 truth for 200 seeds per scenario. Scenarios whose measured rate is below the plan's target
 are kept at the plan's number but marked `fails`, with a regression floor at the measured
 rate, so a change that moves them is visible either way. Measured on 2026-10-18 with the
-simulated shot-to-shot noise equal to the model's `σ_y = 0.07`:
+simulated shot-to-shot noise equal to the model's `σ_y = 0.07` and the taste gate at
+`σ_s ≤ 0.08` (see "Taste retune" below):
 
 | Scenario | Plan target | Measured |
 |---|---|---|
-| (a) first bag, gain within 25 % by shot 6 | ≥ 90 % | ≈ 71–82 % (low-gain truths need more excursion than 5-line probe steps give) |
-| (a′) mis-counted dial | ≥ 90 % | passes |
-| (b) later bag in band by shot 2 / 3 | ≥ 85 % / 75 % | passes |
-| (c) taste setpoint σ ≤ 0.06 within 9 rated shots | ≥ 80 % | ≈ 5 %: the tempered slider likelihood barely narrows the posterior (ideal sliders leave σ ≈ 0.15, ideal preferences ≈ 0.07); median error ≈ 0.10 after 14 shots |
-| (d) same with 20 % channeling | ≥ 80 % | ≈ 2 % |
-| (e) 30-day drift bias < 0.05 | ≥ 90 % | ≈ 82 % |
-| (f) washer epoch re-anchors in one shot | ≥ 90 % | ≈ 88 % (the card is recomputed when the epoch opens, so the anchor shot is pulled at the predicted shift) |
-| (g) RPM sign after 3 pairs | ≥ 80 % | passes |
-| (h) confidence calibration ±0.10 | all words | passes |
-| (i) 1/x truth in band by shot 5 | ≥ 90 % | ≈ 79 % |
+| (a) first bag, gain within 25 % by shot 6 | ≥ 90 % | 73 % (low-gain truths need more excursion than 5-line probe steps give) |
+| (a′) mis-counted dial | ≥ 90 % | 68 % |
+| (b) later bag in band by shot 2 / 3 | ≥ 85 % / 75 % | 91 % / 83 %, passes |
+| (c) taste setpoint found within 9 rated shots at the plan's gate σ_s ≤ 0.06 | ≥ 80 % | 8 % |
+| (c) found at the app's gate σ_s ≤ 0.08, within 9 / 14 rated shots | retune target > 60 % within 14 | 62 % / 90 % |
+| (d) same with 20 % channeling, plan's gate, within 11 | ≥ 80 % | 5 % |
+| (d) at the app's gate, within 11 / 14 | none | 44 % / 60 % |
+| (e) 30-day drift bias < 0.05 | ≥ 90 % | 89 % |
+| (f) washer epoch re-anchors in one shot | ≥ 90 % | 88 % (the card is recomputed when the epoch opens, so the anchor shot is pulled at the predicted shift) |
+| (g) RPM sign after 3 pairs | ≥ 80 % | 96 %, passes |
+| (h) confidence calibration ±0.10 | all words | worst gap 0.03, passes |
+| (i) 1/x truth in band by shot 5 | ≥ 90 % | 79 % |
 
-The taste layer is the open design question: with the plan's tempering the "dialled in" and
-RPM stages (which gate on σ_s ≤ 0.06) are rarely reached within a bag. Candidate retunes,
-none applied: a stronger slider likelihood (floor 0.25 → 0.15, exponent (1+|v|)/4),
-forgetting on ratio changes, or a 0.08 convergence gate.
+"Found" means σ_s at or below the gate and |μ_s − s\*_eff| < 0.08, where s\*_eff is the flow
+that tastes balanced at the shot's brew ratio.
+
+### Taste retune (2026-10-18)
+
+**The simulated taster had the sour–bitter sign backwards.** `perceivedOffset` in
+`src/core/sim/truth.ts` called slow shots sour and short ratios bitter. The app's sign test
+(sour ⇒ finer), the compass veto and rule rows 5–8 assume the opposite on both counts, which
+is the usual espresso convention. Every slider update and every yield move therefore pushed
+the simulated cup away from balance. The posterior was also overconfident: μ_s sat within 1σ
+of the truth in only 28–45 % of bags. Most of the earlier "≈ 4 %" came from this bug. The sign is fixed,
+and `test/core/setpoint.test.ts` now checks the taster against the sign test.
+
+**Information per update.** These numbers come from the setpoint layer alone: 400 seeds,
+Thompson targets, σ_y noise and the simulator's taster.
+
+- A valid better/worse comparison carries 0.18–0.35 nats. A slider carries about 0.03 nats,
+  and about 0.01 within 0.02 of the optimum, where it mostly reads 0.
+- The slider floor caps how far one tasting moves the odds between two setpoints at 4. The
+  lapse floor caps a preference at about 28.
+- After 9 updates σ_s is 0.11 from sliders alone, 0.067 from preferences alone and 0.063
+  from the one-update-per-tasting mix.
+- At one tasting per day the bean-age forgetting (0.02/√day) holds σ_s at 0.064–0.070. The
+  0.06 gate sits under that floor: once forgetting is on, the isolated 14-shot rate falls
+  from 88 % to 42 %. In the full loop about 12 of 14 tastings update the posterior, and the
+  balanced flow moves whenever the yield rule changes the ratio.
+
+**Variants.** The table gives the rate of "found" within 9 and 14 rated shots, 200 seeds per
+scenario. Scenarios b, g and h pass under every variant. Scenarios a, e, f and i are unrated
+and do not change.
+
+| Variant | Gate | (c) 9 | (c) 14 | (d) 9 | (d) 14 |
+|---|---|---|---|---|---|
+| Plan constants | 0.06 | 8 % | 32 % | 2 % | 10 % |
+| Stronger slider: floor 0.15, exponent (1 + \|v\|)/4 | 0.06 | 9 % | 38 % | 3 % | 13 % |
+| Forgetting on ratio change, sd 0.15 per ratio unit | 0.06 | 3 % | 13 % | 2 % | 5 % |
+| **Gate 0.08 (applied)** | 0.08 | 62 % | 90 % | 32 % | 60 % |
+| Stronger slider plus gate 0.08 | 0.08 | 63 % | 93 % | 40 % | 70 % |
+| Old taster sign, plan constants | 0.06 | 4 % | 12 % | 1 % | 2 % |
+| Old taster sign, gate 0.08 | 0.08 | 24 % | 47 % | 7 % | 18 % |
+
+The ratio forgetting was sized to the simulator's ratio coupling. It widens the posterior
+without adding information, so it only slows convergence.
+
+**Choice.** The smallest change above 60 % is one constant: `RULES.setpointSdConverged`
+goes from 0.06 to 0.08. The likelihoods, the one-update-per-tasting rule and the sign test
+are unchanged, so no single tasting moves the posterior more than before. From the prior,
+one tasting shrinks σ_s by at most 33 % for a preference and 12 % for a slider. The worst
+single step seen in the loop is 44 %. `RULES.setpointSdRoute` stays at 0.10, above the gate.
+
+**Why the looser gate is acceptable.** σ_s is conservative in the corrected simulator. At
+shots 9 and 14, μ_s lies within 1σ of s\*_eff in 88–92 % of bags and within 2σ in 99–100 %. When σ_s first reaches 0.08, the median error is 0.027 and 86 % of bags are within
+β = 0.07. 0.08 also equals the Thompson threshold, so exploration stops where "dialled in"
+starts.
+
+**What it costs.**
+
+- "Dialled in" now fires at 1σ = 0.08, wider than β. In 14 % of bags the mean is off by
+  more than β when the gate is first reached. 21 of 139 "dialled in" cards sat on a shot
+  outside β.
+- The RPM texture lever unlocks sooner. It fired 105 times in 200 bags, against 19 before.
+  Each RPM change re-widens σ_s by 0.08, so the gate has to be earned again before the next.
+- Scenario d stays the weak case at 60 % within 14. Channeled shots invalidate comparisons,
+  which leaves more of the work to sliders.
+
+The stronger slider adds 3 pp on c and 10 pp on d on top of the gate, at 1.7 times the
+odds per tasting. It is the next lever to try if field data shows the slider is reliable.
+All of this is simulation; the field test has to confirm it.
 
 ## M5: open until the first sessions at the machine
 

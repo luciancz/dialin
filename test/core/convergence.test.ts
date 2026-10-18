@@ -9,6 +9,8 @@
  *  - regression floors: the rates measured on 2026-10-18 minus a margin, so a change that
  *    makes any scenario worse fails CI, and every message prints the measured rate against
  *    the plan target.
+ * The taste scenarios (c, d) are floored at the app's retuned σ_s gate (0.08); the plan's
+ * 0.06 gate stays in the `fails` block.
  */
 import { beforeAll, describe, expect, it } from 'vitest';
 import { RULES } from '../../src/core/params';
@@ -16,6 +18,9 @@ import { BAND, passRate, ROUTE_BAND, runMany, type SimRun } from '../../src/core
 
 const SEEDS = 200;
 const T = 180_000;
+/** The plan's σ_s gate; the app gates on RULES.setpointSdConverged (0.08 since 2026-10-18). */
+const PLAN_SD_GATE = 0.06;
+const ERR_GATE = 0.08;
 
 const runs: Record<string, SimRun[]> = {};
 const rates: Record<string, number> = {};
@@ -31,8 +36,8 @@ function setpointFound(r: SimRun, k: number, sdGate: number, errGate: number): b
     .some((s) => s.setpointSd <= sdGate && Math.abs(s.setpointMean - s.sStarEff) < errGate);
 }
 
-function msg(name: string, target: number): string {
-  return `${name}: measured ${(rates[name] ?? 0).toFixed(3)}, plan target ${target}`;
+function msg(name: string, target: number, label = 'plan target'): string {
+  return `${name}: measured ${(rates[name] ?? 0).toFixed(3)}, ${label} ${target}`;
 }
 
 beforeAll(() => {
@@ -56,10 +61,24 @@ beforeAll(() => {
   };
   rates.b2 = passRate(R.b ?? [], (r) => err(r, 1) <= ROUTE_BAND);
   rates.b3 = passRate(R.b ?? [], (r) => err(r, 2) <= BAND);
-  rates.c = passRate(R.c ?? [], (r) => setpointFound(r, 9, RULES.setpointSdConverged, 0.08));
-  rates.c_measured = passRate(R.c ?? [], (r) => setpointFound(r, 14, 0.1, 0.1));
-  rates.d = passRate(R.d ?? [], (r) => setpointFound(r, 11, RULES.setpointSdConverged, 0.08));
-  rates.d_measured = passRate(R.d ?? [], (r) => setpointFound(r, 14, 0.12, 0.15));
+  const gate = RULES.setpointSdConverged;
+  rates.c = passRate(R.c ?? [], (r) => setpointFound(r, 9, PLAN_SD_GATE, ERR_GATE));
+  rates.d = passRate(R.d ?? [], (r) => setpointFound(r, 11, PLAN_SD_GATE, ERR_GATE));
+  rates.c9 = passRate(R.c ?? [], (r) => setpointFound(r, 9, gate, ERR_GATE));
+  rates.c14 = passRate(R.c ?? [], (r) => setpointFound(r, 14, gate, ERR_GATE));
+  rates.d11 = passRate(R.d ?? [], (r) => setpointFound(r, 11, gate, ERR_GATE));
+  rates.d14 = passRate(R.d ?? [], (r) => setpointFound(r, 14, gate, ERR_GATE));
+  // σ_s is not overconfident: after 14 rated shots the mean is within 2σ of the balanced flow.
+  rates.c_cover2 = passRate(R.c ?? [], (r) => {
+    const s = r.steps[13];
+    return s !== undefined && Math.abs(s.setpointMean - s.sStarEff) <= 2 * s.setpointSd;
+  });
+  // "Dialled in" is honest: where σ_s first reaches the gate, the mean is within β.
+  const cReached = (R.c ?? []).filter((r) => r.steps.some((s) => s.setpointSd <= gate));
+  rates.c_gate_in_beta = passRate(cReached, (r) => {
+    const s = r.steps.find((x) => x.setpointSd <= gate);
+    return s !== undefined && Math.abs(s.setpointMean - s.sStarEff) <= RULES.beta;
+  });
   let injected = 0;
   let flagged = 0;
   let total = 0;
@@ -139,11 +158,17 @@ describe('convergence suite: regression floors (measured 2026-10-18, see README)
   it('(a′) mis-counted dial, gain ×2: plan ≥ 90 %, measured ≈ 68 %', () => {
     expect(rates.a_miscount, msg('a_miscount', 0.9)).toBeGreaterThanOrEqual(0.6);
   });
-  it('(c) taste setpoint within 9 rated shots: plan ≥ 80 % at σ ≤ 0.06, measured ≈ 4 %; σ ≤ 0.10 / err < 0.10 within 14 ≈ 60 %', () => {
-    expect(rates.c_measured, msg('c_measured', 0.8)).toBeGreaterThanOrEqual(0.45);
+  it('(c) taste setpoint at the σ_s ≤ 0.08 gate, err < 0.08: within 9 ≈ 62 %, within 14 ≈ 90 % (retune target > 60 % within 14)', () => {
+    expect(rates.c9, msg('c9', 0.8)).toBeGreaterThanOrEqual(0.5);
+    expect(rates.c14, msg('c14', 0.6, 'retune target')).toBeGreaterThanOrEqual(0.8);
   });
-  it('(d) with 20 % channeling: plan ≥ 80 % within 11, measured ≈ 1 %; σ ≤ 0.12 / err < 0.15 within 14 ≈ 40 %', () => {
-    expect(rates.d_measured, msg('d_measured', 0.8)).toBeGreaterThanOrEqual(0.25);
+  it('(c) σ_s is not overconfident (≈ 100 % within 2σ at shot 14) and the gate is honest (≈ 86 % within β when first reached)', () => {
+    expect(rates.c_cover2, msg('c_cover2', 0.95, 'floor')).toBeGreaterThanOrEqual(0.95);
+    expect(rates.c_gate_in_beta, msg('c_gate_in_beta', 0.75, 'floor')).toBeGreaterThanOrEqual(0.75);
+  });
+  it('(d) with 20 % channeling, σ_s ≤ 0.08 gate, err < 0.08: within 11 ≈ 44 %, within 14 ≈ 60 %', () => {
+    expect(rates.d11, msg('d11', 0.8)).toBeGreaterThanOrEqual(0.35);
+    expect(rates.d14, msg('d14', 0.8)).toBeGreaterThanOrEqual(0.5);
   });
   it('(e) 30-day drift bias < 0.05: plan ≥ 90 %, measured ≈ 89 %', () => {
     expect(rates.e, msg('e', 0.9)).toBeGreaterThanOrEqual(0.8);
@@ -157,6 +182,7 @@ describe('convergence suite: regression floors (measured 2026-10-18, see README)
 });
 
 describe('convergence suite: plan targets', () => {
+  // (c) and (d) stay at the plan's σ_s ≤ 0.06 gate (measured ≈ 8 % within 9, ≈ 5 % within 11).
   it.fails('all plan targets at once (remove the fails marker when this passes)', () => {
     expect(rates.a, msg('a', 0.9)).toBeGreaterThanOrEqual(0.9);
     expect(rates.a_miscount, msg('a_miscount', 0.9)).toBeGreaterThanOrEqual(0.9);

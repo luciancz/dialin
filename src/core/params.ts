@@ -190,7 +190,16 @@ export const RULES = {
   beta: 0.07,
   betaRoute: 0.14,
   setpointSdRoute: 0.1,
-  setpointSdConverged: 0.06,
+  /**
+   * "Dialled in" (row 11) and RPM-lever (row 9) gate on σ_s. Plan: 0.06. Retuned to 0.08 on
+   * 2026-10-18 (README "Convergence suite", 200-seed simulator): at one tasting per day the
+   * bean-age forgetting (0.02/√day) holds σ_s near 0.065–0.07, so 0.06 sits under the floor
+   * and was reached within 14 rated shots in 32 % of bags. σ_s is conservative there (the
+   * mean is within 1σ of the balanced flow in ~90 % of bags), and at the first σ_s ≤ 0.08 the
+   * median error is 0.027 with 86 % inside β. 0.08 also equals SETPOINT.thompsonSd, so
+   * exploration stops where "dialled in" starts. Must stay below setpointSdRoute.
+   */
+  setpointSdConverged: 0.08,
   freshnessDays: { light: 5, medium_light: 5, medium: 3, medium_dark: 2, dark: 2, unknown: 3 },
   /** Freshness gate still allows a half grind step when far off band. */
   freshnessOverrideLn: 0.25,
@@ -233,6 +242,12 @@ export const SETPOINT = {
   maxDoseDiffG: 0.3,
   minLnFlowDiff: 0.04,
   sliderScale: 0.1,
+  /**
+   * Slider pseudo-likelihood floor (plan). One tasting moves the odds between two setpoints by
+   * at most 1/floor = 4. Tried 2026-10-18 and not applied: floor 0.15 with exponent
+   * (1 + |v|)/4 (odds ≤ 6.7) gained 6 pp on scenario c and 3 pp on d within 14 rated shots at
+   * the 0.06 gate, too little to justify trusting a single slider more (README).
+   */
   sliderFloor: 0.25,
   balancedMinOverall: 7,
   forgetPerDaySd: 0.02,

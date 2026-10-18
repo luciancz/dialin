@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { SETPOINT } from '../../src/core/params';
+import { mulberry32 } from '../../src/core/math/rng';
+import { RULES, SETPOINT } from '../../src/core/params';
 import {
   applyTasting,
   chooseTarget,
@@ -12,6 +13,8 @@ import {
   updatePreference,
   updateSlider,
 } from '../../src/core/setpoint/grid';
+import { tasteSlider } from '../../src/core/sim/taste';
+import { effectiveSetpoint, sampleTruth } from '../../src/core/sim/truth';
 
 const mu0 = 0.65;
 
@@ -37,6 +40,52 @@ describe('setpoint posterior', () => {
     expect(bitter.mean).toBeGreaterThan(mu0 + 0.02);
     const sour3 = summary(updateSlider(sp, y, -3));
     expect(sour3.mean).toBeLessThan(sour.mean);
+  });
+
+  it('the simulated taster follows the sign test: fast or short reads sour, sliders move toward the truth', () => {
+    const rng = mulberry32(5);
+    const t = sampleTruth(rng);
+    const bal = effectiveSetpoint(t, t.rStar);
+    for (const y of [bal + 0.2, bal - 0.2]) {
+      const v = tasteSlider(t, y, t.rStar, rng);
+      expect(Math.sign(v)).toBe(y > bal ? -1 : 1);
+      const after = summary(updateSlider(initSetpoint(y), y, v)).mean;
+      expect(Math.abs(after - bal)).toBeLessThan(Math.abs(y - bal));
+    }
+    expect(tasteSlider(t, t.sStar, t.rStar - 1, rng)).toBeLessThan(0);
+  });
+
+  it('one tasting cannot collapse the posterior', () => {
+    // The slider floor bounds how far one tasting moves the odds between two setpoints.
+    const y = mu0;
+    for (const v of [-3, -2, -1, 1, 2, 3]) {
+      const ls = initSetpoint(mu0).grid.map((s) => sliderLikelihood(s, y, v));
+      expect(Math.max(...ls) / Math.min(...ls)).toBeLessThanOrEqual(
+        1 / SETPOINT.sliderFloor + 1e-9,
+      );
+    }
+    // From the prior, no single slider or preference shrinks σ_s by more than 40 % (measured
+    // worst case 2026-10-18: slider 12 %, preference 33 %), so the converged gate needs several
+    // tastings and a lapse or a mis-set slider can be outvoted.
+    const sp = initSetpoint(mu0);
+    const s0 = summary(sp);
+    let minRatio = 1;
+    for (const dy of [-0.3, -0.2, -0.1, -0.05, 0, 0.05, 0.1, 0.2, 0.3]) {
+      for (const v of [-3, -2, -1, 1, 2, 3]) {
+        minRatio = Math.min(minRatio, summary(updateSlider(sp, mu0 + dy, v)).sd / s0.sd);
+      }
+      for (const d of [0.04, 0.1, 0.2, 0.3]) {
+        for (const vs of ['better', 'worse', 'same'] as const) {
+          minRatio = Math.min(
+            minRatio,
+            summary(updatePreference(sp, mu0 + dy, mu0 + dy + d, vs, 0)).sd / s0.sd,
+            summary(updatePreference(sp, mu0 + dy + d, mu0 + dy, vs, 0)).sd / s0.sd,
+          );
+        }
+      }
+    }
+    expect(minRatio).toBeGreaterThan(0.6);
+    expect(s0.sd * minRatio).toBeGreaterThan(RULES.setpointSdConverged);
   });
 
   it('a "better" after moving slower shifts the setpoint down', () => {

@@ -31,7 +31,8 @@ with its source.
    comparison is valid, otherwise the sour–bitter slider (sign test: sour ⇒ finer), hollow /
    harsh chips, or a `balanced` bump. Forgetting with bean age and on RPM / temperature
    changes. Thompson target while σ_s > 0.08, deterministic ±0.07 probe after two `same`
-   answers, the mean otherwise.
+   answers, the mean otherwise. "Dialled in" (row 11) and the RPM lever (row 9) need
+   σ_s ≤ 0.08 (`RULES.setpointSdConverged`, see Deviations).
 5. **Rules** (`src/core/rules/table.ts`): the twelve rows in order; first match wins. Vetoes:
    step clamps (10 lines, 5 while the gain is unsure, 15 absolute), chirp + 5 floor, gain
    floor 0.010, compass check, RPM floor 700 (500 with opt-in).
@@ -49,7 +50,10 @@ with its source.
 and lapses, channeling), a 1/x flow law, a mis-counted dial (gain ×2), curve synthesis
 through the real feature extractor, and the real replay/recommend loop with a simulated
 user who follows every recommendation. `test/core/convergence.test.ts` runs 200 seeds per
-scenario and asserts the plan's rates.
+scenario and asserts the plan's rates. The simulated taster uses the app's sign convention:
+a shot faster than the balanced flow, or a ratio shorter than the optimum, reads sour. Before
+2026-10-18 both signs were inverted, which made the taste scenarios look far worse than the
+design is (README "Convergence suite").
 
 ## Deviations from the plan text
 
@@ -58,3 +62,9 @@ scenario and asserts the plan's rates.
   against 0.75 × target, since the final yield is unknown when the link never returns.
 - Shots with the same id but differing content on import are kept locally and listed as
   conflicts rather than stored twice, because a duplicate would break the shot ↔ curve link.
+- Taste convergence gate σ_s ≤ 0.08 instead of 0.06 (`RULES.setpointSdConverged`,
+  2026-10-18). At one tasting per day the bean-age forgetting holds σ_s near 0.065–0.07,
+  under the plan's gate. Meanwhile the posterior is conservative, with the mean within 1σ of
+  the balanced flow in about 90 % of simulated bags. The likelihoods, the one-update-per-
+  tasting rule and the sign test are unchanged. A stronger slider likelihood and forgetting
+  on ratio changes were measured and rejected. README "Convergence suite" has the rates.

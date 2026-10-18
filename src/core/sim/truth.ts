@@ -47,12 +47,15 @@ function mu0Ratio(roast: RoastLevel): number {
 }
 
 /**
- * Perceived balance of a cup: 0 is balanced, negative sour, positive bitter. Flow faster than
- * the optimum reads bitter; a ratio shorter than the optimum reads sour (a longer ratio
- * compensates a slightly fast shot, which is what the yield rule relies on).
+ * Perceived balance of a cup: 0 is balanced, negative sour, positive bitter, the app's
+ * slider convention (sour = under-extracted = too fast or too short; the compass veto and
+ * rule rows 5–8 assume it). Flow faster than the optimum reads sour; a ratio shorter than
+ * the optimum reads sour (a longer ratio compensates a slightly fast shot, which is what the
+ * yield rule relies on). Until 2026-10-18 the sign was inverted, so both taste levers pushed
+ * the simulated cup away from balance and the setpoint could only learn from preferences.
  */
 export function perceivedOffset(t: Truth, y: number, ratio: number): number {
-  return y - t.sStar + t.ratioKappa * (t.rStar - ratio);
+  return t.sStar - y + t.ratioKappa * (ratio - t.rStar);
 }
 
 /** The flow that tastes balanced at the given ratio. */

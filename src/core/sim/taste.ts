@@ -31,7 +31,7 @@ function clampSlider(v: number): SliderValue {
   return Math.max(-3, Math.min(3, Math.round(v))) as SliderValue;
 }
 
-/** Slower than the optimum (y < s*) tastes sour (negative), faster tastes bitter. */
+/** Faster than the optimum (y > s*) tastes sour (negative), slower tastes bitter. */
 export function tasteSlider(t: Truth, y: number, ratio: number, rng: Rng): SliderValue {
   const base = (3 * perceivedOffset(t, y, ratio)) / SIM.sliderScale;
   const noise = rng() < 0.3 ? (rng() < 0.5 ? -1 : 1) : 0;
