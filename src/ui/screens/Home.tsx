@@ -1,7 +1,42 @@
+import { modelSummary, setpointView } from '../../app/recommender';
 import { app } from '../../app/state';
+import { RULES } from '../../core/params';
 import { formatDial } from '../../core/units';
+import { PosteriorBar } from '../charts/PosteriorBar';
 import { ConnectionPill } from '../components/ConnectionPill';
 import { RecommendationCard } from '../components/RecommendationCard';
+
+function SetpointCard() {
+  const m = modelSummary.value;
+  const sv = setpointView();
+  if (!m || !sv || app.shotsOfBag.value.length === 0) return null;
+  const [mean, sd] = m.setpoint;
+  const found = sd <= RULES.setpointSdConverged;
+  return (
+    <div class="card">
+      <div class="row between">
+        <h3>Taste setpoint</h3>
+        <span class={`badge ${found ? 'ok' : 'probe'}`}>
+          {found ? 'found' : 'searching'} · {Math.exp(mean).toFixed(2)} g/s ±{' '}
+          {(sd * 100).toFixed(0)} %
+        </span>
+      </div>
+      <PosteriorBar
+        posterior={sv.posterior}
+        rated={sv.rated}
+        predicted={app.lastRecommendation.value?.predictedLnFlow ?? null}
+      />
+      <p class="muted small">
+        Blue dots sour, amber bitter, grey balanced or unrated; orange line = predicted flow of the
+        next shot. Gain ≈{' '}
+        {m.secPerLine
+          ? `${m.secPerLine[0].toFixed(1)} ± ${m.secPerLine[1].toFixed(1)} s/line`
+          : '—'}{' '}
+        · flow model {Math.min(4, m.learnableShots)}/4 shots.
+      </p>
+    </div>
+  );
+}
 
 export function daysSince(iso: string): number {
   return Math.floor((Date.now() - Date.parse(iso)) / 86_400_000);
@@ -69,6 +104,7 @@ export function Home() {
         </div>
       )}
       <RecommendationCard rec={app.lastRecommendation.value} />
+      <SetpointCard />
       <a
         href="#/shot"
         class="btn primary huge"
