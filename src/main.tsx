@@ -1,4 +1,5 @@
 import { render } from 'preact';
+import './app/recommender';
 import { app } from './app/state';
 import { swState } from './app/sw';
 import { diag } from './diag/log';

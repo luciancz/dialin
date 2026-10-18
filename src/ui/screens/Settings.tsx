@@ -1,9 +1,16 @@
 /** Settings / Diagnostics / Backup. */
 import { signal } from '@preact/signals';
 import { deliverJson, readFileAsText } from '../../app/exportDelivery';
+import {
+  modelSummary,
+  type RerunRow,
+  refreshModelSummary,
+  rerunRecommendations,
+} from '../../app/recommender';
 import { app } from '../../app/state';
 import type { SimOptions, TransportKind } from '../../app/transports';
 import type { RawFrameRow } from '../../core/types';
+import { formatDial } from '../../core/units';
 import { buildExport, exportFileName, importFile, type MergePlan } from '../../data/exportImport';
 import { validateExportFile } from '../../data/validate';
 import { diag } from '../../diag/log';
@@ -75,6 +82,83 @@ async function applyImport(): Promise<void> {
   app.toast(
     'info',
     `Imported: ${Object.values(plan.adds).reduce((a, b) => a + b, 0)} added, ${Object.values(plan.updates).reduce((a, b) => a + b, 0)} updated, ${plan.conflicts.length} conflicts.`,
+  );
+}
+
+const rerunRows = signal<RerunRow[] | null>(null);
+
+function ModelCard() {
+  const m = modelSummary.value;
+  const rows = rerunRows.value;
+  return (
+    <div class="card">
+      <h3>Model (replayed from stored shots)</h3>
+      {m ? (
+        <p class="small mono">
+          k_grind {m.kGrind[0].toFixed(4)} ± {m.kGrind[1].toFixed(4)} ln/line (≈{' '}
+          {m.secPerLine?.[0].toFixed(1)} ± {m.secPerLine?.[1].toFixed(1)} s/line) · k_rpm{' '}
+          {m.kRpm[0].toFixed(3)} ± {m.kRpm[1].toFixed(3)} · k_dose {m.kDose[0].toFixed(3)} ±{' '}
+          {m.kDose[1].toFixed(3)}
+          <br />
+          bag intercept {m.aBag ? `${m.aBag[0].toFixed(2)} ± ${m.aBag[1].toFixed(2)}` : '—'} ·
+          setpoint{' '}
+          {Number.isNaN(m.setpoint[0])
+            ? '—'
+            : `${Math.exp(m.setpoint[0]).toFixed(2)} g/s ± ${(m.setpoint[1] * 100).toFixed(0)} %`}{' '}
+          · {m.learnableShots} learnable shots · {m.predictedInBand} predicted in band
+        </p>
+      ) : (
+        <p class="muted small">No model yet.</p>
+      )}
+      <div class="row">
+        <button type="button" class="small" onClick={() => void refreshModelSummary()}>
+          Replay now
+        </button>
+        <button
+          type="button"
+          class="small"
+          onClick={() => {
+            void rerunRecommendations().then((r) => {
+              rerunRows.value = r;
+            });
+          }}
+        >
+          Re-run recommendations (dev)
+        </button>
+      </div>
+      {rows ? (
+        <table class="small" style="margin-top:6px">
+          <thead>
+            <tr>
+              <th>shot</th>
+              <th>stored</th>
+              <th>recomputed</th>
+              <th>same</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.shotId}>
+                <td>{new Date(r.at).toLocaleString()}</td>
+                <td>
+                  {r.stored
+                    ? `${r.stored.lever} → ${formatDial(r.stored.next.grind.dialPos)} ${r.stored.next.grind.rpm} ${r.stored.next.targetYieldG} g`
+                    : '—'}
+                </td>
+                <td>
+                  {r.recomputed
+                    ? `${r.recomputed.lever} → ${formatDial(r.recomputed.next.grind.dialPos)} ${r.recomputed.next.grind.rpm} ${r.recomputed.next.targetYieldG} g`
+                    : '—'}
+                </td>
+                <td class={r.identical ? 'ok' : 'warn'}>
+                  {r.identical ? 'yes' : r.stored ? 'no' : 'n/a'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : null}
+    </div>
   );
 }
 
@@ -315,6 +399,8 @@ export function Settings() {
           <a href="#/onboarding">Re-run onboarding</a> · <a href="#/hardware">Hardware epochs</a>
         </p>
       </div>
+
+      <ModelCard />
 
       <div class="card">
         <h3>Diagnostics</h3>

@@ -242,6 +242,7 @@ class AppState {
         grind: { ...this.nextSettings.value.grind, rpm: bag.rpm, rpmConfirmed: false },
       };
     }
+    await this.onBagLoaded?.();
   }
 
   mustRepo(): Repo {
@@ -545,6 +546,12 @@ class AppState {
 
   /** Hook for the recommender (M2): called after each saved shot. */
   afterShotSaved: (shot: Shot) => Promise<void> = async () => {};
+
+  /** Hook for the recommender: called after the current bag's rows were (re)loaded. */
+  onBagLoaded: (() => Promise<void>) | null = null;
+
+  /** Hook for the recommender: a hardware epoch was opened; recompute the card. */
+  afterEpochChanged: (() => Promise<void>) | null = null;
 
   /**
    * Hook for the setpoint layer (M3): why a better/worse comparison with the previous shot
