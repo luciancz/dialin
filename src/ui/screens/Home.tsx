@@ -1,3 +1,4 @@
+import { isDemo } from '../../app/mode';
 import { modelSummary, setpointView } from '../../app/recommender';
 import { app } from '../../app/state';
 import { RULES } from '../../core/params';
@@ -115,6 +116,12 @@ export function Home() {
       <p class="muted small" style="margin-top:12px">
         Scale in Timer mode, BOOKOO N closed. Tap START as you lift the lever.
       </p>
+      {isDemo() ? null : (
+        <div class="card">
+          <b>No machine handy?</b> <a href="#/demo">Try the simulation</a>: a hidden grinder, scale
+          and palate to dial in, with its own data.
+        </div>
+      )}
     </div>
   );
 }

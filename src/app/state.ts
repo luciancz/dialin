@@ -45,6 +45,7 @@ import {
   timerDriftPct,
 } from '../shot/machine';
 import { RingBuffer } from '../shot/ringBuffer';
+import { DEMO_DB_NAME, isDemo } from './mode';
 import {
   defaultSimOptions,
   type MadeTransport,
@@ -124,7 +125,8 @@ class AppState {
 
   async init(): Promise<void> {
     if (this.ready.value) return;
-    this.db = await openDialinDb();
+    // Demo mode has its own database, so simulated shots never mix with real ones.
+    this.db = await openDialinDb(isDemo() ? DEMO_DB_NAME : undefined);
     this.repo = new Repo(this.db);
     await this.ensureDefaults();
     await this.reloadAll();

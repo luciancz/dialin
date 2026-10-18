@@ -3,6 +3,7 @@
  * app.recorder (the pure reducer's state) and app.pending.
  */
 import { signal } from '@preact/signals';
+import { isDemo } from '../../app/mode';
 import { navigate } from '../../app/router';
 import { app } from '../../app/state';
 import type { Chip, Rating, SliderValue, TempSwitch, VsPrevious } from '../../core/types';
@@ -442,7 +443,7 @@ function RateSheet() {
     await app.saveShot(rating);
     resetRating();
     deviation.value = null;
-    navigate('/');
+    navigate(isDemo() ? '/demo' : '/');
   };
   return (
     <div>

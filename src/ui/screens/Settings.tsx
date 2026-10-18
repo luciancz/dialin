@@ -276,7 +276,9 @@ export function Settings() {
           </label>
         ) : null}
         <p class="muted small">
-          Probe the browser's Bluetooth support on the <a href="#/probe">Probe</a> screen.
+          Probe the browser's Bluetooth support on the <a href="#/probe">Probe</a> screen. To try
+          everything with a hidden simulated grinder and palate and separate data, open the{' '}
+          <a href="#/demo">Simulation</a>.
         </p>
       </div>
 

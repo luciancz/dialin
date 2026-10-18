@@ -25,6 +25,8 @@ export interface SimOptions {
   channelProbability: number;
   seed: number;
   persona?: 'normal' | 'auto_mode' | 'disconnect_12s' | 'auto_off_soon' | undefined;
+  /** Demo mode: plateau flow read at each lever lift (the hidden world at the current dial). */
+  plateauGpsFn?: (() => number) | undefined;
 }
 
 export const defaultSimOptions: SimOptions = {
@@ -74,7 +76,7 @@ export function makeTransport(
       const channel = rng() < sim.channelProbability;
       const spec = randomSpec(
         rng,
-        sim.plateauGps * Math.exp(uniform(rng, -0.05, 0.05)),
+        (sim.plateauGpsFn?.() ?? sim.plateauGps) * Math.exp(uniform(rng, -0.05, 0.05)),
         sim.stopAtG + 15,
         {
           channel,

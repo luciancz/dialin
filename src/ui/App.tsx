@@ -1,8 +1,11 @@
+import { exitDemo } from '../app/demo';
+import { isDemo } from '../app/mode';
 import { match, route } from '../app/router';
 import { app } from '../app/state';
 import { Toasts } from './components/Toasts';
 import { BagDetail } from './screens/BagDetail';
 import { Beans } from './screens/Beans';
+import { Demo } from './screens/Demo';
 import { Hardware } from './screens/Hardware';
 import { History } from './screens/History';
 import { Home } from './screens/Home';
@@ -31,6 +34,7 @@ export function App() {
       </div>
     );
   } else if (path === '/probe') screen = <Probe />;
+  else if (path === '/demo') screen = <Demo />;
   else if (path === '/shot') screen = <Shot />;
   else if (path === '/beans') screen = <Beans />;
   else if (bagMatch) screen = <BagDetail id={bagMatch.id ?? ''} />;
@@ -41,6 +45,16 @@ export function App() {
   else screen = <Home />;
   return (
     <>
+      {isDemo() ? (
+        <div class="demo-banner">
+          <a href="#/demo" class="demo-link">
+            Simulation: simulated grinder, scale and taste, separate data
+          </a>
+          <button type="button" class="small" onClick={exitDemo}>
+            Leave
+          </button>
+        </div>
+      ) : null}
       {screen}
       <Toasts />
       <nav class="tabs">
