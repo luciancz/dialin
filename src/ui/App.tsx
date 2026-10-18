@@ -1,8 +1,12 @@
-import { route } from '../app/router';
+import { match, route } from '../app/router';
 import { app } from '../app/state';
 import { Toasts } from './components/Toasts';
+import { BagDetail } from './screens/BagDetail';
 import { Beans } from './screens/Beans';
+import { Hardware } from './screens/Hardware';
+import { History } from './screens/History';
 import { Home } from './screens/Home';
+import { Onboarding } from './screens/Onboarding';
 import { Probe } from './screens/Probe';
 import { Settings } from './screens/Settings';
 import { Shot } from './screens/Shot';
@@ -11,12 +15,14 @@ const tabs: [string, string][] = [
   ['/', 'Home'],
   ['/shot', 'Shot'],
   ['/beans', 'Beans'],
+  ['/history', 'History'],
   ['/settings', 'Settings'],
 ];
 
 export function App() {
   const path = route.value.path;
   let screen: preact.JSX.Element;
+  const bagMatch = match(path, '/bag/:id');
   if (!app.ready.value && path !== '/probe') {
     screen = (
       <div>
@@ -27,6 +33,10 @@ export function App() {
   } else if (path === '/probe') screen = <Probe />;
   else if (path === '/shot') screen = <Shot />;
   else if (path === '/beans') screen = <Beans />;
+  else if (bagMatch) screen = <BagDetail id={bagMatch.id ?? ''} />;
+  else if (path === '/history') screen = <History />;
+  else if (path === '/hardware') screen = <Hardware />;
+  else if (path === '/onboarding') screen = <Onboarding />;
   else if (path === '/settings') screen = <Settings />;
   else screen = <Home />;
   return (
