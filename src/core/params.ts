@@ -1,0 +1,281 @@
+/**
+ * Every tunable constant in one place, each with the source it came from.
+ * Units: grams, seconds, g/s, ln(g/s), dial lines, RPM, days. "plan §X" refers to the
+ * approved design (docs/ALGORITHM.md summarises it).
+ */
+
+export const APP_VERSION = '0.1.0';
+
+/** Recorder (shot state machine). */
+export const REC = {
+  /** ARMED requires |Δw| < 0.3 g over 2 s (stable cup). */
+  stableDeltaG: 0.3,
+  stableWindowMs: 2000,
+  /** Late tap: weight already rising > 0.5 g in the last 2 s at the tap → send 04, splice. */
+  lateTapRiseG: 0.5,
+  lateTapWindowMs: 2000,
+  /** Forgot tap: in ARMED, > 2 g over 3 s with flow > 0.4 g/s → prompt. */
+  forgotTapRiseG: 2,
+  forgotTapWindowMs: 3000,
+  forgotTapFlowGps: 0.4,
+  /** Timer-mode verification: timer still 0 after this many frames → modeHint 'auto'. */
+  timerVerifyFrames: 5,
+  /** Frames in the first 400 ms with |g| > 2 are tare settling and ignored. */
+  tareSettleMs: 400,
+  tareSettleG: 2,
+  /** Auto-end: t ≥ 10 s, w ≥ 0.5·target, derived flow < 0.15 g/s for 3 s; or w ≥ target + 3 g. */
+  autoEndMinS: 10,
+  autoEndMinYieldFrac: 0.5,
+  autoEndFlowGps: 0.15,
+  autoEndQuietMs: 3000,
+  autoEndOvershootG: 3,
+  /** Pre-alert at target − tailEstimate (default 1.0 g, later the bag's mean tail). */
+  tailEstimateDefaultG: 1.0,
+  /** Drip window after stop, then final yield = median of the last 1 s. */
+  settleMs: 6000,
+  finalYieldMedianMs: 1000,
+  /** Disconnect while RUNNING/ENDING: keep the app clock, reconnect each 1 s, give up at 20 s. */
+  recoverRetryMs: 1000,
+  recoverGiveUpMs: 20_000,
+  /** Aborted shots under 5 g are discarded rather than stored. */
+  abortDiscardG: 5,
+  /** Frame ring kept while connected. */
+  ringMs: 120_000,
+  /** Gap threshold between frames for curve masking. */
+  gapMs: 400,
+  /** Derived-flow window used by the recorder for auto-end (1 s regression). */
+  liveFlowWindowMs: 1000,
+} as const;
+
+/** ScaleClient. */
+export const CLIENT = {
+  staleMs: 1500,
+  lostMs: 5000,
+  backoffMs: [500, 1000, 2000, 4000, 8000] as readonly number[],
+  backoffCapMs: 15_000,
+  giveUpMs: 60_000,
+  /** While a shot is RUNNING keep retrying for the shot duration + 30 s. */
+  runningExtraMs: 30_000,
+  /** Wait at most 2 s for the first weight frame after subscribing. */
+  firstFrameMs: 2000,
+  /** Delay between smoothing-off and auto-off commands on connect. */
+  commandGapMs: 150,
+  autoOffMinutes: 30,
+  autoOffBannerMs: 3 * 60_000,
+  batteryWarnPct: 20,
+  /** Weight changes > 0.2 g count as activity for the app-side auto-off clock. */
+  activityDeltaG: 0.2,
+} as const;
+
+/** Curve resampling and feature extraction (plan "Feature extraction"). */
+export const FEAT = {
+  gridMs: 100,
+  sgWindow: 11,
+  /** 'noisy' when the RMS residual of raw weight around its local quadratic fit exceeds this (g). */
+  noisyResidualG: 0.15,
+  firstDripG: 0.5,
+  firstDripFlowGps: 0.2,
+  firstDripConsecutive: 5,
+  plateauLo: 0.25,
+  plateauHi: 0.75,
+  lateLo: 0.8,
+  lateHi: 0.95,
+  jumpStartAfterDripS: 2,
+  jumpWindowHiFrac: 0.9,
+  dipRatio: 0.7,
+  dipRecoverRatio: 0.9,
+  dipMinS: 0.5,
+  dipMedianWindowS: 3,
+  spikeGps: 0.7,
+  earlyDripS: 4,
+  lateDripS: 15,
+  chokedAtS: 15,
+  chokedFlowGps: 0.5,
+  chokedWeightG: 5,
+  blondRiseRel: 0.5,
+  lowInfoPlateauS: 6,
+  lowInfoYieldG: 20,
+  validMinYieldG: 10,
+  validTimeS: [10, 90] as const,
+  validGridFraction: 0.6,
+  validMinPlateauS: 2,
+  /** curveChannelScore weights (plan table). */
+  channelW: { jump: 0.5, dips: 0.3, lateSlope: 0.2, earlyDripLight: 0.2 },
+} as const;
+
+/** Flow model priors and process noise (plan "Flow model"). */
+export const MODEL = {
+  /** ln per line, positive because a higher dial = coarser = faster. 1–1.7 s per 5 µm line at ~30 s. */
+  kGrindPrior: { mean: 0.045, sd: 0.03 },
+  /** per 100 RPM; sign unknown on stock flats (one conical datum ≈ +0.135 is inside 2σ). */
+  kRpmPrior: { mean: 0, sd: 0.08 },
+  /** per gram of dose; 1–3 s per gram at 30 s. Never reset by epoch events. */
+  kDosePrior: { mean: -0.06, sd: 0.04 },
+  /** First bag of an epoch. */
+  aFirstSd: 0.5,
+  /** Later bags: 0.25² + sd(k_g)²·(ΔL_ref)². */
+  aLaterSd: 0.25,
+  /** Measurement noise of ln(plateauFlow); measured in M1 (acceptance CV ≤ 10 %). */
+  sigmaY: 0.07,
+  /** Reference bean age for the intercept definition. */
+  refAgeDays: 14,
+  /** Offset from mean-after-first-drip flow to plateau flow (to be re-measured). */
+  plateauOffsetLn: 0.08,
+  /** EAF time windows: dose 18 g × ratio, mid-window seconds, first drip ≈ 8 s. */
+  roastDefaults: {
+    light: { ratio: 2.3, tMidS: 31.5 },
+    medium_light: { ratio: 2.1, tMidS: 27.5 },
+    medium: { ratio: 2.0, tMidS: 27.5 },
+    medium_dark: { ratio: 1.9, tMidS: 26 },
+    dark: { ratio: 1.7, tMidS: 24 },
+    unknown: { ratio: 2.0, tMidS: 27.5 },
+  },
+  firstDripAssumedS: 8,
+  doseDefaultG: 18,
+  /** Metadata offsets on a later bag's intercept prior. */
+  deltaMeta: { light: 0.1, dark: -0.1, naturalLike: -0.08, decaf: -0.1, filter: -0.05 },
+  ridgeMinBags: 4,
+  ridgeMinShotsPerBag: 3,
+  ridgeLambda: 1,
+  ridgeMinSd: 0.15,
+  /** Bean-age drift of ln flow per day (33 s → 27 s over 4 weeks), 0 while frozen. */
+  driftYoung: 0.007,
+  driftOld: 0.002,
+  driftAgeSplitDays: 21,
+  /** Process noise sd per √day on a_b. */
+  qYoung: 0.03,
+  qMid: 0.02,
+  qOld: 0.01,
+  qFrozen: 0.005,
+  qAgeYoungDays: 10,
+  qAgeMidDays: 21,
+  /** Added variance on a thawed/opened storage event. */
+  thawVar: 0.05 ** 2,
+  /** k_g, k_r variance growth per day (sd 0.010 → 0.012 over about a year). */
+  kDriftVarPerDay: 1e-7,
+  /** Robust update: Huber thresholds (r1, r2) by innovation sign. Channeling only speeds shots up. */
+  huberNeg: [2, 4] as const,
+  huberPos: [1.5, 3] as const,
+  /** Base weight multipliers. */
+  wChannel: 0.3,
+  wFreshness: 0.5,
+  wLowInfo: 1 / 1.5 ** 2,
+  wEarlyChannel: 0.5,
+  earlyChannelScore: 0.3,
+  earlyChannelShots: 3,
+  /** Escape hatch after two consecutive skips: inflate P[a_b] to 0.5². */
+  reanchorSkips: 2,
+  reanchorSd: 0.5,
+  /** Epoch-event variances. */
+  cleaningSd: 0.25,
+  reZeroSd: 0.25,
+  washerSd: 0.5,
+  springSd: 0.5,
+  recountSd: 0.5,
+  newBurrsSd: 0.5,
+  /** A 0.1 mm washer ≈ 20 nominal lines (finer at the same reading). */
+  washerLinesPer: 20,
+  /** Inversion floor on k_g and step clamps. */
+  kGrindFloor: 0.01,
+  stepMaxLines: 10,
+  probeStepLines: 5,
+  stepAbsMaxLines: 15,
+  kGrindSdConverged: 0.012,
+  /** Lines above the chirp where the model may recommend. */
+  chirpMarginLines: 5,
+} as const;
+
+/** Rule table thresholds (plan "Rule layer"). */
+export const RULES = {
+  beta: 0.07,
+  betaRoute: 0.14,
+  setpointSdRoute: 0.1,
+  setpointSdConverged: 0.06,
+  freshnessDays: { light: 5, medium_light: 5, medium: 3, medium_dark: 2, dark: 2, unknown: 3 },
+  /** Freshness gate still allows a half grind step when far off band. */
+  freshnessOverrideLn: 0.25,
+  ratioCap: { light: 2.8, medium: 2.3, dark: 2.0 },
+  ratioFloor: { light: 1.8, medium: 1.6, dark: 1.4 },
+  yieldStepG: 2,
+  yieldBigStepG: 4,
+  /** RPM lever. */
+  rpmHold: 1000,
+  rpmStep: 200,
+  rpmMin: 700,
+  rpmMax: 1400,
+  rpmOptInMin: 500,
+  rpmMinShotsBetween: 3,
+  rpmTextureSlider: 2,
+  /** Temperature card: ≥ 4 rated in-band shots with mean |v| ≥ 1.5, once per bag. */
+  tempMinRated: 4,
+  tempMeanSlider: 1.5,
+  /** Confidence words from Φ(β/s_p) − Φ(−β/s_p). */
+  firm: 0.7,
+  probable: 0.4,
+  /** Outlier gate on the last shot (r > 4) blocks changes until re-anchored. */
+  outlierR: 4,
+  /** Lookback for rule evaluation. */
+  lookback: 5,
+} as const;
+
+/** Preference-based setpoint search (plan "Preference-based setpoint search"). */
+export const SETPOINT = {
+  gridHalfWidth: 0.6,
+  gridStep: 0.01,
+  priorSd: 0.2,
+  utilityW: 0.15,
+  jnd: 0.1,
+  tauBase: 0.5,
+  tauPerDay: 0.25,
+  lapse: 0.1,
+  /** Validity of a better/worse comparison. */
+  maxLnYieldDiff: 0.1,
+  maxDoseDiffG: 0.3,
+  minLnFlowDiff: 0.04,
+  sliderScale: 0.1,
+  sliderFloor: 0.25,
+  balancedMinOverall: 7,
+  forgetPerDaySd: 0.02,
+  forgetOnLeverChangeSd: 0.08,
+  thompsonSd: 0.08,
+  thompsonClamp: 0.12,
+  probeOffset: 0.07,
+  /** Roaster recipe blends 50/50 into the prior mean. */
+  recipeWeight: 0.5,
+} as const;
+
+/** Simulator hidden-truth ranges (plan "Simulator"). */
+export const SIM = {
+  kGrind: [0.02, 0.09] as const,
+  kRpm: [-0.08, 0.08] as const,
+  kDose: [-0.1, -0.03] as const,
+  aSd: 0.3,
+  drift: [0.004, 0.01] as const,
+  setpointSd: 0.15,
+  tasteTau: [0.3, 0.6] as const,
+  tasteLapse: 0.15,
+  channelProb: [0.15, 0.25] as const,
+  channelLn: [0.15, 0.4] as const,
+  spikeGps: 0.9,
+  spikeS: 1.5,
+  dips: [1, 3] as const,
+  firstDripS: [6, 10] as const,
+  rampS: 3,
+  lateRise: 0.02,
+  noiseG: 0.05,
+  truncG: 0.1,
+  timerSlow: 0.007,
+  tailG: [1, 2] as const,
+  tailS: [4, 5] as const,
+  frameMs: 100.7,
+  frameJitterMs: 30,
+  sliderScale: 0.25,
+} as const;
+
+/** Backup nags. */
+export const BACKUP = {
+  nagShots: 5,
+  nagDays: 7,
+  redDays: 14,
+  rawRecordingsKept: 5,
+} as const;

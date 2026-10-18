@@ -1,4 +1,5 @@
 import { render } from 'preact';
+import { app } from './app/state';
 import { swState } from './app/sw';
 import { diag } from './diag/log';
 import { App } from './ui/App';
@@ -6,6 +7,9 @@ import './ui/styles.css';
 
 const root = document.getElementById('app');
 if (root) render(<App />, root);
+void app.init().catch((err: unknown) => {
+  diag.log('error', `database init failed: ${String(err)}`);
+});
 
 // Service worker: a Windows-only nicety. WKWebView (Bluefy) has no supported path, so
 // registration failure is tolerated and recorded; the app never depends on it.

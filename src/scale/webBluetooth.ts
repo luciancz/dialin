@@ -24,6 +24,25 @@ export interface WebBluetoothOptions {
   pollMs?: number;
 }
 
+export interface WriteCapabilities {
+  hasWriteValueWithResponse: boolean;
+  hasWriteValue: boolean;
+  hasWriteValueWithoutResponse: boolean;
+  propertyWriteWithoutResponse: boolean;
+}
+
+/**
+ * writeValueWithResponse when it exists, else legacy writeValue, else
+ * writeValueWithoutResponse only when the characteristic property allows it and the other
+ * two are absent (FF12 is read/write/notify without write-without-response in the nRF dump).
+ */
+export function pickWriteMethod(c: WriteCapabilities): WriteMethod | null {
+  if (c.hasWriteValueWithResponse) return 'withResponse';
+  if (c.hasWriteValue) return 'legacy';
+  if (c.hasWriteValueWithoutResponse && c.propertyWriteWithoutResponse) return 'withoutResponse';
+  return null;
+}
+
 export function hasWebBluetooth(): boolean {
   return typeof navigator !== 'undefined' && typeof navigator.bluetooth !== 'undefined';
 }
@@ -193,14 +212,12 @@ export class WebBluetoothTransport implements Transport {
   }
 
   private chooseWriteMethod(c: BluetoothRemoteGATTCharacteristic): void {
-    const hasWithResponse = typeof c.writeValueWithResponse === 'function';
-    const hasLegacy = typeof c.writeValue === 'function';
-    const hasWithout =
-      typeof c.writeValueWithoutResponse === 'function' && c.properties?.writeWithoutResponse;
-    if (hasWithResponse) this.writeMethod = 'withResponse';
-    else if (hasLegacy) this.writeMethod = 'legacy';
-    else if (hasWithout) this.writeMethod = 'withoutResponse';
-    else this.writeMethod = null;
+    this.writeMethod = pickWriteMethod({
+      hasWriteValueWithResponse: typeof c.writeValueWithResponse === 'function',
+      hasWriteValue: typeof c.writeValue === 'function',
+      hasWriteValueWithoutResponse: typeof c.writeValueWithoutResponse === 'function',
+      propertyWriteWithoutResponse: Boolean(c.properties?.writeWithoutResponse),
+    });
     this.info.caps.writeMethod = this.writeMethod ?? 'none';
     this.info.caps.ff12Write = Boolean(c.properties?.write);
     this.info.caps.ff12WriteWithoutResponse = Boolean(c.properties?.writeWithoutResponse);
