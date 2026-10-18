@@ -13,6 +13,7 @@ import type {
   Rating,
   RawRecording,
   Recommendation,
+  RpmCalibrationRun,
   SensorSample,
   Settings,
   Shot,
@@ -35,6 +36,7 @@ export interface DialinDB extends DBSchema {
   rawRecordings: { key: Id; value: RawRecording; indexes: { shotId: Id } };
   sensorSamples: { key: Id; value: SensorSample; indexes: { shotId: Id } };
   settings: { key: 'settings'; value: Settings };
+  rpmRuns: { key: Id; value: RpmCalibrationRun; indexes: { epochId: Id; bagId: Id } };
 }
 
 export type Db = IDBPDatabase<DialinDB>;
@@ -66,9 +68,15 @@ export function openDialinDb(name = DB_NAME): Promise<Db> {
         const sensors = db.createObjectStore('sensorSamples', { keyPath: 'id' });
         sensors.createIndex('shotId', 'shotId');
         db.createObjectStore('settings', { keyPath: 'id' });
-        return;
       }
-      // Later versions: run the shared row migrations over the live stores.
+      if (oldVersion < 2) {
+        const runs = db.createObjectStore('rpmRuns', { keyPath: 'id' });
+        runs.createIndex('epochId', 'epochId');
+        runs.createIndex('bagId', 'bagId');
+      }
+      // Existing databases: run the shared row migrations over the live stores. A fresh
+      // install (oldVersion 0) has no rows to migrate.
+      if (oldVersion < 1) return;
       for (const store of storesNeedingMigration(oldVersion)) {
         const os = tx.objectStore(store as never);
         const rows = (await os.getAll()) as unknown as Record<string, unknown>[];

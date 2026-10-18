@@ -11,6 +11,7 @@ import type {
   Rating,
   RawRecording,
   Recommendation,
+  RpmCalibrationRun,
   Settings,
   Shot,
   ShotQuality,
@@ -204,6 +205,15 @@ export class Repo {
     return this.db.getAll('rawRecordings');
   }
 
+  // ---- RPM calibration runs ----
+  async listRpmRuns(): Promise<RpmCalibrationRun[]> {
+    return (await this.db.getAll('rpmRuns')).filter((r) => !r.deleted);
+  }
+
+  async putRpmRun(r: RpmCalibrationRun): Promise<void> {
+    await this.db.put('rpmRuns', touched(r));
+  }
+
   async counts(): Promise<Record<string, number>> {
     const out: Record<string, number> = {};
     for (const name of [
@@ -216,6 +226,7 @@ export class Repo {
       'quality',
       'recommendations',
       'rawRecordings',
+      'rpmRuns',
     ] as const) {
       out[name] = await this.db.count(name);
     }
@@ -235,6 +246,7 @@ export class Repo {
       'rawRecordings',
       'sensorSamples',
       'settings',
+      'rpmRuns',
     ] as const;
     const tx = this.db.transaction(names, 'readwrite');
     await Promise.all(names.map((n) => tx.objectStore(n).clear()));

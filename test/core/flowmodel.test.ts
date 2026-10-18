@@ -7,11 +7,17 @@ import {
   type BagMeta,
   cloneState,
   diagOf,
+  IDX_KQ,
   initFlowModel,
   kDose,
   kGrind,
+  kRpm,
+  kRpmCurv,
   metaOffsetRidge,
   mu0Roast,
+  N_SHARED,
+  rpmEffect,
+  rpmSlope,
 } from '../../src/core/flowmodel/state';
 import { type Observation, update } from '../../src/core/flowmodel/update';
 import { isPsd, solve } from '../../src/core/math/linalg';
@@ -43,6 +49,92 @@ function obs(over: Partial<Observation> & { y: number; lines: number }): Observa
     ...over,
   };
 }
+
+describe('flow model: RPM slope and curvature', () => {
+  it('has four shared elements; the first bag sits at index 4', () => {
+    const s = initFlowModel('e1');
+    expect(N_SHARED).toBe(4);
+    expect(s.m.length).toBe(4);
+    expect(kRpm(s).mean).toBeCloseTo(MODEL.kRpmPrior.mean, 12);
+    expect(kRpmCurv(s).sd).toBeCloseTo(MODEL.kRpmCurvPrior.sd, 12);
+    const b = addBag(s, 'bag1', meta, 250, day(0));
+    expect(b.index).toBe(4);
+  });
+
+  it('recovers k_r from a fixed-dial L H H L design (700/1300 RPM)', () => {
+    const s = initFlowModel('e1');
+    addBag(s, 'bag1', meta, 250, day(0));
+    for (let i = 0; i < 6; i++)
+      update(s, obs({ lines: 250 + (i % 3) * 5, y: 0.6 + 0.05 * ((i % 3) * 5) }));
+    const kr = -0.03;
+    const rng = mulberry32(5);
+    for (const rpm of [700, 1300, 1300, 700, 700, 1300, 1300, 700]) {
+      const u = (rpm - 1000) / 100;
+      update(s, obs({ lines: 250, rpm, y: 0.6 + kr * u + 0.02 * randn(rng) }));
+    }
+    expect(kRpm(s).mean).toBeCloseTo(kr, 2);
+    expect(kRpm(s).sd).toBeLessThan(0.01);
+    // Symmetric levels keep the curvature near its prior: the slope estimate is not biased by it.
+    expect(Math.abs(kRpmCurv(s).mean)).toBeLessThan(0.005);
+  });
+
+  it('identifies curvature with a third level and predicts the RPM effect with its sd', () => {
+    const s = initFlowModel('e1');
+    addBag(s, 'bag1', meta, 250, day(0));
+    for (let i = 0; i < 6; i++)
+      update(s, obs({ lines: 250 + (i % 3) * 5, y: 0.6 + 0.05 * ((i % 3) * 5) }));
+    const kr = -0.02;
+    const kq = -0.004;
+    for (const rpm of [700, 1300, 1000, 1000, 1300, 700, 1600, 1600, 500, 500]) {
+      const u = (rpm - 1000) / 100;
+      update(s, obs({ lines: 250, rpm, y: 0.6 + kr * u + kq * u * u }));
+    }
+    expect(kRpmCurv(s).mean).toBeLessThan(-0.002);
+    const eff = rpmEffect(s, 5);
+    expect(eff.mean).toBeCloseTo(kr * 5 + kq * 25, 1);
+    expect(eff.sd).toBeGreaterThan(0);
+    const slope = rpmSlope(s, 3);
+    expect(slope.mean).toBeCloseTo(kRpm(s).mean + 2 * kRpmCurv(s).mean * 3, 10);
+  });
+
+  it('invert includes k_r·u + κ·u², so predictAt at the inverted dial hits the target', () => {
+    const s = initFlowModel('e1');
+    addBag(s, 'bag1', meta, 250, day(0));
+    for (let i = 0; i < 6; i++)
+      update(s, obs({ lines: 250 + (i % 3) * 5, y: 0.6 + 0.05 * ((i % 3) * 5) }));
+    s.m[1] = -0.03;
+    s.m[IDX_KQ] = -0.003;
+    const target = 0.62;
+    for (const rpm of [600, 1000, 1400]) {
+      const inv = invert(s, 'bag1', target, rpm, 18, 250, DEFAULT_DIAL_SPEC, null);
+      const atRaw = predictAt(s, 'bag1', inv?.raw ?? 0, rpm, 18);
+      expect(atRaw?.yHat ?? 0).toBeCloseTo(target, 6);
+      expect(inv?.clamped).toBeNull();
+    }
+    const low = invert(s, 'bag1', -2, 1000, 18, 250, DEFAULT_DIAL_SPEC, 248);
+    expect(low?.clamped).toBe('chirp');
+  });
+
+  it('new burrs reset k_g, k_r and κ but keep k_d', () => {
+    const s = initFlowModel('e1');
+    addBag(s, 'bag1', meta, 250, day(0));
+    for (const rpm of [700, 1300, 1000, 1600])
+      update(s, obs({ lines: 250, rpm, doseG: 19, y: 0.5 }));
+    const kd = kDose(s).mean;
+    const s2 = applyEpochEvent(s, {
+      newEpochId: 'e2',
+      kind: 'new_burrs',
+      oldSpec: DEFAULT_DIAL_SPEC,
+      newSpec: DEFAULT_DIAL_SPEC,
+    });
+    expect(kRpm(s2).mean).toBeCloseTo(MODEL.kRpmPrior.mean, 12);
+    expect(kRpm(s2).sd).toBeCloseTo(MODEL.kRpmPrior.sd, 12);
+    expect(kRpmCurv(s2).mean).toBeCloseTo(0, 12);
+    expect(kRpmCurv(s2).sd).toBeCloseTo(MODEL.kRpmCurvPrior.sd, 12);
+    expect(kDose(s2).mean).toBeCloseTo(kd, 12);
+    expect(isPsd(s2.P)).toBe(true);
+  });
+});
 
 describe('flow model', () => {
   it('first-bag prior is ln(Y/(t_mid−8)) + 0.08 (light ≈ 0.65)', () => {

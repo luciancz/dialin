@@ -1,13 +1,14 @@
 /**
  * Prediction at arbitrary settings and inversion for a target ln flow, with the step clamps:
- *   L* = L_ref,b + (y* − a_b − k_r·u − k_d·d) / max(k̂_g, 0.010)
+ *   L* = L_ref,b + (y* − h₀·m) / max(k̂_g, 0.010), h₀ = the shot row at L = L_ref,b, so every
+ *   shared term (a_b, k_r·u, κ·u², k_d·d) enters exactly once.
  *   |L* − L_cur| ≤ 10 lines (≤ 5 while sd(k_g) > 0.012), ≤ 15 absolutely; within
  *   [chirp + 5, max lines]; rounded to the nearest line.
  */
 import { MODEL } from '../params';
 import type { DialSpec, Id } from '../types';
 import { maxLines } from '../units';
-import { bagOf, type FlowModelState, IDX_KD, IDX_KG, IDX_KR, kGrind } from './state';
+import { bagOf, type FlowModelState, IDX_KG, kGrind } from './state';
 import { rowFor } from './update';
 
 export interface Prediction {
@@ -51,6 +52,8 @@ export interface Inversion {
   /** True when the gain was at its floor (model unsure). */
   gainFloored: boolean;
   probeStep: boolean;
+  /** Which dial limit cut the step, if any (the backup RPM lever reacts to this). */
+  clamped: 'chirp' | 'end' | null;
 }
 
 export function invert(
@@ -68,10 +71,10 @@ export function invert(
   const kg = kGrind(s);
   const gainFloored = kg.mean <= MODEL.kGrindFloor;
   const gain = gainFloored ? MODEL.kGrindPrior.mean : kg.mean;
-  const a = s.m[b.index] ?? 0;
-  const u = (rpm - 1000) / 100;
-  const d = doseG - b.meta.doseDefaultG;
-  const raw = b.LrefB + (yTarget - a - (s.m[IDX_KR] ?? 0) * u - (s.m[IDX_KD] ?? 0) * d) / gain;
+  const h0 = rowFor(s, b.index, b.LrefB, b.LrefB, rpm, doseG, b.meta.doseDefaultG);
+  let y0 = 0;
+  for (let i = 0; i < s.m.length; i++) y0 += (h0[i] ?? 0) * (s.m[i] ?? 0);
+  const raw = b.LrefB + (yTarget - y0) / gain;
   const vetoes: string[] = [];
   if (gainFloored) vetoes.push('model unsure: grind gain at its floor, prior gain used');
   const probeStep = kg.sd > MODEL.kGrindSdConverged;
@@ -84,15 +87,18 @@ export function invert(
   let L = Math.round(currentLines + delta);
   const lo = chirpLines !== null ? chirpLines + MODEL.chirpMarginLines : 0;
   const hi = maxLines(spec);
+  let clamped: Inversion['clamped'] = null;
   if (L < lo) {
     vetoes.push(`clamped above the chirp point (${lo} lines)`);
     L = lo;
+    clamped = 'chirp';
   }
   if (L > hi) {
     vetoes.push(`clamped at the end of the dial (${hi} lines)`);
     L = hi;
+    clamped = 'end';
   }
-  return { raw, lines: L, deltaLines: L - currentLines, vetoes, gainFloored, probeStep };
+  return { raw, lines: L, deltaLines: L - currentLines, vetoes, gainFloored, probeStep, clamped };
 }
 
 export { IDX_KG };

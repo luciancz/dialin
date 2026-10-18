@@ -1,11 +1,12 @@
 /**
  * Pure per-store migrations v(n) → v(n+1) over plain objects. Both the IndexedDB
  * `upgrade` hook (db.ts) and the JSON importer (exportImport.ts) run this same chain,
- * so there is one path and one test. DB_VERSION 1 has no steps yet; the scaffolding is
- * what matters.
+ * so there is one path and one test.
+ *
+ * v1 → v2 (RPM calibration): new store `rpmRuns`; settings gain `rpmRange` (VS6 500–1600).
  */
 
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 export const STORE_NAMES = [
   'beans',
@@ -19,6 +20,7 @@ export const STORE_NAMES = [
   'rawRecordings',
   'sensorSamples',
   'settings',
+  'rpmRuns',
 ] as const;
 export type StoreName = (typeof STORE_NAMES)[number];
 
@@ -28,8 +30,10 @@ export type RowMigration = (row: Record<string, unknown>) => Record<string, unkn
 export type MigrationSteps = Record<number, Partial<Record<StoreName, RowMigration>>>;
 
 export const MIGRATIONS: MigrationSteps = {
-  // Example for a future change:
-  // 1: { bags: (row) => ({ ...row, newField: row.newField ?? 'default' }) },
+  1: {
+    // The RPM range replaces the low-RPM opt-in; the VS6's full range is the default.
+    settings: (row) => ({ ...row, rpmRange: row.rpmRange ?? [500, 1600] }),
+  },
 };
 
 /** Migrate `rows` of `store` from `fromVersion` to `toVersion` (null results are dropped). */

@@ -1,6 +1,7 @@
 /**
  * Joint Gaussian state over the pooled gains and per-bag intercepts for one calibration
- * epoch: z = [k_g, k_r, k_d, a_b1 … a_bn]. Each bag has its own reference line L_ref,b
+ * epoch: z = [k_g, k_r, k_d, κ, a_b1 … a_bn], with y = a_b + k_g·ΔL + k_r·u + κ·u² + k_d·d and
+ * u = (RPM − 1000)/100. Each bag has its own reference line L_ref,b
  * (its first learnable shot), so a bag's first observation lands on its intercept and
  * never on the pooled grind gain. Priors and process noise live in params.ts.
  */
@@ -11,7 +12,20 @@ import type { Id, Process, RoastLevel, RoastTarget } from '../types';
 export const IDX_KG = 0;
 export const IDX_KR = 1;
 export const IDX_KD = 2;
-export const N_SHARED = 3;
+/** Curvature of the RPM effect (per (100 RPM)²). */
+export const IDX_KQ = 3;
+export const N_SHARED = 4;
+
+/** Priors of the shared elements, in index order. */
+export const SHARED_PRIORS: readonly { mean: number; sd: number }[] = [
+  MODEL.kGrindPrior,
+  MODEL.kRpmPrior,
+  MODEL.kDosePrior,
+  MODEL.kRpmCurvPrior,
+];
+
+/** Grinder-level elements: reset to their priors when the burrs change. k_d is not. */
+export const GRINDER_IDX: readonly number[] = [IDX_KG, IDX_KR, IDX_KQ];
 
 export interface BagMeta {
   roastLevel: RoastLevel;
@@ -62,12 +76,8 @@ export function initFlowModel(epochId: Id, LrefE: number | null = null): FlowMod
   return {
     epochId,
     LrefE,
-    m: [MODEL.kGrindPrior.mean, MODEL.kRpmPrior.mean, MODEL.kDosePrior.mean],
-    P: [
-      [MODEL.kGrindPrior.sd ** 2, 0, 0],
-      [0, MODEL.kRpmPrior.sd ** 2, 0],
-      [0, 0, MODEL.kDosePrior.sd ** 2],
-    ],
+    m: SHARED_PRIORS.map((p) => p.mean),
+    P: SHARED_PRIORS.map((p, i) => SHARED_PRIORS.map((_, j) => (i === j ? p.sd ** 2 : 0))),
     bags: [],
     pooled: [],
     lastAt: null,
@@ -193,6 +203,33 @@ export function kRpm(s: FlowModelState): { mean: number; sd: number } {
 
 export function kDose(s: FlowModelState): { mean: number; sd: number } {
   return { mean: s.m[IDX_KD] ?? 0, sd: Math.sqrt(Math.max(0, s.P[IDX_KD]?.[IDX_KD] ?? 0)) };
+}
+
+export function kRpmCurv(s: FlowModelState): { mean: number; sd: number } {
+  return { mean: s.m[IDX_KQ] ?? 0, sd: Math.sqrt(Math.max(0, s.P[IDX_KQ]?.[IDX_KQ] ?? 0)) };
+}
+
+/** Local RPM slope dy/du = k_r + 2κu at u, with its sd. */
+export function rpmSlope(s: FlowModelState, u: number): { mean: number; sd: number } {
+  const prr = s.P[IDX_KR]?.[IDX_KR] ?? 0;
+  const prq = s.P[IDX_KR]?.[IDX_KQ] ?? 0;
+  const pqq = s.P[IDX_KQ]?.[IDX_KQ] ?? 0;
+  return {
+    mean: (s.m[IDX_KR] ?? 0) + 2 * (s.m[IDX_KQ] ?? 0) * u,
+    sd: Math.sqrt(Math.max(0, prr + 4 * u * prq + 4 * u * u * pqq)),
+  };
+}
+
+/** RPM contribution to ln flow relative to 1000 RPM, k_r·u + κ·u², with its sd. */
+export function rpmEffect(s: FlowModelState, u: number): { mean: number; sd: number } {
+  const prr = s.P[IDX_KR]?.[IDX_KR] ?? 0;
+  const prq = s.P[IDX_KR]?.[IDX_KQ] ?? 0;
+  const pqq = s.P[IDX_KQ]?.[IDX_KQ] ?? 0;
+  const u2 = u * u;
+  return {
+    mean: (s.m[IDX_KR] ?? 0) * u + (s.m[IDX_KQ] ?? 0) * u2,
+    sd: Math.sqrt(Math.max(0, u2 * prr + 2 * u * u2 * prq + u2 * u2 * pqq)),
+  };
 }
 
 export function bagOf(s: FlowModelState, bagId: Id): BagState | undefined {

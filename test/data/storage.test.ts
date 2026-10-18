@@ -9,6 +9,7 @@ import type {
   Curve,
   Features,
   Meta,
+  RpmCalibrationRun,
   Settings,
   Shot,
   ShotQuality,
@@ -155,6 +156,7 @@ describe('schema and repo', () => {
       'ratings',
       'rawRecordings',
       'recommendations',
+      'rpmRuns',
       'sensorSamples',
       'settings',
       'shots',
@@ -301,6 +303,66 @@ describe('export / import', () => {
     expect(snap.bags).toEqual([]);
   });
 
+  it('upgrades a v1 database to v2: creates rpmRuns and migrates settings', async () => {
+    const { openDB } = await import('idb');
+    const name = `v1-${Math.random()}`;
+    // A v1 database exactly as the v1 app created it (subset of stores is enough).
+    const v1 = await openDB(name, 1, {
+      upgrade(db) {
+        db.createObjectStore('settings', { keyPath: 'id' });
+        db.createObjectStore('beans', { keyPath: 'id' });
+        db.createObjectStore('bags', { keyPath: 'id' }).createIndex('beanId', 'beanId');
+        const epochs = db.createObjectStore('epochs', { keyPath: 'id' });
+        epochs.createIndex('startedAt', 'startedAt');
+        const shots = db.createObjectStore('shots', { keyPath: 'id' });
+        shots.createIndex('bagId', 'bagId');
+        shots.createIndex('epochId', 'epochId');
+        shots.createIndex('at', 'at');
+        for (const s of ['curves', 'ratings', 'quality'] as const) {
+          db.createObjectStore(s, { keyPath: 'id' }).createIndex('shotId', 'shotId', {
+            unique: true,
+          });
+        }
+        const recs = db.createObjectStore('recommendations', { keyPath: 'id' });
+        recs.createIndex('bagId', 'bagId');
+        recs.createIndex('createdAt', 'createdAt');
+        db.createObjectStore('rawRecordings', { keyPath: 'id' }).createIndex('shotId', 'shotId');
+        db.createObjectStore('sensorSamples', { keyPath: 'id' }).createIndex('shotId', 'shotId');
+      },
+    });
+    const { rpmRange: _drop, ...v1Settings } = settings('dev-A');
+    await v1.put('settings', v1Settings);
+    v1.close();
+    const v2 = await openDialinDb(name);
+    expect([...v2.objectStoreNames]).toContain('rpmRuns');
+    const s = await v2.get('settings', 'settings');
+    expect(s?.rpmRange).toEqual([500, 1600]);
+    expect(s?.deviceId).toBe('dev-A');
+    v2.close();
+  });
+
+  it('imports a v1 export file: settings gain rpmRange, runs default to none', () => {
+    const { rpmRange: _drop, ...v1Settings } = settings('dev-B');
+    const snap = snapshotFromFile({
+      format: 'dialin',
+      schemaVersion: 1,
+      exportedAt: 'x',
+      deviceId: 'dev-B',
+      appVersion: 't',
+      settings: v1Settings as Settings,
+      beans: [],
+      bags: [],
+      epochs: [],
+      shots: [],
+      curves: [],
+      ratings: [],
+      quality: [],
+      recommendations: [],
+    });
+    expect(snap.settings?.rpmRange).toEqual([500, 1600]);
+    expect(snap.rpmRuns).toEqual([]);
+  });
+
   it('imports settings only onto a device that has not finished onboarding', () => {
     const incoming = settings('dev-B');
     const r1 = mergeSnapshots(empty({ settings: null }), empty({ settings: incoming }));
@@ -327,6 +389,7 @@ function empty(over: Partial<Snapshot> = {}): Snapshot {
     quality: [],
     recommendations: [],
     rawRecordings: [],
+    rpmRuns: [],
     ...over,
   };
 }
@@ -340,6 +403,7 @@ function canon(s: Snapshot): unknown {
     shots: sortRows(s.shots),
     curves: sortRows(s.curves),
     quality: sortRows(s.quality),
+    rpmRuns: sortRows(s.rpmRuns),
   };
 }
 
@@ -356,7 +420,18 @@ function randomPair(r: () => number): [Snapshot, Snapshot] {
     const quality: ShotQuality[] = [];
     const shots: Shot[] = [];
     const curves: ExportCurve[] = [];
+    const rpmRuns: RpmCalibrationRun[] = [];
     for (const i of ids) {
+      if (r() < 0.3) {
+        rpmRuns.push({
+          ...meta(device, pick(dates)),
+          id: `run-${i}`,
+          epochId: 'epoch',
+          bagId: 'bag',
+          startedAt: '2026-10-01T00:00:00.000Z',
+          status: pick(['active', 'done', 'abandoned'] as const),
+        });
+      }
       if (r() < 0.6) {
         const at = pick(dates);
         beans.push({
@@ -382,7 +457,7 @@ function randomPair(r: () => number): [Snapshot, Snapshot] {
         });
       }
     }
-    return empty({ beans, shots, curves, quality });
+    return empty({ beans, shots, curves, quality, rpmRuns });
   };
   return [mk('A'), mk('B')];
 }

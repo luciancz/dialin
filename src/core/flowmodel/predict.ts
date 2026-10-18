@@ -3,9 +3,9 @@
  * the intercept, process noise by age (frozen bags barely move), a thaw/open kick, and a
  * tiny variance growth on the pooled gains.
  */
-import { MODEL } from '../params';
+import { MODEL, RPM } from '../params';
 import type { StorageEventKind } from '../types';
-import { ageDays, type BagState, type FlowModelState, IDX_KG, IDX_KR } from './state';
+import { ageDays, type BagState, type FlowModelState, IDX_KG, IDX_KQ, IDX_KR } from './state';
 
 export function driftPerDay(age: number, frozen: boolean): number {
   if (frozen) return 0;
@@ -52,6 +52,8 @@ export function predictBag(
     if (dd > 0) {
       (s.P[IDX_KG] as number[])[IDX_KG] = (s.P[IDX_KG]?.[IDX_KG] ?? 0) + MODEL.kDriftVarPerDay * dd;
       (s.P[IDX_KR] as number[])[IDX_KR] = (s.P[IDX_KR]?.[IDX_KR] ?? 0) + MODEL.kDriftVarPerDay * dd;
+      (s.P[IDX_KQ] as number[])[IDX_KQ] =
+        (s.P[IDX_KQ]?.[IDX_KQ] ?? 0) + RPM.curvDriftVarPerDay * dd;
     }
   }
   if (s.lastAt === null || atIso > s.lastAt) s.lastAt = atIso;

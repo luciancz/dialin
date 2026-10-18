@@ -45,6 +45,8 @@ export function validateExportFile(x: unknown): ValidationResult {
   checkMetaRows('recommendations', x.recommendations, errors, ['bagId', 'lever', 'next']);
   if (x.rawRecordings !== undefined)
     checkMetaRows('rawRecordings', x.rawRecordings, errors, ['frames']);
+  if (x.rpmRuns !== undefined)
+    checkMetaRows('rpmRuns', x.rpmRuns, errors, ['epochId', 'bagId', 'status']);
   if (Array.isArray(x.curves)) {
     x.curves.forEach((c, i) => {
       if (!isObj(c)) return;

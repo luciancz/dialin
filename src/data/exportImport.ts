@@ -19,6 +19,7 @@ import type {
   Rating,
   RawRecording,
   Recommendation,
+  RpmCalibrationRun,
   Settings,
   Shot,
   ShotQuality,
@@ -49,6 +50,8 @@ export interface ExportFile {
   quality: ShotQuality[];
   recommendations: Recommendation[];
   rawRecordings?: RawRecording[];
+  /** Schema v2+. v1 files have no RPM calibration runs. */
+  rpmRuns?: RpmCalibrationRun[];
 }
 
 /** Plain-object view of every store, the unit the pure merge works on. */
@@ -63,6 +66,7 @@ export interface Snapshot {
   quality: ShotQuality[];
   recommendations: Recommendation[];
   rawRecordings: RawRecording[];
+  rpmRuns: RpmCalibrationRun[];
 }
 
 export type MergeStore = Exclude<keyof Snapshot, 'settings'>;
@@ -74,6 +78,7 @@ const MUTABLE: MergeStore[] = [
   'quality',
   'recommendations',
   'rawRecordings',
+  'rpmRuns',
 ];
 const IMMUTABLE: MergeStore[] = ['shots', 'curves'];
 
@@ -126,19 +131,31 @@ export function curveHash(c: {
 }
 
 export async function readSnapshot(db: Db, includeRaw = true): Promise<Snapshot> {
-  const [settings, beans, bags, epochs, shots, curves, ratings, quality, recommendations, raw] =
-    await Promise.all([
-      db.get('settings', 'settings'),
-      db.getAll('beans'),
-      db.getAll('bags'),
-      db.getAll('epochs'),
-      db.getAll('shots'),
-      db.getAll('curves'),
-      db.getAll('ratings'),
-      db.getAll('quality'),
-      db.getAll('recommendations'),
-      includeRaw ? db.getAll('rawRecordings') : Promise.resolve([] as RawRecording[]),
-    ]);
+  const [
+    settings,
+    beans,
+    bags,
+    epochs,
+    shots,
+    curves,
+    ratings,
+    quality,
+    recommendations,
+    raw,
+    rpmRuns,
+  ] = await Promise.all([
+    db.get('settings', 'settings'),
+    db.getAll('beans'),
+    db.getAll('bags'),
+    db.getAll('epochs'),
+    db.getAll('shots'),
+    db.getAll('curves'),
+    db.getAll('ratings'),
+    db.getAll('quality'),
+    db.getAll('recommendations'),
+    includeRaw ? db.getAll('rawRecordings') : Promise.resolve([] as RawRecording[]),
+    db.getAll('rpmRuns'),
+  ]);
   return {
     settings: settings ?? null,
     beans,
@@ -150,6 +167,7 @@ export async function readSnapshot(db: Db, includeRaw = true): Promise<Snapshot>
     quality,
     recommendations,
     rawRecordings: raw,
+    rpmRuns,
   };
 }
 
@@ -173,6 +191,7 @@ export async function buildExport(
     ratings: snap.ratings,
     quality: snap.quality,
     recommendations: snap.recommendations,
+    rpmRuns: snap.rpmRuns,
   };
   if (opts.includeRaw) file.rawRecordings = snap.rawRecordings;
   return file;
@@ -199,6 +218,7 @@ export function snapshotFromFile(file: ExportFile): Snapshot {
     quality: mig('quality', file.quality),
     recommendations: mig('recommendations', file.recommendations),
     rawRecordings: mig('rawRecordings', file.rawRecordings),
+    rpmRuns: mig('rpmRuns', file.rpmRuns),
   };
 }
 
@@ -213,6 +233,7 @@ function emptyCounts(): Record<MergeStore, number> {
     quality: 0,
     recommendations: 0,
     rawRecordings: 0,
+    rpmRuns: 0,
   };
 }
 
@@ -347,6 +368,7 @@ export async function applyMerge(db: Db, merged: MergeResult): Promise<void> {
     'recommendations',
     'rawRecordings',
     'settings',
+    'rpmRuns',
   ] as const;
   const tx = db.transaction(stores, 'readwrite');
   const ops: Promise<unknown>[] = [];

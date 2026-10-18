@@ -9,6 +9,7 @@ const LEVER_LABEL: Record<Recommendation['lever'], string> = {
   wait: 'Wait',
   temperature: 'Temperature',
   none: 'Repeat',
+  calibrate: 'RPM calibration',
 };
 
 export function RecommendationCard({ rec }: { rec: Recommendation | null }) {

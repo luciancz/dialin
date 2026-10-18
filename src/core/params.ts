@@ -107,8 +107,16 @@ export const FEAT = {
 export const MODEL = {
   /** ln per line, positive because a higher dial = coarser = faster. 1–1.7 s per 5 µm line at ~30 s. */
   kGrindPrior: { mean: 0.045, sd: 0.03 },
-  /** per 100 RPM; sign unknown on stock flats (one conical datum ≈ +0.135 is inside 2σ). */
-  kRpmPrior: { mean: 0, sd: 0.08 },
+  /**
+   * ln flow per 100 RPM on stock VS6 flats. From Varia's own laser-diffraction data (flats
+   * barely change PSD with RPM, slightly finer at high RPM, mostly above 1100) converted to
+   * flow with a Kozeny–Carman exponent 2–4: −0.007 … −0.037. Other flat grinders show both
+   * signs (EG-1 owners faster at high RPM, Mythos 2 slower), so the sd keeps +0.04 within 1.6σ.
+   * Research 2026-10-19 (docs/ALGORITHM.md "RPM").
+   */
+  kRpmPrior: { mean: -0.015, sd: 0.035 },
+  /** Curvature κ of the RPM effect per (100 RPM)²: Varia's data is steeper above ~1100. Shrunk. */
+  kRpmCurvPrior: { mean: 0, sd: 0.005 },
   /** per gram of dose; 1–3 s per gram at 30 s. Never reset by epoch events. */
   kDosePrior: { mean: -0.06, sd: 0.04 },
   /** First bag of an epoch. */
@@ -285,6 +293,80 @@ export const SIM = {
   frameMs: 100.7,
   frameJitterMs: 30,
   sliderScale: 0.25,
+} as const;
+
+/**
+ * RPM calibration and the RPM levers (plan "RPM calibration", research 2026-10-19).
+ * u = (RPM − 1000)/100 everywhere.
+ */
+export const RPM = {
+  /** VS6 hardware: 500–1600 RPM in 100 RPM steps. */
+  rangeDefault: [500, 1600] as const,
+  step: 100,
+  reference: 1000,
+  /** E006: undocumented VS6 stall error seen at 500–600 RPM with dense beans. */
+  e006Rpm: 600,
+  /** A reported stall raises that bean's floor to the stall RPM + this. */
+  stallMargin: 100,
+  /** "Calibrated": sd(k_r) at or below this (≤ 5 % flow error over ±300 RPM). */
+  calibratedSd: 0.015,
+  /** Block 1: L H H L, L = max(lo, 700), H = min(hi, L + 600) (Δ = 6 → sd ≈ 0.0115 in 4 shots). */
+  blockLow: 700,
+  blockSpan: 600,
+  /** Block 2: X Y Y X with |X − Y| ≥ 300, chosen by information gain. */
+  block2MinSpan: 300,
+  /** A slot counts when its shot is learnable, accepted and has Huber weight ≥ 0.5. */
+  slotMinWeight: 0.5,
+  maxRepeatsPerSlot: 2,
+  /** Early stop after a block: sd(k_r) ≤ min(calibratedSd, stopFlowErr/u_max) and MI(θ) < this. */
+  stopFlowErr: 0.05,
+  stopMiNats: 0.05,
+  /** Offer gate. */
+  offerMaxSetpointSd: 0.1,
+  offerDeclineDays: 7,
+  /** Cross-RPM comparisons count as matched flow when |Δ y_ref| ≤ this. */
+  matchedFlowLn: 0.07,
+  /** Balance shift δ (ln flow per 100 RPM): prior and observation model. */
+  deltaPriorSd: 0.02,
+  /** Slider steps per ln unit of flow offset (3 steps per 0.25 ln). Assumption: measure in the field. */
+  sliderPerLn: 12,
+  deltaMaxPairHours: 12,
+  deltaMaxDyLn: 0.15,
+  /** Preference grid. */
+  thetaMin: 500,
+  thetaMax: 1600,
+  thetaStep: 50,
+  betaGrid: [-0.5, -0.25, -0.1, 0, 0.1, 0.25, 0.5, 0.75, 1] as const,
+  orderBiasGrid: [-0.25, 0, 0.25] as const,
+  thetaPriorMean: 1000,
+  thetaPriorSd: 300,
+  /** Bean prior: blend of earlier beans (blurred) and the population prior. */
+  beanPriorBlur: 150,
+  beanPriorWeight: 0.8,
+  beanPriorMinRatings: 3,
+  otherRoastWeight: 0.3,
+  /** Thin–heavy ordered probit noise and the utility scale U = −β²(u − θ_u)²/18. */
+  bodyNoise: 0.8,
+  utilityScale: 18,
+  tieBand: 0.5,
+  lapse: 0.1,
+  /** "RPM barely changes body": P(|6β| < 1). Body moves need pInsensitive below this. */
+  pInsensitiveMax: 0.8,
+  /** JND band: RPMs with expected regret ≤ this. */
+  regretJnd: 0.1,
+  /** Body move gates. */
+  bodyMinShotsBetween: 3,
+  bodyImproveProb: 0.7,
+  bodyStepCap: 300,
+  /** Backup flow lever and fine trim. */
+  backupMaxStep: 400,
+  trimMaxStep: 200,
+  trimMinResidual: 0.015,
+  trimMinGain: 0.01,
+  /** Slope significance for the backup lever: |slope| ≥ z·sd. */
+  backupZ: 1.28,
+  /** κ variance growth per day, scaled like k_r's (sd ratio 0.005/0.035). */
+  curvDriftVarPerDay: 1e-7 * (0.005 / 0.035) ** 2,
 } as const;
 
 /** Backup nags. */

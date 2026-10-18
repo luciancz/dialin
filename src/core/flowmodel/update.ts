@@ -11,7 +11,7 @@ import { add, identity, matMul, outer, scale, sub, symmetrize, transpose } from 
 import { MODEL } from '../params';
 import type { Id, StorageEventKind } from '../types';
 import { predictBag } from './predict';
-import { bagOf, type FlowModelState, IDX_KD, IDX_KG, IDX_KR } from './state';
+import { bagOf, type FlowModelState, IDX_KD, IDX_KG, IDX_KQ, IDX_KR } from './state';
 
 export interface Observation {
   bagId: Id;
@@ -47,8 +47,10 @@ export function rowFor(
   doseDefaultG: number,
 ): number[] {
   const h = new Array<number>(s.m.length).fill(0);
+  const u = (rpm - 1000) / 100;
   h[IDX_KG] = lines - LrefB;
-  h[IDX_KR] = (rpm - 1000) / 100;
+  h[IDX_KR] = u;
+  h[IDX_KQ] = u * u;
   h[IDX_KD] = doseG - doseDefaultG;
   h[bagIndex] = 1;
   return h;

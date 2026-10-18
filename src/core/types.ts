@@ -57,6 +57,8 @@ export interface Bag extends Meta {
     raw?: string;
   };
   storage: { at: string; event: StorageEventKind }[];
+  /** Grinder stalls (VS6 E006) reported with this bag: they raise its RPM floor. */
+  stalls?: { at: string; rpm: number; shotId?: Id }[];
   /** Held RPM, default 1000. */
   rpm: number;
   /** Thompson-sampling PRNG seed. */
@@ -209,7 +211,9 @@ export type ShotStatus =
   | 'no_tap_recovered'
   | 'partial_disconnect'
   | 'aborted'
-  | 'manual_entry';
+  | 'manual_entry'
+  /** The grinder stalled (VS6 E006): kept for the record, never learned from. */
+  | 'stalled';
 
 export interface ShotQuality extends Meta {
   shotId: Id;
@@ -233,9 +237,45 @@ export interface Shot extends Meta {
   endedBy: EndedBy;
   recommendationId: Id | null;
   deviation: Deviation | null;
+  /** RPM calibration slot this shot was pulled for (immutable tag). */
+  calibration?: CalibrationTag;
 }
 
-export type Lever = 'grind' | 'yield' | 'rpm' | 'prep' | 'wait' | 'temperature' | 'none';
+export interface CalibrationTag {
+  runId: Id;
+  /** 0..7: block 1 = slots 0–3 (L H H L), block 2 = slots 4–7 (X Y Y X). */
+  slot: number;
+  plannedRpm: number;
+}
+
+export type RpmRunStatus = 'active' | 'done' | 'stopped' | 'abandoned' | 'declined';
+
+/**
+ * An RPM calibration session (or a declined offer). Only intent and status are stored; the
+ * slots, repeats and results are derived in replay from the tagged shots.
+ */
+export interface RpmCalibrationRun extends Meta {
+  epochId: Id;
+  bagId: Id;
+  startedAt: string;
+  status: RpmRunStatus;
+  endedAt?: string;
+  note?: string;
+}
+
+/**
+ * `rpm` is the compensated body move (RPM and dial change together so flow holds);
+ * `calibrate` is a calibration slot.
+ */
+export type Lever =
+  | 'grind'
+  | 'yield'
+  | 'rpm'
+  | 'prep'
+  | 'wait'
+  | 'temperature'
+  | 'none'
+  | 'calibrate';
 export type Stage = 'B_grind' | 'C_ratio' | 'D_hone' | 'E_temp' | 'F_rpm';
 export type ConfidenceWord = 'firm' | 'probable' | 'probe' | 'insufficient';
 
@@ -255,14 +295,28 @@ export interface Recommendation extends Meta {
   sentence: string;
   whyNot: string[];
   vetoes: string[];
-  source: 'rules' | 'flowModel' | 'setpoint';
+  source: 'rules' | 'flowModel' | 'setpoint' | 'rpmModel';
   snapshot: {
     kGrind: [number, number];
     kRpm: [number, number];
     kDose: [number, number];
     aBag: [number, number];
     setpoint: [number, number];
+    /** RPM curvature κ (mean, sd). */
+    kRpmCurv?: [number, number];
+    /** Balance shift δ per 100 RPM (mean, sd). */
+    delta?: [number, number];
+    /** Preferred RPM θ (mean, sd) and P(RPM barely changes body). */
+    rpmPref?: [number, number, number];
   };
+  /** A card the user can accept (start an RPM calibration). */
+  offer?: 'rpm_calibration';
+  /** Set when the next shot is a calibration slot; the shot copies it as its tag. */
+  calibration?: CalibrationTag;
+  /** Extra practical guidance (e.g. E006 at low RPM). */
+  guidance?: string[];
+  /** Probability that the body move improves the cup (rpm lever). */
+  bodyConfidence?: number;
 }
 
 export type BleCaps = Record<string, string | boolean | number>;
@@ -272,7 +326,10 @@ export interface Settings {
   deviceId: Id;
   onboardingDone: boolean;
   defaultRpm: number;
+  /** Legacy (pre-RPM-calibration); superseded by rpmRange and no longer read. */
   allowLowRpm: boolean;
+  /** RPM range for calibration and recommendations; VS6 hardware is 500–1600. */
+  rpmRange?: [number, number];
   rpmResetsOnPowerOn: boolean | 'unknown';
   maraSwitch: { temp: TempSwitch; mode: 'coffee' | 'steam' | 'unknown' };
   scaleFirmware?: string;

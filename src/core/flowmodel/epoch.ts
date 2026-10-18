@@ -5,7 +5,7 @@
 import { MODEL } from '../params';
 import type { CalibrationEpoch, DialSpec, Id } from '../types';
 import { fromLines, toLines } from '../units';
-import { cloneState, type FlowModelState, IDX_KG, IDX_KR, kGrind } from './state';
+import { cloneState, type FlowModelState, GRINDER_IDX, kGrind, SHARED_PRIORS } from './state';
 
 export interface EpochTransition {
   newEpochId: Id;
@@ -59,16 +59,17 @@ export function applyEpochEvent(prev: FlowModelState, t: EpochTransition): FlowM
       break;
     }
     case 'new_burrs': {
-      s.m[IDX_KG] = MODEL.kGrindPrior.mean;
-      s.m[IDX_KR] = MODEL.kRpmPrior.mean;
-      for (let j = 0; j < s.m.length; j++) {
-        (s.P[IDX_KG] as number[])[j] = 0;
-        (s.P[j] as number[])[IDX_KG] = 0;
-        (s.P[IDX_KR] as number[])[j] = 0;
-        (s.P[j] as number[])[IDX_KR] = 0;
+      // Grind gain and the RPM effect (slope and curvature) are burr properties: back to priors.
+      for (const i of GRINDER_IDX) {
+        const prior = SHARED_PRIORS[i];
+        if (!prior) continue;
+        s.m[i] = prior.mean;
+        for (let j = 0; j < s.m.length; j++) {
+          (s.P[i] as number[])[j] = 0;
+          (s.P[j] as number[])[i] = 0;
+        }
+        (s.P[i] as number[])[i] = prior.sd ** 2;
       }
-      (s.P[IDX_KG] as number[])[IDX_KG] = MODEL.kGrindPrior.sd ** 2;
-      (s.P[IDX_KR] as number[])[IDX_KR] = MODEL.kRpmPrior.sd ** 2;
       setVar(MODEL.newBurrsSd);
       break;
     }
