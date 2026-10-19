@@ -9,6 +9,8 @@
     "src/scale/protocol.ts",
     "src/scale/transport.ts",
     "src/shot/machine.ts",
-    "src/shot/ringBuffer.ts"
+    "src/shot/ringBuffer.ts",
+    "src/shot/autoTare.ts",
+    "src/shot/weigh.ts"
   ]
 }

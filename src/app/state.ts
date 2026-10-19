@@ -34,6 +34,7 @@ import {
   ScaleClient,
   type Warning,
 } from '../scale/scaleClient';
+import { type AutoTareState, autoTareStep, initAutoTare } from '../shot/autoTare';
 import {
   type Effect,
   initialState,
@@ -104,6 +105,9 @@ class AppState {
   readonly autoOff = signal<AutoOffInfo>({ at: null, soon: false, rearms: 0 });
   readonly scaleName = signal('');
   readonly ring = new RingBuffer();
+  /** Auto-tare detector state (src/shot/autoTare.ts) and the time of the last tare it sent. */
+  private autoTare: AutoTareState = initAutoTare();
+  readonly lastAutoTareAt = signal<number | null>(null);
 
   // ---- recorder ----
   readonly recorder = signal<RecorderState>(initialState());
@@ -312,6 +316,7 @@ class AppState {
           timerMs: frame.timerMs,
           tRxMs,
         });
+        this.maybeAutoTare(tRxMs);
       }),
       client.onRaw.on(({ src, bytes, tRxMs, parsed }) => {
         diag.pushFrame(src, bytes, tRxMs);
@@ -365,6 +370,27 @@ class AppState {
     }
   }
 
+  /**
+   * Tare once when a cup or the dosing cup is put down and the reading settles. Off while a
+   * shot records or waits for its rating, and when Settings → auto-tare is off.
+   */
+  private maybeAutoTare(tRxMs: number): void {
+    const phase = this.recorder.value.phase;
+    const idle = phase === 'IDLE' || phase === 'ARMED' || phase === 'SAVED' || phase === 'ABORTED';
+    const enabled = idle && !this.pending.value && this.settings.value?.autoTare !== false;
+    const r = autoTareStep(this.autoTare, this.ring, tRxMs, enabled);
+    this.autoTare = r.state;
+    if (!r.tare || !this.client) return;
+    void this.client
+      .send(commands.tare())
+      .then(() => {
+        this.dispatch({ type: 'tared', now: tRxMs });
+        this.lastAutoTareAt.value = tRxMs;
+        diag.log('info', 'auto-tare: cup put down');
+      })
+      .catch((err) => diag.log('warn', `auto-tare failed: ${String(err)}`));
+  }
+
   private runEffect(e: Effect): void {
     switch (e.type) {
       case 'send': {
@@ -375,7 +401,11 @@ class AppState {
               ? commands.start()
               : e.cmd === 'stop'
                 ? commands.stop()
-                : commands.beep(e.n ?? 1);
+                : e.cmd === 'tare'
+                  ? commands.tare()
+                  : e.cmd === 'reset'
+                    ? commands.reset()
+                    : commands.beep(e.n ?? 1);
         void this.client
           ?.send(bytes)
           .catch((err) => diag.log('warn', `send ${e.cmd} failed: ${String(err)}`));

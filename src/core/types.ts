@@ -343,6 +343,12 @@ export interface Settings {
   screenDimArg?: 'true' | 'false' | 'none';
   /** Preferred transport on the Settings screen. */
   transport?: 'webbt' | 'fake' | 'replay';
+  /** Tare automatically when a cup or the dosing cup is put on the scale (default on). */
+  autoTare?: boolean;
+  /** Show the 3D grinder, machine and scale views (default on). */
+  show3d?: boolean;
+  /** Grinder colour in the 3D views. */
+  grinderColor?: 'black' | 'white';
   updatedAt: string;
 }
 

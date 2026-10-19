@@ -63,6 +63,24 @@ export class RingBuffer {
     return last.grams - earlier.grams;
   }
 
+  /** last.grams − grams at `fromMs` (0 when there is no sample at or before it). */
+  riseSince(fromMs: number): number {
+    const last = this.last();
+    const earlier = this.at(fromMs);
+    if (!last || !earlier || earlier === last) return 0;
+    return last.grams - earlier.grams;
+  }
+
+  /** Largest |Δgrams| between consecutive samples in [fromMs, toMs] (0 with < 2 samples). */
+  maxJumpBetween(fromMs: number, toMs: number): number {
+    const xs = this.between(fromMs, toMs);
+    let m = 0;
+    for (let i = 1; i < xs.length; i++) {
+      m = Math.max(m, Math.abs((xs[i]?.grams ?? 0) - (xs[i - 1]?.grams ?? 0)));
+    }
+    return m;
+  }
+
   /** max − min of grams over the last `ms`. */
   rangeOver(ms: number, nowMs: number): number {
     const xs = this.between(nowMs - ms, nowMs);

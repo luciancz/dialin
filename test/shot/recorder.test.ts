@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../../src/core/math/rng';
 import { type CurveSpec, synthCurve } from '../../src/core/sim/curveSynth';
+import { autoTareStep, initAutoTare } from '../../src/shot/autoTare';
 import {
   type Effect,
   initialState,
@@ -52,6 +53,11 @@ class Harness {
         this.timerRunning = true;
         this.timerStartedAt = this.now;
       }
+    } else if (cmd === 'tare') {
+      this.tareG = this.cupG;
+    } else if (cmd === 'reset') {
+      // 06 zeroes the timer only when it is stopped (docs/PROTOCOL.md).
+      if (!this.timerRunning) this.timerFrozenMs = 0;
     } else if (cmd === 'stop') {
       if (this.timerRunning) {
         this.timerFrozenMs = this.timerMs();
@@ -85,6 +91,7 @@ class Harness {
       tRxMs: this.now,
     });
     if ((this.now / 100) % 3 === 0) this.dispatch({ type: 'tick', now: this.now });
+    this.afterFrame();
   }
 
   idle(ms: number, cupG = this.cupG): void {
@@ -105,6 +112,23 @@ class Harness {
       if (this.state.phase === 'RATE' || this.state.phase === 'IDLE') break;
       this.step(base + (curve.g[i] ?? 0));
       onStep?.(tS);
+    }
+  }
+
+  /** The app's auto-tare path: detector on every frame, 01 to the scale, then 'tared'. */
+  autoTare = initAutoTare();
+  autoTareOn = false;
+
+  afterFrame(): void {
+    if (!this.autoTareOn) return;
+    const p = this.state.phase;
+    const idle = p === 'IDLE' || p === 'ARMED' || p === 'SAVED' || p === 'ABORTED';
+    const r = autoTareStep(this.autoTare, this.ring, this.now, idle);
+    this.autoTare = r.state;
+    if (r.tare) {
+      this.onCommand('tare');
+      this.effects.push({ type: 'send', cmd: 'tare' });
+      this.dispatch({ type: 'tared', now: this.now });
     }
   }
 
@@ -368,5 +392,91 @@ describe('recorder: abort', () => {
     armed(h);
     h.dispatch({ type: 'disarm', now: h.now });
     expect(h.state.phase).toBe('IDLE');
+  });
+});
+
+describe('recorder: cup put down, auto-tare and restarts', () => {
+  it('a cup put down while armed is tared once and never raises the forgot-tap prompt', () => {
+    const h = new Harness();
+    h.autoTareOn = true;
+    h.idle(2500, 0);
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36 });
+    h.idle(300, 0);
+    h.idle(3000, 210); // cup down
+    expect(h.sent('tare')).toBe(1);
+    expect(h.state.tareAtMs).not.toBeNull();
+    expect(h.state.prompt).toBeNull();
+    expect(h.ring.last()?.grams).toBe(0);
+    // Tap: a normal start (07), not a late tap.
+    h.dispatch({ type: 'tap', now: h.now });
+    expect(h.sent('tareStart')).toBe(1);
+    expect(h.state.draft?.status).toBe('ok');
+    // The pour itself never auto-tares.
+    h.playCurve(curve, 210, curve.endAt);
+    expect(h.sent('tare')).toBe(1);
+  });
+
+  it('START one second after putting the cup down (no auto-tare) is not a late tap', () => {
+    const h = new Harness();
+    h.idle(2500, 0);
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36 });
+    h.idle(1000, 150);
+    expect(h.state.prompt).toBeNull();
+    h.dispatch({ type: 'tap', now: h.now });
+    expect(h.state.draft?.status).toBe('ok');
+    expect(h.sent('tareStart')).toBe(1);
+    expect(h.state.draft?.samples.length).toBe(0);
+  });
+
+  it('a slow pour never auto-tares; taking the cup off re-arms it for the next cup', () => {
+    const h = new Harness();
+    h.autoTareOn = true;
+    h.idle(2000, 0);
+    // Coffee-like ramp onto an empty scale at 2 g/s for 20 s: no tare.
+    for (let i = 0; i < 200; i++) h.step(i * 0.2);
+    h.idle(2000);
+    expect(h.sent('tare')).toBe(0);
+    h.idle(2000, 0);
+    // Dosing cup down → tare; beans poured in quickly (18 g over 1 s) → no second tare.
+    h.idle(2500, 95);
+    expect(h.sent('tare')).toBe(1);
+    for (let i = 1; i <= 10; i++) h.step(95 + 1.8 * i);
+    h.idle(3000);
+    expect(h.sent('tare')).toBe(1);
+    expect(h.ring.last()?.grams).toBeCloseTo(18, 1);
+    // Cup off (reading −95 g), espresso cup on → tared again.
+    h.idle(1500, 0);
+    h.idle(3000, 180);
+    expect(h.sent('tare')).toBe(2);
+  });
+
+  it('a late tap after a previous shot resets the frozen timer before starting it', () => {
+    const h = new Harness();
+    armed(h);
+    h.dispatch({ type: 'tap', now: h.now });
+    h.playCurve(curve, 120, curve.endAt);
+    h.dispatch({ type: 'tap', now: h.now });
+    h.idle(7000);
+    expect(h.state.phase).toBe('RATE');
+    expect(h.timerMs()).toBeGreaterThan(0); // frozen by 05
+    h.dispatch({ type: 'rated', now: h.now });
+    const base = h.cupG;
+    h.idle(2500);
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36 });
+    h.idle(500);
+    const idx = curve.t.findIndex((t) => t >= 11);
+    for (let i = 0; i <= idx; i++) h.step(base + (curve.g[i] ?? 0));
+    h.dispatch({ type: 'tap', now: h.now });
+    expect(h.state.draft?.status).toBe('late_tap');
+    const sends = h.effects
+      .filter((e) => e.type === 'send')
+      .map((e) => (e.type === 'send' ? e.cmd : ''));
+    expect(sends.slice(-2)).toEqual(['reset', 'start']);
+    h.idle(3000, base + 30);
+    const xs = h.state.draft?.samples ?? [];
+    const a = xs[xs.length - 20];
+    const b = xs[xs.length - 1];
+    // The clock keeps running (it would stall on a frozen timer).
+    expect((b?.t ?? 0) - (a?.t ?? 0)).toBeGreaterThan(1.5);
   });
 });

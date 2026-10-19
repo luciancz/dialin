@@ -45,6 +45,25 @@ export const REC = {
   gapMs: 400,
   /** Derived-flow window used by the recorder for auto-end (1 s regression). */
   liveFlowWindowMs: 1000,
+  /**
+   * A frame-to-frame jump this large is an object put on or taken off the scale, never a pour
+   * (a fast shot adds ≈ 0.4 g per 100 ms frame). Rise windows that contain one are not a
+   * forgotten or late tap.
+   */
+  placementJumpG: 8,
+  /** After a tare command, frames this long are the scale applying it. */
+  tareApplyMs: 600,
+  /**
+   * Auto-tare (cup or dosing cup put down): the reading rose ≥ 20 g within the last 3 s, with a
+   * placement jump, then held within ±0.2 g for 1 s → one tare. It re-arms when something is
+   * taken off (reading ≤ −10 g), with 3 s between tares.
+   */
+  autoTareStepG: 20,
+  autoTareLookbackMs: 3000,
+  autoTareSettleMs: 1000,
+  autoTareBandG: 0.2,
+  autoTareRemovedG: 10,
+  autoTareCooldownMs: 3000,
 } as const;
 
 /** ScaleClient. */

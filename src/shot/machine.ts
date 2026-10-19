@@ -77,6 +77,8 @@ export interface RecorderState {
   prompt: 'forgot_tap' | null;
   /** Live flow estimate (g/s) for the UI. */
   liveFlow: number;
+  /** Receive time of the last plain tare (auto-tare on cup placement); null = none. */
+  tareAtMs: number | null;
 }
 
 export type RecorderEvent =
@@ -92,10 +94,12 @@ export type RecorderEvent =
   | { type: 'dismiss_forgot_tap'; now: number }
   | { type: 'manual_yield'; now: number; grams: number }
   | { type: 'rated'; now: number }
-  | { type: 'reset'; now: number };
+  | { type: 'reset'; now: number }
+  /** The app sent a plain tare (01), e.g. auto-tare when the cup was put down. */
+  | { type: 'tared'; now: number };
 
 export type Effect =
-  | { type: 'send'; cmd: 'tareStart' | 'start' | 'stop' | 'beep'; n?: number }
+  | { type: 'send'; cmd: 'tareStart' | 'start' | 'stop' | 'beep' | 'tare' | 'reset'; n?: number }
   | { type: 'warn'; code: string; msg: string }
   | { type: 'prompt'; kind: 'forgot_tap' }
   | { type: 'pre_alert' }
@@ -104,7 +108,7 @@ export type Effect =
   | { type: 'finalize'; discard: boolean };
 
 export function initialState(): RecorderState {
-  return { phase: 'IDLE', draft: null, armed: null, prompt: null, liveFlow: 0 };
+  return { phase: 'IDLE', draft: null, armed: null, prompt: null, liveFlow: 0, tareAtMs: null };
 }
 
 export function learnGate(status: ShotStatus, featuresValid: boolean): boolean {
@@ -170,6 +174,13 @@ function liveFlowOf(samples: readonly ShotSample[], windowS: number): number {
   return Number.isNaN(f) ? 0 : f;
 }
 
+/** Start of a rise window of `ms`, never before the last plain tare had been applied. */
+function riseWindowStart(state: RecorderState, now: number, ms: number): number {
+  const afterTare =
+    state.tareAtMs === null ? Number.NEGATIVE_INFINITY : state.tareAtMs + REC.tareApplyMs;
+  return Math.max(now - ms, afterTare);
+}
+
 /** Start the pull from a tap or an accepted forgot-tap prompt. */
 function startShot(
   state: RecorderState,
@@ -181,11 +192,15 @@ function startShot(
   if (!armed) return [state, []];
   const d = newDraft(now, armed);
   const effects: Effect[] = [{ type: 'shot_running', running: true }];
-  const rise = ring.riseOver(REC.lateTapWindowMs, now);
-  const late = mode === 'forgot' || rise > REC.lateTapRiseG;
+  // Rise window: the last 2 s, but never before the last tare had settled. A window with a
+  // placement jump is a cup put down (not coffee): that is never a late tap.
+  const from = riseWindowStart(state, now, REC.lateTapWindowMs);
+  const rise = ring.riseSince(from);
+  const placed = ring.maxJumpBetween(from, now) >= REC.placementJumpG;
+  const late = mode === 'forgot' || (rise > REC.lateTapRiseG && !placed);
   if (!late) {
     d.startCmd = 'tareStart';
-    const med = ring.medianBetween(now - REC.lateTapWindowMs, now);
+    const med = ring.medianBetween(from, now);
     d.preTapMedianG = Number.isNaN(med) ? (ring.last()?.grams ?? 0) : med;
     effects.push({ type: 'send', cmd: 'tareStart' });
   } else {
@@ -218,6 +233,9 @@ function startShot(
         ? `no tap: start estimated from the weight rise, ${d.preTapSpliceS.toFixed(1)} s recovered`
         : `late tap: ${d.preTapSpliceS.toFixed(1)} s of pre-tap frames spliced in`,
     );
+    // 06 first: after the previous shot's 05 the timer is frozen and 04 alone is ignored
+    // (docs/PROTOCOL.md), which would stall the scale timer the samples are anchored to.
+    effects.push({ type: 'send', cmd: 'reset' });
     effects.push({ type: 'send', cmd: 'start' });
     effects.push({
       type: 'warn',
@@ -310,16 +328,19 @@ export function reduce(
           },
           prompt: null,
           liveFlow: 0,
+          tareAtMs: state.tareAtMs,
         },
         [],
       ];
     }
     case 'disarm': {
       if (state.phase !== 'ARMED') return [state, []];
-      return [initialState(), []];
+      return [{ ...initialState(), tareAtMs: state.tareAtMs }, []];
     }
     case 'reset':
-      return [initialState(), []];
+      return [{ ...initialState(), tareAtMs: state.tareAtMs }, []];
+    case 'tared':
+      return [{ ...state, tareAtMs: ev.now }, []];
     case 'tap': {
       if (state.phase === 'ARMED') return startShot(state, ev.now, ring, 'tap');
       if (state.phase === 'RUNNING') return endShot(state, ev.now, 'tap');
@@ -444,10 +465,13 @@ function onFrame(
       if (!armed) return [state, []];
       const stable = ring.rangeOver(REC.stableWindowMs, ev.now) < REC.stableDeltaG;
       let prompt = state.prompt;
+      // A cup put down (a placement jump) or the tare that follows is not a running shot.
+      const from = riseWindowStart(state, ev.now, REC.forgotTapWindowMs);
       if (
         prompt === null &&
-        ring.riseOver(REC.forgotTapWindowMs, ev.now) > REC.forgotTapRiseG &&
-        ring.flowOver(REC.liveFlowWindowMs, ev.now) > REC.forgotTapFlowGps
+        ring.riseSince(from) > REC.forgotTapRiseG &&
+        ring.maxJumpBetween(from, ev.now) < REC.placementJumpG &&
+        ring.flowOver(Math.min(REC.liveFlowWindowMs, ev.now - from), ev.now) > REC.forgotTapFlowGps
       ) {
         prompt = 'forgot_tap';
         effects.push({ type: 'prompt', kind: 'forgot_tap' });
