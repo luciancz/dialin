@@ -108,6 +108,8 @@ class AppState {
   /** Auto-tare detector state (src/shot/autoTare.ts) and the time of the last tare it sent. */
   private autoTare: AutoTareState = initAutoTare();
   readonly lastAutoTareAt = signal<number | null>(null);
+  /** Dose weighed in the bean weighing step (attached to the next shot when still in use). */
+  readonly weighedDose = signal<{ g: number; plannedG: number } | null>(null);
 
   // ---- recorder ----
   readonly recorder = signal<RecorderState>(initialState());
@@ -391,6 +393,15 @@ class AppState {
       .catch((err) => diag.log('warn', `auto-tare failed: ${String(err)}`));
   }
 
+  /** Tare now (the weighing step's button, or when auto-tare is off). */
+  async tareNow(): Promise<void> {
+    if (!this.client) return;
+    const now = realClock.now();
+    await this.client.send(commands.tare());
+    this.dispatch({ type: 'tared', now });
+    this.lastAutoTareAt.value = now;
+  }
+
   private runEffect(e: Effect): void {
     switch (e.type) {
       case 'send': {
@@ -509,6 +520,9 @@ class AppState {
     }
     this.shotIndexOfDay += 1;
     const shotId = newId();
+    // The weighed dose counts only if the dose was not changed by hand afterwards.
+    const wd = this.weighedDose.value;
+    const weighed = wd && Math.abs(wd.g - this.nextSettings.value.doseG) < 0.05 ? wd : null;
     const prevRec = this.lastRecommendation.value;
     // A calibration slot is tagged when the shot was pulled at the slot's RPM (the tag is
     // immutable; the planner reads slots and repeats from it).
@@ -528,6 +542,7 @@ class AppState {
         shotIndexOfDay: this.shotIndexOfDay,
         appVersion: APP_VERSION,
         ...(settings.scaleFirmware ? { scaleFirmware: settings.scaleFirmware } : {}),
+        ...(weighed ? { doseWeighed: weighed } : {}),
       },
       features: pending.features,
       endedBy: pending.draft.endedBy ?? 'tap',
@@ -575,6 +590,7 @@ class AppState {
     await this.saveSettings({ shotsSinceExport: settings.shotsSinceExport + 1 });
     this.pending.value = null;
     this.pendingDeviation = null;
+    this.weighedDose.value = null;
     this.dispatch({ type: 'rated', now: realClock.now() });
     this.dispatch({ type: 'reset', now: realClock.now() });
     await this.loadBagRows(bag.id);

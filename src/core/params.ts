@@ -64,6 +64,16 @@ export const REC = {
   autoTareBandG: 0.2,
   autoTareRemovedG: 10,
   autoTareCooldownMs: 3000,
+  /**
+   * Bean weighing: the dose is captured once the reading is above 3 g and steady within one
+   * scale count (0.1 g) for 1.5 s; it is re-opened if the reading moves by 0.3 g. A dose more
+   * than 0.3 g from the plan gets a note.
+   */
+  weighMinG: 3,
+  weighStableMs: 1500,
+  weighStableRangeG: 0.1,
+  weighReopenG: 0.3,
+  weighNoteG: 0.3,
 } as const;
 
 /** ScaleClient. */

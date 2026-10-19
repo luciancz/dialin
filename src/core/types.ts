@@ -135,6 +135,8 @@ export interface Context {
   prepNote?: string;
   appVersion: string;
   scaleFirmware?: string;
+  /** The dose was weighed on the scale (bean weighing step): the exact grams and the plan. */
+  doseWeighed?: { g: number; plannedG: number };
   /** Future drop-ins (Gicar tap, pump reed, pressure). Nothing writes these yet. */
   sensors?: { gicar?: unknown; pumpOnAtMs?: number; pressureBar?: number[] };
 }
