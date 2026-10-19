@@ -4,10 +4,12 @@ import { initSetpoint, summary, updateSlider } from '../../src/core/setpoint/gri
 import {
   balancedLnFlow,
   bestLines,
+  bodyRegret,
   createDemoWorld,
   perceivedOffset,
   ratioOf,
   simulateDemoShot,
+  stallsAt,
   tasteDemoShot,
   trueLnFlow,
 } from '../../src/core/sim/demoWorld';
@@ -47,7 +49,7 @@ describe('demo world', () => {
   });
 
   it('tastes sour when faster than balanced (under-extracted) and bitter when slower', () => {
-    const w = { ...createDemoWorld({ seed: 9, L0: 180 }), tasteNoise: 0 };
+    const w = { ...createDemoWorld({ seed: 9, L0: 180 }), tasteNoise: 0, betaBody: 1 };
     const rng = mulberry32(1);
     const bal = balancedLnFlow(w, 2.2);
     const sour = tasteDemoShot(
@@ -111,5 +113,33 @@ describe('demo world', () => {
     }
     const meanAbs = errs.reduce((a, e) => a + Math.abs(e), 0) / errs.length;
     expect(meanAbs).toBeLessThan(0.05);
+  });
+  it('v2: RPM curvature, balance shift, body sensitivity and stalls', () => {
+    const w = { ...createDemoWorld({ seed: 11, L0: 180 }), kQ: 0.004, delta: 0.02 };
+    expect(w.version).toBe(2);
+    // The compensated best dial at 1300 RPM tastes balanced at 1300 RPM.
+    const s = settings(180, {
+      grind: { dialPos: fromLines(180, DEFAULT_DIAL_SPEC), rpm: 1300, rpmConfirmed: true },
+    });
+    const L = bestLines(w, s);
+    const atBest = {
+      ...s,
+      grind: { ...s.grind, dialPos: fromLines(Math.round(L), DEFAULT_DIAL_SPEC) },
+    };
+    const y = trueLnFlow(w, atBest, DEFAULT_DIAL_SPEC);
+    expect(Math.abs(perceivedOffset(w, y, ratioOf(s), 1300))).toBeLessThanOrEqual(w.kG / 2 + 1e-9);
+    // δ > 0: the balanced flow is higher at higher RPM.
+    expect(balancedLnFlow(w, 2.2, 1300)).toBeCloseTo(balancedLnFlow(w, 2.2) + 0.06, 9);
+    expect(bodyRegret(w, w.rpmStar)).toBe(0);
+    expect(stallsAt({ ...w, stallBelow: 600 }, 500)).toBe(true);
+    expect(stallsAt({ ...w, stallBelow: 600 }, 600)).toBe(false);
+    expect(stallsAt({ ...w, stallBelow: null }, 500)).toBe(false);
+    // β = 0: body does not depend on RPM.
+    const flat = { ...w, betaBody: 0, tasteNoise: 0 };
+    const rng = mulberry32(5);
+    for (const rpm of [600, 1000, 1500]) {
+      const t = tasteDemoShot(flat, { y: 0.5, ratio: 2.2, rpm, channel: false }, null, rng);
+      expect(t.thinHeavy).toBe(0);
+    }
   });
 });

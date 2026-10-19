@@ -252,6 +252,12 @@ describe('RPM levers', () => {
     expect(b).not.toBeNull();
     expect(b?.rpm).toBeGreaterThan(1000);
     expect(Math.abs(b?.residual ?? 1)).toBeLessThan(0.03);
+    // The body band only has RPMs that make it worse: an RPM outside the band still wins.
+    const outside = backupRpm(c, 180, 1000, [500, 1000]);
+    expect(outside?.rpm).toBeGreaterThan(1000);
+    // Inside the band wins when it is nearly as good.
+    const near = backupRpm(c, 180, 1000, [1000, 1600]);
+    expect(near?.rpm).toBeGreaterThan(1000);
     // Unknown direction: no backup.
     const unsure = ctx(-0.002);
     (unsure.model.P[IDX_KR] as number[])[IDX_KR] = 0.03 ** 2;

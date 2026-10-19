@@ -21,7 +21,7 @@ import {
   kRpmCurv,
 } from './flowmodel/state';
 import { phi } from './math/normal';
-import { MODEL, RULES } from './params';
+import { MODEL, RPM, RULES } from './params';
 import { type Balance, balanceSd, initBalance, sStarAt } from './rpm/balance';
 import {
   CALIBRATION_SLOTS,
@@ -41,6 +41,7 @@ import { allowedRpmRange, clampRpm, e006Guidance, uOf } from './rpm/range';
 import {
   backupSentence,
   bodySentence,
+  calibrationDoneSentence,
   calibrationSentence,
   firstShotSentence,
   grindSentence,
@@ -71,7 +72,7 @@ import type {
   Stage,
   TempSwitch,
 } from './types';
-import { fromLines, toLines } from './units';
+import { formatDial, fromLines, toLines } from './units';
 
 export interface ShotView {
   shot: Shot;
@@ -209,6 +210,22 @@ export function recommend(input: RecommendInput): RecommendOutput {
       })
     : null;
   const bodyTarget = bodyMoveTarget(curRpm, prefSummary.bayesRpm, range);
+  // The session just ended (the last shot was a slot and none is next): leave the slot's RPM.
+  let calibrationFinish: { rpm: number; reason: 'preferred' | 'previous' } | null = null;
+  const lastTag = last?.shot.calibration ?? null;
+  if (lastTag && !progress?.next) {
+    const insensitive = pref.ratings === 0 || prefSummary.pInsensitive >= RPM.pInsensitiveMax;
+    const firstTagged = shots.findIndex((s) => s.shot.calibration?.runId === lastTag.runId);
+    const before = firstTagged > 0 ? shots[firstTagged - 1] : undefined;
+    const preRun = before?.shot.settings.grind.rpm ?? bag.rpm;
+    // The slot's RPM was an experimental level, not a choice: always leave it. Back to the usual
+    // RPM unless the preferred body is clearly elsewhere (the usual RPM is outside the band).
+    const usualOk = insensitive || (preRun >= prefSummary.band[0] && preRun <= prefSummary.band[1]);
+    const target = clampRpm(usualOk ? preRun : prefSummary.bayesRpm, range);
+    if (target !== curRpm) {
+      calibrationFinish = { rpm: target, reason: usualOk ? 'previous' : 'preferred' };
+    }
+  }
   const ctx: LeverCtx = {
     model,
     bagId: bag.id,
@@ -261,6 +278,7 @@ export function recommend(input: RecommendInput): RecommendOutput {
       probImprove: probImprove(pref, curRpm, bodyTarget),
     },
     calibration: progress?.next ?? null,
+    calibrationFinish,
     tempCardShown: input.tempCardShown,
     outlierPending,
     learnableCount: learnable.length,
@@ -330,7 +348,32 @@ export function recommend(input: RecommendInput): RecommendOutput {
     if (cv.veto) vetoes.push(cv.veto);
     if (inv) vetoes.push(...inv.vetoes);
     if (inv?.probeStep && Math.abs((inv.raw ?? 0) - curLines) > MODEL.probeStepLines) probe = true;
+    // Backup flow lever: the dial is at (or was cut by) a limit; a calibrated RPM covers the
+    // rest. Tried also when the dial already sits at the limit (the step rounds to zero).
+    const tryBackup = (atLines: number): boolean => {
+      if (!inv?.clamped || halfStep) return false;
+      if (!calibrated) {
+        whyNot.push('not backup RPM: RPM not calibrated yet');
+        return false;
+      }
+      const shiftAt = (r: number) => yTarget + (targetAt(r) - targetAt(curRpm));
+      const b = backupRpm({ ...ctx, targetAt: shiftAt }, atLines, curRpm, prefSummary.band);
+      if (!b) {
+        whyNot.push(
+          'not backup RPM: no RPM in reach closes the gap (direction unknown or too small)',
+        );
+        return false;
+      }
+      setRpmAndDial(b.rpm, atLines);
+      targetY = shiftAt(b.rpm);
+      source = 'rpmModel';
+      return true;
+    };
     if (d === 0) {
+      if (inv?.clamped && tryBackup(curLines)) {
+        sentence = `Keep ${formatDial(current.grind.dialPos)}.${backupSentence({ rpm: next.grind.rpm, prevRpm: curRpm, limit: inv.clamped })}`;
+        return;
+      }
       if (!halfStep && tryTrim()) return;
       lever = 'none';
       sentence = noneSentence({
@@ -354,26 +397,8 @@ export function recommend(input: RecommendInput): RecommendOutput {
       secPerLineSd,
       learning,
     });
-    // Backup flow lever: the dial hit a limit; let a calibrated RPM cover the rest.
-    if (inv?.clamped && !halfStep) {
-      if (!calibrated) {
-        whyNot.push('not backup RPM: RPM not calibrated yet');
-      } else {
-        const b = backupRpm(
-          { ...ctx, targetAt: (r) => yTarget + (targetAt(r) - targetAt(curRpm)) },
-          toLines(next.grind.dialPos, spec),
-          curRpm,
-          prefSummary.band,
-        );
-        if (b) {
-          setRpmAndDial(b.rpm, toLines(next.grind.dialPos, spec));
-          source = 'rpmModel';
-          sentence += backupSentence({ rpm: b.rpm, prevRpm: curRpm, limit: inv.clamped });
-        } else
-          whyNot.push(
-            'not backup RPM: no RPM in reach closes the gap (direction unknown or too small)',
-          );
-      }
+    if (inv?.clamped && tryBackup(toLines(next.grind.dialPos, spec))) {
+      sentence += backupSentence({ rpm: next.grind.rpm, prevRpm: curRpm, limit: inv.clamped });
     }
   };
 
@@ -405,6 +430,27 @@ export function recommend(input: RecommendInput): RecommendOutput {
         targetY,
         prep: decision.prep,
         repeat: (slotState?.tries ?? 0) > 0,
+      });
+      break;
+    }
+    case 14: {
+      // Calibration done: one compensated move from the last slot to the preferred RPM.
+      lever = 'rpm';
+      source = 'rpmModel';
+      stage = 'F_rpm';
+      const inv = compensatedDial(ctx, decision.rpm);
+      if (inv) vetoes.push(...inv.vetoes);
+      setRpmAndDial(decision.rpm, inv?.lines ?? curLines);
+      targetY = targetAt(decision.rpm);
+      sentence = calibrationDoneSentence({
+        rpm: decision.rpm,
+        prevRpm: curRpm,
+        from: current.grind.dialPos,
+        to: next.grind.dialPos,
+        deltaLines: toLines(next.grind.dialPos, spec) - curLines,
+        targetY,
+        reason: decision.reason,
+        prep: decision.prep,
       });
       break;
     }

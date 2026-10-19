@@ -357,6 +357,8 @@ export const RPM = {
   trimMinGain: 0.01,
   /** Slope significance for the backup lever: |slope| ≥ z·sd. */
   backupZ: 1.28,
+  /** Backup RPM: an RPM inside the body band wins when within this much ln flow of the best. */
+  backupBandSlackLn: 0.02,
   /** κ variance growth per day, scaled like k_r's (sd ratio 0.005/0.035). */
   curvDriftVarPerDay: 1e-7 * (0.005 / 0.035) ** 2,
 } as const;

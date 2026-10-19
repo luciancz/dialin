@@ -55,6 +55,8 @@ export interface RuleFacts {
   rpmFacts: RpmFacts;
   /** Next slot of an active RPM calibration run, if any. */
   calibration: { slot: number; rpm: number } | null;
+  /** The calibration session just ended on the last shot: where RPM should go now. */
+  calibrationFinish: { rpm: number; reason: 'preferred' | 'previous' } | null;
   tempCardShown: boolean;
   /** Last shot skipped as an outlier and not yet re-anchored. */
   outlierPending: boolean;
@@ -72,7 +74,14 @@ export type RuleDecision =
   | { row: 10; lever: 'temperature'; taste: 'sour' | 'bitter'; k: number; n: number }
   | { row: 11; lever: 'none'; reason: 'dialled_in' }
   | { row: 12; lever: 'grind'; target: 'setpoint_search' }
-  | { row: 13; lever: 'calibrate'; slot: number; rpm: number; prep: string[] | null };
+  | { row: 13; lever: 'calibrate'; slot: number; rpm: number; prep: string[] | null }
+  | {
+      row: 14;
+      lever: 'rpm';
+      rpm: number;
+      reason: 'preferred' | 'previous';
+      prep: string[] | null;
+    };
 
 export function lastRated(shots: RuleShot[]): RuleShot | null {
   for (let i = shots.length - 1; i >= 0; i--) {
@@ -113,6 +122,20 @@ export function evaluateRules(f: RuleFacts): { decision: RuleDecision; whyNot: s
         lever: 'calibrate',
         slot: f.calibration.slot,
         rpm: f.calibration.rpm,
+        prep: channelled ? signs : null,
+      },
+      whyNot,
+    };
+  }
+  // 14. The session just ended on an extreme slot: one compensated move to the preferred RPM
+  // (or back to the pre-session RPM when RPM barely changes body).
+  if (f.calibrationFinish) {
+    return {
+      decision: {
+        row: 14,
+        lever: 'rpm',
+        rpm: f.calibrationFinish.rpm,
+        reason: f.calibrationFinish.reason,
         prep: channelled ? signs : null,
       },
       whyNot,
@@ -277,6 +300,7 @@ export const RULE_NAMES: Record<number, string> = {
   11: 'dialled in',
   12: 'setpoint search',
   13: 'RPM calibration slot',
+  14: 'calibration done → preferred RPM',
 };
 
 export function leverOf(d: RuleDecision): Lever {

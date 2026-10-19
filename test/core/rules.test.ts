@@ -61,6 +61,7 @@ function facts(over: Partial<RuleFacts> = {}): RuleFacts {
       probImprove: 0,
     },
     calibration: null,
+    calibrationFinish: null,
     tempCardShown: false,
     outlierPending: false,
     learnableCount: 3,
@@ -198,6 +199,25 @@ describe('rule table, one case per row', () => {
     ).decision;
     expect(d.row).toBe(13);
     if (d.row === 13) expect(d.prep?.length).toBeGreaterThan(0);
+  });
+  it("14 after the session the last slot's RPM goes to the preferred one (after row 13, before prep)", () => {
+    const fin = { rpm: 900, reason: 'preferred' as const };
+    expect(evaluateRules(facts({ calibrationFinish: fin })).decision).toMatchObject({
+      row: 14,
+      lever: 'rpm',
+      rpm: 900,
+      prep: null,
+    });
+    const ch = evaluateRules(
+      facts({ calibrationFinish: fin, shots: [ruleShot({ channelFlag: true })] }),
+    ).decision;
+    expect(ch.row).toBe(14);
+    if (ch.row === 14) expect(ch.prep?.length).toBeGreaterThan(0);
+    // A slot still to pull wins.
+    expect(
+      evaluateRules(facts({ calibration: { slot: 7, rpm: 500 }, calibrationFinish: fin })).decision
+        .row,
+    ).toBe(13);
   });
   it('10 temperature once per bag after 4 rated in-band shots leaning sour', () => {
     const sour = [rated(-2), rated(-1), rated(-2), rated(-2)].map((s) => ({

@@ -88,7 +88,10 @@ export interface PlanInput {
 }
 
 export function planCalibration(p: PlanInput): CalibrationProgress {
-  const tagged = p.views.filter((v) => v.shot.calibration?.runId === p.run.id);
+  // A stalled shot (E006) is not a try: it narrows the range and the slot is re-planned.
+  const tagged = p.views.filter(
+    (v) => v.shot.calibration?.runId === p.run.id && v.quality?.status !== 'stalled',
+  );
   const slots: SlotState[] = Array.from({ length: CALIBRATION_SLOTS }, (_, slot) => ({
     slot,
     plannedRpm: null,

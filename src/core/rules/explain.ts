@@ -95,6 +95,28 @@ export function calibrationSentence(a: {
   return head + prep + tail;
 }
 
+/** The calibration session ended: leave the last slot's RPM for the preferred (or previous) one. */
+export function calibrationDoneSentence(a: {
+  rpm: number;
+  prevRpm: number;
+  from: DialPosition;
+  to: DialPosition;
+  deltaLines: number;
+  targetY: number;
+  reason: 'preferred' | 'previous';
+  prep: string[] | null;
+}): string {
+  const why =
+    a.reason === 'preferred'
+      ? 'your preferred body'
+      : 'your usual RPM (it is within the RPM range that gives you the same body)';
+  const prep =
+    a.prep && a.prep.length > 0
+      ? ` The last shot looked channelled (${a.prep.join(', ')}): WDT and a level tamp.`
+      : '';
+  return `RPM calibration done: set ${a.rpm} RPM (was ${a.prevRpm}) for ${why}, and ${dialMove(a.from, a.to, a.deltaLines)}, compensated to hold ${gps(a.targetY)} g/s.${prep}`;
+}
+
 /** Backup flow lever: the dial is at a limit, RPM covers the rest. */
 export function backupSentence(a: {
   rpm: number;

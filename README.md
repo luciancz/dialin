@@ -20,6 +20,7 @@ is the checklist for the first sessions at the machine.
 | M2 flow model, rules, recommendation, replay, simulator | done; see "Convergence suite" |
 | M3 taste setpoint, RPM rule, temperature card | done; see "Convergence suite" |
 | M4 onboarding, beans/bags, hardware epochs, history, backup nags | done |
+| RPM calibration (8-shot session, compensated RPM levers, E006 handling) | done; see "RPM calibration" |
 | M5 field hardening | **open**, needs the scale and the machine (list below) |
 
 ## Setup
@@ -56,9 +57,14 @@ service worker with the precache list into `dist/`).
    numbers. The taste-setpoint card shows the posterior over plateau flow.
 6. **Hardware**: open a new calibration epoch when you clean, add a washer, change springs or
    burrs, re-zero or recount the dial. The card is recomputed from the transformed model.
-7. **History**: badges, include / exclude a shot from learning (with a note), flow-vs-dial
+7. **RPM calibration** (`#/rpm`, from Hardware, the bag page or the offer on the card):
+   eight shots minutes apart, every dial compensated to hold the balanced flow. Afterwards
+   the app moves body at the same flow, uses RPM when the dial is at a limit, and trims
+   below one dial line. "Grinder stalled (E006)" on the shot screen raises the bag's RPM
+   floor to the stall + 100.
+8. **History**: badges, include / exclude a shot from learning (with a note), flow-vs-dial
    scatter with the fitted line, overlay of two curves.
-8. **Settings → Backup**: export (share sheet → download → clipboard) and import with a
+9. **Settings → Backup**: export (share sheet → download → clipboard) and import with a
    dry-run merge preview. Export every few shots; the app nags at 5 shots or 7 days.
 
 ### iPhone (Bluefy)
@@ -93,24 +99,27 @@ site is served under `/dialin/`; hash routing keeps refreshes working.
 `test/core/convergence.test.ts` runs the real recommend / replay loop against a seeded hidden
 truth for 200 seeds per scenario. Scenarios whose measured rate is below the plan's target
 are kept at the plan's number but marked `fails`, with a regression floor at the measured
-rate, so a change that moves them is visible either way. Measured on 2026-10-18 with the
-simulated shot-to-shot noise equal to the model's `σ_y = 0.07` and the taste gate at
-`σ_s ≤ 0.08` (see "Taste retune" below):
+rate, so a change that moves them is visible either way. Measured with the simulated
+shot-to-shot noise equal to the model's `σ_y = 0.07` and the taste gate at `σ_s ≤ 0.08`
+(see "Taste retune" below). Re-measured on 2026-10-19: the RPM calibration build redraws
+k_r from the research prior and adds RPM truth draws, so every seed's random stream
+changed. Moves of a few points against 2026-10-18 are sampling noise between two sets of
+200 seeds.
 
 | Scenario | Plan target | Measured |
 |---|---|---|
-| (a) first bag, gain within 25 % by shot 6 | ≥ 90 % | 73 % (low-gain truths need more excursion than 5-line probe steps give) |
+| (a) first bag, gain within 25 % by shot 6 | ≥ 90 % | 74 % (low-gain truths need more excursion than 5-line probe steps give) |
 | (a′) mis-counted dial | ≥ 90 % | 68 % |
-| (b) later bag in band by shot 2 / 3 | ≥ 85 % / 75 % | 91 % / 83 %, passes |
+| (b) later bag in band by shot 2 / 3 | ≥ 85 % / 75 % | 89 % / 74.5 % (shot 3 is one seed short; 83 % on the old draw) |
 | (c) taste setpoint found within 9 rated shots at the plan's gate σ_s ≤ 0.06 | ≥ 80 % | 8 % |
-| (c) found at the app's gate σ_s ≤ 0.08, within 9 / 14 rated shots | retune target > 60 % within 14 | 62 % / 90 % |
-| (d) same with 20 % channeling, plan's gate, within 11 | ≥ 80 % | 5 % |
-| (d) at the app's gate, within 11 / 14 | none | 44 % / 60 % |
-| (e) 30-day drift bias < 0.05 | ≥ 90 % | 89 % |
-| (f) washer epoch re-anchors in one shot | ≥ 90 % | 88 % (the card is recomputed when the epoch opens, so the anchor shot is pulled at the predicted shift) |
-| (g) RPM sign after 3 pairs | ≥ 80 % | 96 %, passes |
-| (h) confidence calibration ±0.10 | all words | worst gap 0.03, passes |
-| (i) 1/x truth in band by shot 5 | ≥ 90 % | 79 % |
+| (c) found at the app's gate σ_s ≤ 0.08, within 9 / 14 rated shots | retune target > 60 % within 14 | 61 % / 92 % |
+| (d) same with 20 % channeling, plan's gate, within 11 | ≥ 80 % | 4 % |
+| (d) at the app's gate, within 11 / 14 | none | 44 % / 65 % |
+| (e) 30-day drift bias < 0.05 | ≥ 90 % | 93 % |
+| (f) washer epoch re-anchors in one shot | ≥ 90 % | 84 % (the card is recomputed when the epoch opens, so the anchor shot is pulled at the predicted shift) |
+| (g) RPM sign after 3 pairs | ≥ 80 % | 94 %, passes |
+| (h) confidence calibration ±0.10 | all words | worst gap 0.04, passes |
+| (i) 1/x truth in band by shot 5 | ≥ 90 % | 78 % |
 
 "Found" means σ_s at or below the gate and |μ_s − s\*_eff| < 0.08, where s\*_eff is the flow
 that tastes balanced at the shot's brew ratio.
@@ -181,6 +190,53 @@ The stronger slider adds 3 pp on c and 10 pp on d on top of the gate, at 1.7 tim
 odds per tasting. It is the next lever to try if field data shows the slider is reliable.
 All of this is simulation; the field test has to confirm it.
 
+### RPM calibration (2026-10-19)
+
+`test/core/convergence_rpm.test.ts` and `convergence_rpm_limits.test.ts` run 200 seeds each.
+The hidden truth adds an RPM curvature κ ~ N(0, 0.004²), a balance shift δ ~ N(0, 0.02²), a
+preferred RPM θ ~ U(700, 1400) and a body sensitivity β, which is 0 in 30 % of seeds. k_r is
+drawn from the research prior N(−0.015, 0.035²). The simulated taster rates thin–heavy as
+β·(u − θ_u) plus N(0, 0.8²) and adds the body utility to better / same / worse. Scenario
+k is 8 rated shots then the session, pulled ten minutes apart. Scenario l adds 10 daily
+shots. In scenario m the second bag's balanced dial sits below chirp + 5. In scenario n
+the grinder stalls below 750 RPM.
+
+| Scenario | Plan target | Measured |
+|---|---|---|
+| (k) sd(k_r) ≤ 0.012 after the session | ≥ 95 % | 98.5 %, passes |
+| (k) k̂_r within 2 sd of the truth | ≥ 90 % | 94 %, passes |
+| (k) session done within 10 shots | ≥ 95 % | 93.5 % (channelled slots repeat; 97.5 % of runs complete) |
+| (k) every calibration shot within 0.14 ln of the balanced flow at its RPM | ≥ 90 % | 15 % of sessions, 72 % of shots |
+| (k) δ within 2 sd of the truth | none | 95.5 % |
+| (l) body-sensitive: final body regret ≤ 0.1 | ≥ 75 % | 92 %, passes (63 % if RPM stays at 1000) |
+| (l) compensated RPM moves hold flow within β | ≥ 80 % | 97.5 % of 202 moves, passes |
+| (l) RPM-insensitive: no body move, back to the usual RPM | ≥ 90 % | 100 %, passes |
+| (l) RPM-insensitive: P(RPM barely matters) ≥ 0.6 | ≥ 70 % | 98 %, passes |
+| (m) backup RPM reaches the band at the dial floor, reachable seeds | ≥ 80 % | 86 %, passes (1 % without RPM) |
+| (n) no recommendation below stall + 100 | 100 % | 100 %, passes |
+| (n) session completes after the stall | ≥ 90 % | 100 %, passes |
+
+**Two fixes came out of these runs.**
+
+- **Session finish (rule row 14).** The session used to leave you at its last slot, often
+  500 or 1600 RPM. Body moves then crawled back 300 RPM at a time with three-shot gaps,
+  which ended worse than never leaving 1000. Now the card after the last slot makes one
+  compensated move. It returns to your usual RPM when that sits inside your body band, and
+  otherwise goes to the preferred RPM.
+- **Backup RPM selection.** When no RPM inside the body band helped, the in-band
+  preference also blocked the out-of-band RPMs that close the gap. Now an in-band RPM wins
+  only when it gets within 0.02 ln of the best RPM overall. The backup is also tried when
+  the dial already sits at its limit and the step rounds to zero.
+
+**What it costs.** The first shot at each new RPM level carries the prior's uncertainty,
+about ±11 % flow at 700 RPM and more at 500 or 1600. On the slot table, repeat visits miss
+the balanced flow by 0.07–0.09 ln RMS and first visits by 0.10–0.19. The 0.14 target for
+every shot cannot hold while the session spans 500–1600. Narrowing block 2 would trade away
+the information the session exists to collect, so the target stays under `it.fails`. The
+plan's "flow within β after body moves" is measured as the true flow at the moved settings
+against the model's prediction. Matching the true balanced flow also depends on the
+setpoint, which σ_s covers.
+
 ## M5: open until the first sessions at the machine
 
 Run `docs/FIELD_TEST.md` on Windows Chrome, then on the iPhone in Bluefy. Open items:
@@ -196,3 +252,6 @@ Run `docs/FIELD_TEST.md` on Windows Chrome, then on the iPhone in Bluefy. Open i
 - Own recordings from the recorder transport committed as fixtures (replacing the synthetic
   ones for the replay tests).
 - Threshold tuning from the first 10 real shots (auto-end, pre-alert tail, late-tap window).
+- RPM calibration on the real grinder (`docs/FIELD_TEST.md` §RPM): the sign and size of k_r
+  against the prior N(−0.015, 0.035²); whether the 12 slider steps per ln flow assumed by δ
+  is plausible from matched-flow tastings; whether compensated moves hold flow within 7 %.

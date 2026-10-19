@@ -58,7 +58,9 @@ function residualAt(ctx: LeverCtx, lines: number, rpm: number): number | null {
 
 /**
  * Backup flow lever: the dial is stuck at `clampedLines`; pick the RPM within ±400 that brings
- * the prediction closest to target, preferring the body band. Null when nothing helps by ≥ 0.01.
+ * the prediction closest to target. Inside the body band is preferred when it gets within
+ * 0.02 ln of the best RPM overall (body matters less than a 2 % flow error). Null when nothing
+ * helps by ≥ 0.01.
  */
 export function backupRpm(
   ctx: LeverCtx,
@@ -70,7 +72,7 @@ export function backupRpm(
   const base = residualAt(ctx, clampedLines, currentRpm);
   if (base === null) return null;
   const [lo, hi] = ctx.range;
-  let best: { rpm: number; residual: number; inBand: boolean } | null = null;
+  const improving: { rpm: number; residual: number; inBand: boolean }[] = [];
   for (
     let r = quantRpm(Math.max(lo, currentRpm - RPM.backupMaxStep));
     r <= Math.min(hi, currentRpm + RPM.backupMaxStep);
@@ -78,19 +80,26 @@ export function backupRpm(
   ) {
     if (r === currentRpm || r < lo) continue;
     const res = residualAt(ctx, clampedLines, r);
-    if (res === null) continue;
-    const inBand = band ? r >= band[0] && r <= band[1] : true;
-    const cand = { rpm: r, residual: res, inBand };
-    if (
-      !best ||
-      (cand.inBand && !best.inBand && Math.abs(res) < Math.abs(base) - RPM.trimMinGain) ||
-      (cand.inBand === best.inBand && Math.abs(res) < Math.abs(best.residual))
-    ) {
-      best = cand;
-    }
+    if (res === null || Math.abs(res) > Math.abs(base) - RPM.trimMinGain) continue;
+    improving.push({ rpm: r, residual: res, inBand: band ? r >= band[0] && r <= band[1] : true });
   }
-  if (!best || Math.abs(best.residual) > Math.abs(base) - RPM.trimMinGain) return null;
-  return { rpm: best.rpm, residual: best.residual };
+  // Smallest residual, ties to the smaller RPM change.
+  const better = (a: (typeof improving)[number], b: (typeof improving)[number]) =>
+    Math.abs(a.residual) < Math.abs(b.residual) - 1e-12 ||
+    (Math.abs(a.residual) <= Math.abs(b.residual) + 1e-12 &&
+      Math.abs(a.rpm - currentRpm) < Math.abs(b.rpm - currentRpm));
+  let best: (typeof improving)[number] | null = null;
+  let bestIn: (typeof improving)[number] | null = null;
+  for (const c of improving) {
+    if (!best || better(c, best)) best = c;
+    if (c.inBand && (!bestIn || better(c, bestIn))) bestIn = c;
+  }
+  if (!best) return null;
+  const pick =
+    bestIn && Math.abs(bestIn.residual) <= Math.abs(best.residual) + RPM.backupBandSlackLn
+      ? bestIn
+      : best;
+  return { rpm: pick.rpm, residual: pick.residual };
 }
 
 /**
