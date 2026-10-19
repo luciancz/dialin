@@ -44,7 +44,8 @@ export interface MadeTransport {
   webbt?: WebBluetoothTransport;
 }
 
-let simShotCounter = 0;
+// Starts at a random value so the first simulated shot after a reload is not always the same one.
+let simShotCounter = Math.floor(Math.random() * 1_000_000);
 
 export function makeTransport(
   kind: TransportKind,
@@ -61,7 +62,8 @@ export function makeTransport(
             ? { autoOffAfterMs: 4 * 60_000, standbyMin: 5, autoOffCommandExtends: false }
             : {};
     const fake = new FakeTransport({ clock: realClock, seed: sim.seed, persona });
-    fake.setCupWeight(118.3);
+    // The simulated scale starts empty, so putting a cup on it is a visible placement (auto-tare).
+    fake.setCupWeight(0);
     // Self-driving: a start command "lifts the lever" and the simulated shot begins to pour.
     fake.onCommand((bytes) => {
       const cmd = bytes[2];

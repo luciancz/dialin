@@ -15,6 +15,7 @@ import {
   pullDemoShot,
   resetDemo,
   updateDemoWorld,
+  watchDemoShot,
 } from '../../app/demo';
 import { isDemo } from '../../app/mode';
 import { lastReplay, modelSummary } from '../../app/recommender';
@@ -33,6 +34,7 @@ import {
 } from '../../core/sim/demoWorld';
 import { formatDial, fromLines, toLines } from '../../core/units';
 import { RecommendationCard } from '../components/RecommendationCard';
+import { ThreeView } from '../components/ThreeView';
 
 function DemoIntro() {
   return (
@@ -120,6 +122,7 @@ export function Demo() {
         <span class="badge probe">demo data</span>
       </div>
 
+      <ThreeView view="setup" height={220} />
       <RecommendationCard rec={app.lastRecommendation.value} />
 
       <div class="card">
@@ -133,6 +136,13 @@ export function Demo() {
           <button
             type="button"
             class="primary"
+            disabled={busy !== ''}
+            onClick={() => void watchDemoShot()}
+          >
+            Watch a shot: weigh, grind and pour in 3D
+          </button>
+          <button
+            type="button"
             disabled={busy !== ''}
             onClick={() => {
               void pullDemoShot('manual').then((ok) => {

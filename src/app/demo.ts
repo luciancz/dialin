@@ -19,9 +19,14 @@ import type { DialPosition } from '../core/types';
 import { toLines } from '../core/units';
 import { deleteDialinDb } from '../data/db';
 import { diag } from '../diag/log';
+import { realClock } from '../scale/clock';
 import type { ShotDraft } from '../shot/machine';
+import { openWeigh, weighStep } from '../shot/weigh';
+import { grindRateGps } from '../ui/three/anim';
 import { reportStall } from './calibration';
 import { DEMO_DB_NAME, isDemo, reloadInto } from './mode';
+import { navigate } from './router';
+import { backToPlan, openGrindStep, openWeighStep, weighOpenedAt } from './shotFlow';
 import { app, type PendingShot } from './state';
 
 /** Only the two simulation sliders live in local storage; the hidden world does not. */
@@ -233,18 +238,29 @@ export async function pullDemoShot(mode: 'manual' | 'auto'): Promise<boolean> {
   app.pending.value = pending;
   if (mode === 'manual') return true;
 
+  await rateAsPalate(w, pending, shot.yObs, shot.channel, rng);
+  return true;
+}
+
+/** The simulated palate tastes the pending shot and saves it with the rating. */
+async function rateAsPalate(
+  w: DemoWorld,
+  pending: PendingShot,
+  yFallback: number,
+  channel: boolean,
+  rng: () => number,
+): Promise<void> {
+  const s = app.nextSettings.value;
   const prev = app.shotsOfBag.value[app.shotsOfBag.value.length - 1] ?? null;
-  const yCup =
-    shot.features.plateauFlow && shot.features.plateauFlow > 0
-      ? Math.log(shot.features.plateauFlow)
-      : shot.yObs;
+  const f = pending.features;
+  const yCup = f.plateauFlow && f.plateauFlow > 0 ? Math.log(f.plateauFlow) : yFallback;
   const prevY =
     prev?.features.plateauFlow && prev.features.plateauFlow > 0
       ? Math.log(prev.features.plateauFlow)
       : null;
   const tasting = tasteDemoShot(
     w,
-    { y: yCup, ratio: ratioOf(s), rpm: s.grind.rpm, channel: shot.channel },
+    { y: yCup, ratio: ratioOf(s), rpm: s.grind.rpm, channel },
     prev && prevY !== null
       ? { y: prevY, ratio: ratioOf(prev.settings), rpm: prev.settings.grind.rpm }
       : null,
@@ -260,7 +276,135 @@ export async function pullDemoShot(mode: 'manual' | 'auto'): Promise<boolean> {
     overall1to9: tasting.overall,
     drink: 'black',
   });
-  return true;
+}
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/** Wait until `ok()` holds (polled every 100 ms); false after `ms`. */
+async function until(ok: () => boolean, ms: number): Promise<boolean> {
+  const end = realClock.now() + ms;
+  while (realClock.now() < end) {
+    if (ok()) return true;
+    await sleep(100);
+  }
+  return ok();
+}
+
+/** Weight of the VS6's empty dosing cup and of the glass espresso cup (simulated scale). */
+const DOSING_CUP_G = 92.4;
+const ESPRESSO_CUP_G = 168.0;
+let watching = false;
+
+/**
+ * Watch a whole shot through the live path: the simulated scale gets the dosing cup (auto-tare),
+ * the beans (the weigh step captures the dose), the grind, then the espresso cup (auto-tare),
+ * START, the pour, STOP at the target, the drip window and the simulated palate's rating.
+ * Everything runs through the real recorder, auto-tare, weigh step and 3D views.
+ */
+export async function watchDemoShot(): Promise<void> {
+  const w = demoWorld.value;
+  if (!w || watching) return;
+  watching = true;
+  try {
+    if (app.clientState.value !== 'connected') {
+      demoBusy.value = 'connecting the simulated scale…';
+      await app.connect();
+      await until(() => app.clientState.value === 'connected', 6000);
+    }
+    const fake = app.made?.fake;
+    if (!fake) throw new Error('the simulated scale is not connected');
+    const s0 = app.nextSettings.value;
+    if (stallsAt(w, s0.grind.rpm)) {
+      app.toast('warn', `Simulated VS6: E006 at ${s0.grind.rpm} RPM, the motor stalled.`);
+      await reportStall(s0.grind.rpm);
+      return;
+    }
+    sessionPulls += 1;
+    const rng = mulberry32(
+      (w.seed + app.shotsOfBag.value.length * 7919 + sessionPulls * 104_729) >>> 0,
+    );
+    navigate('/shot');
+    // 1. Dosing cup on the scale: auto-tare.
+    demoBusy.value = 'dosing cup on the scale…';
+    fake.setCupWeight(0);
+    await sleep(900);
+    openWeighStep();
+    const opened = weighOpenedAt.value;
+    await sleep(500);
+    fake.setCupWeight(DOSING_CUP_G);
+    const tared = await until(() => (app.lastAutoTareAt.value ?? 0) > opened, 4000);
+    if (!tared) await app.tareNow();
+    // 2. Beans in over 2.5 s with a small overshoot; the weigh step captures the dose.
+    demoBusy.value = 'weighing the beans…';
+    const dose = Math.round((s0.doseG + 0.25 * (rng() - 0.5)) * 10) / 10;
+    for (let i = 1; i <= 25; i++) {
+      const f = i / 25;
+      fake.setCupWeight(DOSING_CUP_G + dose * Math.min(1, f * 1.02));
+      await sleep(100);
+    }
+    fake.setCupWeight(DOSING_CUP_G + dose);
+    await until(
+      () =>
+        weighStep(openWeigh(opened), {
+          connected: true,
+          nowMs: realClock.now(),
+          tareAtMs: app.lastAutoTareAt.value,
+          ring: app.ring,
+        }).phase === 'captured',
+      5000,
+    );
+    const got = Math.round((app.lastWeight.value?.grams ?? dose) * 10) / 10;
+    app.weighedDose.value = { g: got, plannedG: s0.doseG };
+    app.nextSettings.value = { ...app.nextSettings.value, doseG: got };
+    // 3. Grind (the VS6 view runs while the beans go through).
+    demoBusy.value = `grinding ${got.toFixed(1)} g at ${s0.grind.rpm} RPM…`;
+    openGrindStep();
+    await sleep(Math.min(8000, (1000 * got) / grindRateGps(s0.grind.rpm)) + 600);
+    // 4. Dosing cup off, espresso cup on: auto-tare again; arm.
+    demoBusy.value = 'cup on the scale…';
+    fake.setCupWeight(0);
+    await sleep(1200);
+    backToPlan();
+    const before = app.lastAutoTareAt.value ?? 0;
+    fake.setCupWeight(ESPRESSO_CUP_G);
+    if (!(await until(() => (app.lastAutoTareAt.value ?? 0) > before, 4000))) await app.tareNow();
+    const ns = app.nextSettings.value;
+    app.nextSettings.value = { ...ns, grind: { ...ns.grind, rpmConfirmed: true } };
+    if (app.lastRecommendation.value) app.pendingDeviation = 'followed';
+    app.dispatch({ type: 'arm', now: realClock.now(), targetYieldG: ns.targetYieldG });
+    await sleep(1800);
+    // 5. Lever up (START), pour, STOP at the target minus the drip tail.
+    demoBusy.value = 'pulling the shot…';
+    app.dispatch({ type: 'tap', now: realClock.now() });
+    await until(() => {
+      const r = app.recorder.value;
+      return r.phase === 'RUNNING' && (r.draft?.lastG ?? 0) >= ns.targetYieldG - 1.2;
+    }, 90_000);
+    if (app.recorder.value.phase === 'RUNNING') app.dispatch({ type: 'tap', now: realClock.now() });
+    demoBusy.value = 'drip window…';
+    await until(() => app.pending.value !== null, 15_000);
+    const pending = app.pending.value;
+    if (!pending) throw new Error('the shot did not finish');
+    // 6. The simulated palate tastes it (the curve tells whether it channelled).
+    demoBusy.value = 'tasting…';
+    await sleep(1200);
+    const channel = pending.features.curveChannelScore >= 0.5;
+    await rateAsPalate(
+      w,
+      pending,
+      Math.log(Math.max(0.05, pending.features.plateauFlow ?? 1)),
+      channel,
+      rng,
+    );
+    fake.setCupWeight(0);
+    navigate('/demo');
+  } catch (err) {
+    app.toast('error', `Watch a shot stopped: ${String(err)}`);
+    diag.log('warn', `watch a shot: ${String(err)}`);
+  } finally {
+    watching = false;
+    demoBusy.value = '';
+  }
 }
 
 /** Pull and auto-rate `n` shots in a row, following each recommendation. */

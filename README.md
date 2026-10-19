@@ -21,6 +21,7 @@ is the checklist for the first sessions at the machine.
 | M3 taste setpoint, RPM rule, temperature card | done; see "Convergence suite" |
 | M4 onboarding, beans/bags, hardware epochs, history, backup nags | done |
 | RPM calibration (8-shot session, compensated RPM levers, E006 handling) | done; see "RPM calibration" |
+| Bean weighing, auto-tare, 3D VS6 / Mara X / Themis Mini views | done; see "3D views and weighing" |
 | M5 field hardening | **open**, needs the scale and the machine (list below) |
 
 ## Setup
@@ -49,9 +50,13 @@ service worker with the precache list into `dist/`).
    check the Timer-mode test, keep-awake and the capability table. Everything measured is
    stored in `settings.bleCaps` and included in exports.
 3. **Beans → Add bean**: roaster, name, roast level, process, roast date, dose, starting RPM.
-4. **Shot**: dial (rev · number · line), RPM with the "VS6 display matches" tick, dose, target
-   yield, temperature switch → Arm → **tap START as you lift the lever** → STOP at the target
-   (or let it auto-end) → rate (better / same / worse, sour–bitter, thin–heavy, chips).
+4. **Shot**: Plan → **Weigh beans** → Grind → Arm → pour.
+   - **Weigh beans:** put the empty dosing cup on the scale and it tares itself. Pour in the
+     beans; the steady reading becomes the exact dose, and the planned yield stays.
+   - **Grind:** shows the VS6 at the card's dial and RPM.
+   - **Arm:** put the cup on the scale and it tares itself. **Tap START as you lift the
+     lever** → STOP at the target, or let it auto-end → rate: better / same / worse,
+     sour–bitter, thin–heavy, chips.
 5. **Home** shows the next-shot card: one lever, absolute dial, RPM, yield, a sentence, a
    confidence word and the predicted flow band; "why not the other levers" expands the model
    numbers. The taste-setpoint card shows the posterior over plateau flow.
@@ -66,6 +71,27 @@ service worker with the precache list into `dist/`).
    scatter with the fitted line, overlay of two curves.
 9. **Settings → Backup**: export (share sheet → download → clipboard) and import with a
    dry-run merge preview. Export every few shots; the app nags at 5 shots or 7 days.
+
+### 3D views and weighing
+
+The VS6, the Mara X and the Themis Mini are drawn in 3D with three.js, from the published
+dimensions in `src/ui/three/dims.ts`. three.js is a lazily loaded chunk of about 150 kB gzip.
+
+- **What moves.** The VS6 hopper turns to the card's dial, its LED shows the RPM, and grounds
+  fall into the dosing cup while grinding. The Mara X lever lifts, the pump gauge ramps, and two
+  streams thicken with the live flow. The cup fills to the live weight, and the scale shows the
+  reading.
+- **Where.** Home, the weigh and grind steps, Armed and the live shot, and the demo's
+  "Watch a shot". "Watch a shot" runs the whole weigh → grind → pour flow through the
+  simulated scale and the real recorder.
+- **Settings → Grinder & machine.** 3D views can be turned off; nothing renders without
+  WebGL. You can also pick the grinder colour and turn auto-tare off.
+
+Auto-tare (`src/shot/autoTare.ts`) sends one tare when the reading rises by 20 g or more with
+a sharp jump, then holds within ±0.2 g for 1 s. It is off from START until the shot is saved.
+After a tare it waits until something is taken off, so beans poured into a tared dosing cup are
+never tared away. Putting a cup down while armed no longer raises "Shot running?", and a
+START right after putting the cup down is no longer read as a late tap.
 
 ### iPhone (Bluefy)
 

@@ -12,6 +12,7 @@ import {
   InstancedMesh,
   type Material,
   Mesh,
+  type Object3D,
   PerspectiveCamera,
   PMREMGenerator,
   Scene,
@@ -73,7 +74,7 @@ export interface SceneHandle {
 const CAMERAS: Record<View, [number, number, number]> = {
   marax: [0.42, 0.36, 0.83],
   grind: [0.5, 0.42, 0.76],
-  weigh: [0.25, 0.45, 0.86],
+  weigh: [0.2, 0.8, 0.58],
   setup: [0.24, 0.36, 0.9],
 };
 
@@ -144,11 +145,14 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
   }
   // Weigh view: the dosing cup with beans on the scale, its bay on the VS6 empty.
   let beans: ReturnType<typeof buildBeans> | null = null;
+  /** What the camera frames: the whole scene, or just the scale and cup while weighing. */
+  const frameRoots: Object3D[] = [scene];
   if (view === 'weigh' && vs6) {
     vs6.setCupInBay(false);
     const dc = buildDosingCup(mats);
     dc.group.position.set(115, themis.topY, 50);
     scene.add(dc.group);
+    frameRoots.splice(0, 1, themis.group, dc.group);
     beans = buildBeans(mats.beans, VS6.cupInnerR, 0);
     beans.mesh.position.set(115, themis.topY, 50);
     scene.add(beans.mesh);
@@ -180,14 +184,18 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
   scene.updateMatrixWorld(true);
   const bounds = new Box3();
   const tmp = new Box3();
-  scene.traverse((obj) => {
-    if (!(obj instanceof Mesh) || obj instanceof InstancedMesh || obj.userData.skipBounds) return;
-    if (!obj.visible) return;
-    obj.geometry.computeBoundingBox();
-    const bb = obj.geometry.boundingBox;
-    if (bb) bounds.union(tmp.copy(bb).applyMatrix4(obj.matrixWorld));
-  });
+  for (const root of frameRoots) {
+    root.traverse((obj) => {
+      if (!(obj instanceof Mesh) || obj instanceof InstancedMesh || obj.userData.skipBounds) return;
+      if (!obj.visible) return;
+      obj.geometry.computeBoundingBox();
+      const bb = obj.geometry.boundingBox;
+      if (bb) bounds.union(tmp.copy(bb).applyMatrix4(obj.matrixWorld));
+    });
+  }
   const sphere = bounds.getBoundingSphere(new Sphere());
+  // Small framings (the scale and cup while weighing) keep some context around them.
+  sphere.radius = Math.max(sphere.radius, 170);
   const fitDistance = () => {
     const v = (camera.fov * Math.PI) / 180;
     const h = 2 * Math.atan(Math.tan(v / 2) * camera.aspect);

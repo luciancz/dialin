@@ -43,6 +43,19 @@ connect). Grinder and machine warm.
    `MODEL.sigmaY` in `src/core/params.ts` and re-run the test suite.
 5. From the same shots, note mean flow vs plateau flow: it calibrates `plateauOffsetLn`.
 6. Deliberately tap late once and forget to tap once; confirm the recovery paths and badges.
+   Do it right after a normal shot as well: the late-tap path now sends reset (06) before
+   start (04), and the clock must keep running.
+7. **Auto-tare.**
+   - Put the empty dosing cup down: one tare once the reading settles, about 1 s.
+   - Pour the beans in: no second tare, and the dose is captured to 0.1 g. Check it
+     against a kitchen scale: ±0.1 g.
+   - Take the cup off, put the espresso cup down: one tare.
+   - Arm, START: no tare during the pour or the drip window.
+   - Record any false or missed tare, and the cup weights. The thresholds are
+     `REC.autoTare*` in `src/core/params.ts`.
+8. **3D views on the iPhone (Bluefy).** Check that rendering is smooth while pouring, that
+   battery drain over a session is acceptable, and that vertical swipes still scroll the
+   page. If not, turn 3D views off in Settings.
 
 ## D. Backup
 
