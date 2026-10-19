@@ -62,3 +62,39 @@ connect). Grinder and machine warm.
 Compare the stated confidence on each recommendation with whether the next shot's plateau
 flow landed within 7 % of the predicted value. The History screen shows the realised
 in-deadband frequency per confidence word; it should match within ±0.10.
+
+## G. RPM calibration (VS6, after the grind has settled)
+
+Wait for the offer card ("Calibrate RPM for your grinder?"), or start from Hardware → RPM
+calibration. The offer needs a settled grind gain, 2 of the last 3 shots predicted in band,
+a taste setpoint within ±10 % and a rested bean.
+
+1. **Warm up.** Run a purge dose through the grinder and pull one shot at your usual settings
+   first. Keep the beans, dose, puck prep and feeding technique the same for all 8 shots.
+2. **Order.** Follow the cards: slots 1–4 are low high high low (700 / 1300 by default), and
+   slots 5–8 are a pair the app picks. That pair can be 500 or 1600. Each card's dial is
+   compensated; set it exactly and tick "VS6 display matches".
+3. **At 600 RPM or below** start the motor before pouring the beans and feed slowly. If
+   the VS6 shows **E006**, tap "Grinder stalled (E006)". On the pre-shot card that is
+   enough. If you finished grinding at another RPM and pulled the shot, use the button on
+   the rate sheet; the shot is kept but not learned from. That bag's floor becomes the
+   stall + 100.
+4. **Rate every shot:** thin–heavy first, then sour–bitter, then better / same / worse
+   against the previous shot. Rinse with water between tastings. Cross-RPM comparisons are
+   valid only when the flows matched; the sheet says when they did not.
+5. **Repeats.** A channelled or outlier shot repeats its slot. Three tries on one slot end
+   the session as "too noisy"; fix the prep and start again later.
+6. **After the session** the card moves you back to your usual RPM, or to your preferred
+   one, with a compensated dial.
+
+Record from the RPM screen and the export:
+
+| # | Check | Expected | Record |
+|---|---|---|---|
+| G1 | k_r sign and size | prior −0.015 ± 0.035 ln per 100 RPM; Varia's PSD data says slightly finer at high RPM | k̂_r ± sd |
+| G2 | Curvature | κ near 0, or steeper above 1100 RPM (the research hints at a break there) | κ̂ |
+| G3 | Compensated flow | every slot's measured flow within ±14 % of the target; repeats within ±7 % | slot table |
+| G4 | Slider scale c | δ assumes 12 sour–bitter steps per ln flow. Check it against two matched-flow pairs at one RPM: Δslider / Δln flow | c |
+| G5 | Body | thin–heavy differs between 700 and 1300 by ≥ 1 step, or the app reports "RPM barely changes body" | θ̂, P(flat) |
+| G6 | Body move | a later card that changes RPM keeps the flow within 7 % | next shot |
+| G7 | E006 | stalls only at ≤ 600 RPM; note the bean and RPM | stalls list |

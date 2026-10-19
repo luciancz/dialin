@@ -11,6 +11,7 @@ import { History } from './screens/History';
 import { Home } from './screens/Home';
 import { Onboarding } from './screens/Onboarding';
 import { Probe } from './screens/Probe';
+import { RpmCalibration } from './screens/RpmCalibration';
 import { Settings } from './screens/Settings';
 import { Shot } from './screens/Shot';
 
@@ -40,6 +41,7 @@ export function App() {
   else if (bagMatch) screen = <BagDetail id={bagMatch.id ?? ''} />;
   else if (path === '/history') screen = <History />;
   else if (path === '/hardware') screen = <Hardware />;
+  else if (path === '/rpm') screen = <RpmCalibration />;
   else if (path === '/onboarding') screen = <Onboarding />;
   else if (path === '/settings') screen = <Settings />;
   else screen = <Home />;

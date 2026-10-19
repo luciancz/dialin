@@ -3,9 +3,11 @@
  * app.recorder (the pure reducer's state) and app.pending.
  */
 import { signal } from '@preact/signals';
+import { reportStall } from '../../app/calibration';
 import { isDemo } from '../../app/mode';
 import { navigate } from '../../app/router';
 import { app } from '../../app/state';
+import { allowedRpmRange, e006Guidance } from '../../core/rpm/range';
 import type { Chip, Rating, SliderValue, TempSwitch, VsPrevious } from '../../core/types';
 import { DEFAULT_DIAL_SPEC, formatDial, toLines } from '../../core/units';
 import { realClock } from '../../scale/clock';
@@ -51,6 +53,10 @@ function PreShot() {
   const connected = app.clientState.value === 'connected';
   const lastRec = app.lastRecommendation.value;
   const rpmNag = settings?.rpmResetsOnPowerOn !== false && !rpmConfirmedThisSession.value;
+  const range = bag ? allowedRpmRange(settings?.rpmRange, [bag]) : ([500, 1600] as const);
+  const slot = lastRec?.calibration ?? null;
+  const onSlot = slot !== null && ns.grind.rpm === slot.plannedRpm;
+  const lowRpm = e006Guidance(ns.grind.rpm);
   if (!bag) {
     return (
       <div>
@@ -93,6 +99,19 @@ function PreShot() {
           </div>
         </div>
       ) : null}
+      {slot ? (
+        <div class={`card ${onSlot ? 'probe' : 'warn'}`}>
+          <b>
+            RPM calibration {slot.slot + 1}/8 · {slot.plannedRpm} RPM
+          </b>
+          <p class="small">
+            {onSlot
+              ? 'Dial and RPM are prefilled from the card (the dial is compensated for this RPM). Feed the beans the same way as always; rate thin–heavy first.'
+              : `Set ${slot.plannedRpm} RPM for this slot; at another RPM the shot is not counted for the session.`}{' '}
+            <a href="#/rpm">Session</a>
+          </p>
+        </div>
+      ) : null}
       <div class="card">
         <h3>Grind</h3>
         <DialPicker
@@ -108,7 +127,11 @@ function PreShot() {
             type="button"
             onClick={() =>
               set({
-                grind: { ...ns.grind, rpm: Math.max(500, ns.grind.rpm - 100), rpmConfirmed: false },
+                grind: {
+                  ...ns.grind,
+                  rpm: Math.max(range[0], ns.grind.rpm - 100),
+                  rpmConfirmed: false,
+                },
               })
             }
           >
@@ -121,7 +144,7 @@ function PreShot() {
               set({
                 grind: {
                   ...ns.grind,
-                  rpm: Math.min(1600, ns.grind.rpm + 100),
+                  rpm: Math.min(range[1], ns.grind.rpm + 100),
                   rpmConfirmed: false,
                 },
               })
@@ -146,6 +169,31 @@ function PreShot() {
             First shot this session: the VS6 may have reset to 0500 at power-on. Check the display.
           </p>
         ) : null}
+        {lowRpm.length > 0 ? (
+          <ul class="small warn">
+            {lowRpm.map((g) => (
+              <li key={g}>{g}</li>
+            ))}
+          </ul>
+        ) : null}
+        {ns.grind.rpm <= 800 || slot ? (
+          <button
+            type="button"
+            class="small"
+            style="margin-top:6px"
+            onClick={() => {
+              if (confirm(`Record a grinder stall (E006) at ${ns.grind.rpm} RPM for this bag?`)) {
+                void reportStall(ns.grind.rpm);
+              }
+            }}
+          >
+            Grinder stalled (E006)
+          </button>
+        ) : null}
+        <p class="muted small">
+          range {range[0]}–{range[1]} RPM
+          {bag.stalls && bag.stalls.length > 0 ? ' (floor raised after a stall)' : ''}
+        </p>
       </div>
       <div class="card">
         <div class="grid3">
@@ -418,6 +466,11 @@ function RateSheet() {
       ? null
       : 'no previous shot of this bag';
   const cmpOk = cmpReason === null;
+  const lastRec = app.lastRecommendation.value;
+  const ns = app.nextSettings.value;
+  const calShot =
+    lastRec?.calibration !== undefined && ns.grind.rpm === lastRec.calibration.plannedRpm;
+  const crossRpm = prev !== undefined && prev.settings.grind.rpm !== ns.grind.rpm;
   const badge = p.learn ? 'ok' : 'warn';
   const toggleChip = (c: Chip) => {
     const has = chips.value.includes(c);
@@ -514,10 +567,29 @@ function RateSheet() {
         </div>
         {cmpReason ? (
           <p class="muted small">better/worse disabled: {cmpReason}</p>
+        ) : prev && crossRpm ? (
+          <p class="muted small">
+            flow matched, {ns.grind.rpm} vs {prev.settings.grind.rpm} RPM: this comparison teaches
+            your preferred RPM (body), not the flow
+          </p>
         ) : prev ? (
           <p class="muted small">
             compared with the shot at {new Date(prev.at).toLocaleTimeString()}
           </p>
+        ) : null}
+        {calShot ? (
+          <p class="small probe">
+            Calibration shot: rate body (thin–heavy) first, then sour–bitter.
+          </p>
+        ) : null}
+        {calShot ? (
+          <Slider
+            label="thin–heavy"
+            left="thin"
+            right="heavy"
+            value={thinHeavy.value}
+            onChange={(v) => (thinHeavy.value = v)}
+          />
         ) : null}
         <Slider
           label="sour–bitter"
@@ -526,13 +598,15 @@ function RateSheet() {
           value={sourBitter.value}
           onChange={(v) => (sourBitter.value = v)}
         />
-        <Slider
-          label="thin–heavy"
-          left="thin"
-          right="heavy"
-          value={thinHeavy.value}
-          onChange={(v) => (thinHeavy.value = v)}
-        />
+        {calShot ? null : (
+          <Slider
+            label="thin–heavy"
+            left="thin"
+            right="heavy"
+            value={thinHeavy.value}
+            onChange={(v) => (thinHeavy.value = v)}
+          />
+        )}
         <div class="chips">
           {CHIPS.map((c) => (
             <button
@@ -565,14 +639,31 @@ function RateSheet() {
           Save, skip rating
         </button>
       </div>
-      <button
-        type="button"
-        class="danger small"
-        style="margin-top:8px"
-        onClick={() => app.discardPending()}
-      >
-        Discard this shot
-      </button>
+      <div class="row" style="margin-top:8px">
+        <button type="button" class="danger small" onClick={() => app.discardPending()}>
+          Discard this shot
+        </button>
+        {ns.grind.rpm <= 800 || calShot ? (
+          <button
+            type="button"
+            class="small"
+            onClick={() => {
+              if (
+                confirm(
+                  `The grinder stalled (E006) on this dose at ${ns.grind.rpm} RPM? The shot is kept but not learned from.`,
+                )
+              ) {
+                void reportStall(ns.grind.rpm).then(() => {
+                  resetRating();
+                  navigate(isDemo() ? '/demo' : '/');
+                });
+              }
+            }}
+          >
+            Grinder stalled (E006)
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

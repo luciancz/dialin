@@ -11,6 +11,7 @@ import {
   type DemoWorld,
   ratioOf,
   simulateDemoShot,
+  stallsAt,
   tasteDemoShot,
   trueLnFlow,
 } from '../core/sim/demoWorld';
@@ -19,6 +20,7 @@ import { toLines } from '../core/units';
 import { deleteDialinDb } from '../data/db';
 import { diag } from '../diag/log';
 import type { ShotDraft } from '../shot/machine';
+import { reportStall } from './calibration';
 import { DEMO_DB_NAME, isDemo, reloadInto } from './mode';
 import { app, type PendingShot } from './state';
 
@@ -191,6 +193,14 @@ export async function pullDemoShot(mode: 'manual' | 'auto'): Promise<boolean> {
   const epoch = app.currentEpoch.value;
   if (!w || !epoch || !app.currentBag.value) return false;
   const s = app.nextSettings.value;
+  // The hidden grinder stalls (E006) below its threshold: the simulated you reports it and
+  // the card moves the RPM up (no shot is pulled).
+  if (stallsAt(w, s.grind.rpm)) {
+    lastDemoShot.value = null;
+    app.toast('warn', `Simulated VS6: E006 at ${s.grind.rpm} RPM, the motor stalled.`);
+    await reportStall(s.grind.rpm);
+    return mode === 'auto';
+  }
   sessionPulls += 1;
   const rng = mulberry32(
     (w.seed + app.shotsOfBag.value.length * 7919 + sessionPulls * 104_729) >>> 0,
@@ -235,7 +245,9 @@ export async function pullDemoShot(mode: 'manual' | 'auto'): Promise<boolean> {
   const tasting = tasteDemoShot(
     w,
     { y: yCup, ratio: ratioOf(s), rpm: s.grind.rpm, channel: shot.channel },
-    prev && prevY !== null ? { y: prevY, ratio: ratioOf(prev.settings) } : null,
+    prev && prevY !== null
+      ? { y: prevY, ratio: ratioOf(prev.settings), rpm: prev.settings.grind.rpm }
+      : null,
     rng,
   );
   const reason = prev ? (app.comparisonReason?.(pending) ?? null) : 'no previous shot';

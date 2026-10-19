@@ -231,7 +231,8 @@ export function BagDetail({ id }: { id: string }) {
           </tbody>
         </table>
         <p class="small">
-          <a href="#/history">Full history and charts</a>
+          <a href="#/history">Full history and charts</a> ·{' '}
+          <a href="#/rpm">RPM calibration and preferred body</a>
         </p>
       </div>
     </div>

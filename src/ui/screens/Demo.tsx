@@ -3,6 +3,8 @@
  * shots (rate them yourself or let the simulated palate rate them), watch the card follow,
  * and reveal the hidden truth next to what the model has learned.
  */
+
+import { activeRun, startRun } from '../../app/calibration';
 import {
   autoRunDemo,
   demoBusy,
@@ -15,9 +17,13 @@ import {
   updateDemoWorld,
 } from '../../app/demo';
 import { isDemo } from '../../app/mode';
-import { modelSummary } from '../../app/recommender';
+import { lastReplay, modelSummary } from '../../app/recommender';
 import { navigate } from '../../app/router';
 import { app } from '../../app/state';
+import { kRpm, kRpmCurv } from '../../core/flowmodel/state';
+import { balanceSd } from '../../core/rpm/balance';
+import { initPreference, summarizePreference } from '../../core/rpm/preference';
+import { allowedRpmRange } from '../../core/rpm/range';
 import {
   balancedLnFlow,
   bestLines,
@@ -47,8 +53,8 @@ function DemoIntro() {
             channeling, through the real curve analysis.
           </li>
           <li>
-            <b>Your palate</b>: a hidden best flow and ratio, and a preferred body that the RPM
-            lever can find.
+            <b>Your palate</b>: a hidden best flow and ratio, and a preferred body (or none) that
+            the RPM calibration can find. The grinder may stall (E006) at low RPM.
           </li>
         </ul>
         <p class="small">
@@ -95,7 +101,17 @@ export function Demo() {
   const lastT = shots[shots.length - 1]?.features.totalTimeS ?? 30;
   const best = fromLines(bestLines(w, ns), spec);
   const flowNow = Math.exp(trueLnFlow(w, ns, spec));
-  const balanced = Math.exp(balancedLnFlow(w, ratioOf(ns)));
+  const balanced = Math.exp(balancedLnFlow(w, ratioOf(ns), ns.grind.rpm));
+  const rr = lastReplay.value;
+  const bag = app.currentBag.value;
+  const bean = app.currentBean.value;
+  const run = activeRun();
+  const krM = rr ? kRpm(rr.model) : null;
+  const kqM = rr ? kRpmCurv(rr.model) : null;
+  const prefS = summarizePreference(
+    (bean && rr?.prefByBean.get(bean.id)) || initPreference(),
+    allowedRpmRange(app.settings.value?.rpmRange, bag ? [bag] : []),
+  );
   const last = lastDemoShot.value;
   return (
     <div>
@@ -132,6 +148,20 @@ export function Demo() {
             </button>
             <button type="button" disabled={busy !== ''} onClick={() => void autoRunDemo(5)}>
               Auto-run 5 shots
+            </button>
+          </div>
+          <div class="grid2">
+            {run ? (
+              <a href="#/rpm" class="btn">
+                RPM calibration in progress
+              </a>
+            ) : (
+              <button type="button" disabled={busy !== ''} onClick={() => void startRun()}>
+                Start RPM calibration
+              </button>
+            )}
+            <button type="button" disabled={busy !== ''} onClick={() => void autoRunDemo(8)}>
+              Auto-run 8 shots
             </button>
           </div>
           <button
@@ -196,7 +226,32 @@ export function Demo() {
                   : '—',
               )}
               {row('best ratio', `1:${w.rStar.toFixed(2)}`, `1:${ratioOf(ns).toFixed(2)}`)}
-              {row('preferred body', `${w.rpmStar} RPM`, `${ns.grind.rpm} RPM`)}
+              {row(
+                'RPM flow effect',
+                `k_r ${w.kR.toFixed(3)}, κ ${w.kQ.toFixed(4)} per 100 RPM`,
+                krM && kqM
+                  ? `k_r ${krM.mean.toFixed(3)} ± ${krM.sd.toFixed(3)}, κ ${kqM.mean.toFixed(4)}`
+                  : '—',
+              )}
+              {row(
+                'balance shift δ',
+                `${w.delta.toFixed(3)} per 100 RPM`,
+                rr ? `${rr.balance.mean.toFixed(3)} ± ${balanceSd(rr.balance).toFixed(3)}` : '—',
+              )}
+              {row(
+                'preferred body',
+                w.betaBody === 0
+                  ? 'RPM does not change body'
+                  : `${w.rpmStar} RPM (β ${w.betaBody.toFixed(2)} steps per 100 RPM)`,
+                prefS.ratings === 0
+                  ? `${ns.grind.rpm} RPM (no body ratings)`
+                  : `θ ${prefS.thetaMean.toFixed(0)} ± ${prefS.thetaSd.toFixed(0)}, P(flat) ${prefS.pInsensitive.toFixed(2)}`,
+              )}
+              {row(
+                'E006 stall',
+                w.stallBelow === null ? 'never' : `below ${w.stallBelow} RPM`,
+                bag?.stalls?.length ? `${bag.stalls.length} reported` : 'none reported',
+              )}
               {row('channeling', `${Math.round(w.channelProb * 100)} % of shots`, '')}
             </tbody>
           </table>

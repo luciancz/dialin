@@ -1,6 +1,9 @@
 /** Hardware epochs: timeline and the events that re-open the flow model. */
 import { signal } from '@preact/signals';
+import { lastReplay } from '../../app/recommender';
 import { app } from '../../app/state';
+import { kRpm } from '../../core/flowmodel/state';
+import { isCalibrated } from '../../core/rpm/calibration';
 import type { CalibrationEpoch, DialPosition, EpochEventKind } from '../../core/types';
 import { formatDial, fromLines, toLines } from '../../core/units';
 import { newMeta, nowIso } from '../../data/repo';
@@ -115,6 +118,8 @@ export function Hardware() {
         </div>
       ) : null}
 
+      <RpmCalibrationLink />
+
       <div class="card">
         <h3>Something changed?</h3>
         <div class="stack">
@@ -217,6 +222,28 @@ export function Hardware() {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+/** RPM calibration status for this epoch (the flow effect is a grinder property). */
+function RpmCalibrationLink() {
+  const r = lastReplay.value;
+  const kr = r ? kRpm(r.model) : null;
+  const done = r ? isCalibrated(r.model) : false;
+  return (
+    <div class="card">
+      <h3>RPM calibration</h3>
+      <p class="small">
+        {kr
+          ? done
+            ? `Calibrated for this epoch: +100 RPM changes ln flow by ${kr.mean.toFixed(3)} ± ${kr.sd.toFixed(3)}.`
+            : `Not calibrated for this epoch (k_r ± ${kr.sd.toFixed(3)}). New burrs reset it; re-check the preferred body per bean.`
+          : 'No shots in this epoch yet.'}
+      </p>
+      <a href="#/rpm" class="btn">
+        {done ? 'Calibration and results' : 'Calibrate RPM (8 shots)'}
+      </a>
     </div>
   );
 }

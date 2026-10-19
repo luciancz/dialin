@@ -480,6 +480,14 @@ class AppState {
     this.shotIndexOfDay += 1;
     const shotId = newId();
     const prevRec = this.lastRecommendation.value;
+    // A calibration slot is tagged when the shot was pulled at the slot's RPM (the tag is
+    // immutable; the planner reads slots and repeats from it).
+    const tag =
+      prevRec?.calibration &&
+      this.pendingDeviation !== 'ignored' &&
+      this.nextSettings.value.grind.rpm === prevRec.calibration.plannedRpm
+        ? prevRec.calibration
+        : null;
     const shot: Shot = {
       ...newMeta(deviceId, shotId, at),
       bagId: bag.id,
@@ -495,6 +503,7 @@ class AppState {
       endedBy: pending.draft.endedBy ?? 'tap',
       recommendationId: prevRec?.id ?? null,
       deviation: this.pendingDeviation,
+      ...(tag ? { calibration: { ...tag } } : {}),
     };
     const curve: Curve = { ...newMeta(deviceId, newId(), at), shotId, ...pending.curve };
     const quality: ShotQuality = {

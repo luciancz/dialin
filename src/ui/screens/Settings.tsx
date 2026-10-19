@@ -1,5 +1,6 @@
 /** Settings / Diagnostics / Backup. */
 import { signal } from '@preact/signals';
+import { forgetStall } from '../../app/calibration';
 import { deliverJson, readFileAsText } from '../../app/exportDelivery';
 import {
   modelSummary,
@@ -9,6 +10,8 @@ import {
 } from '../../app/recommender';
 import { app } from '../../app/state';
 import type { SimOptions, TransportKind } from '../../app/transports';
+import { RPM } from '../../core/params';
+import { settingsRange } from '../../core/rpm/range';
 import type { RawFrameRow } from '../../core/types';
 import { formatDial } from '../../core/units';
 import { buildExport, exportFileName, importFile, type MergePlan } from '../../data/exportImport';
@@ -361,14 +364,7 @@ export function Settings() {
 
       <div class="card">
         <h3>Grinder & machine</h3>
-        <label class="row" style="align-items:center;gap:8px">
-          <input
-            type="checkbox"
-            checked={s?.allowLowRpm ?? false}
-            onChange={(e) => void app.saveSettings({ allowLowRpm: e.currentTarget.checked })}
-          />
-          allow 500–600 RPM recommendations (stall risk)
-        </label>
+        <RpmRangeSettings />
         <label>
           <span>VS6 shows 0500 after power-on?</span>
           <select
@@ -473,6 +469,78 @@ export function Settings() {
           </button>
         </details>
       </div>
+    </div>
+  );
+}
+
+const RPM_STEPS: number[] = [];
+for (let r = RPM.rangeDefault[0]; r <= RPM.rangeDefault[1]; r += RPM.step) RPM_STEPS.push(r);
+
+/** RPM range for calibration and recommendations, and the stalls (E006) reported per bag. */
+function RpmRangeSettings() {
+  const st = app.settings.value;
+  const [lo, hi] = settingsRange(st?.rpmRange);
+  const save = (a: number, b: number) => {
+    const nlo = Math.min(a, b - RPM.step);
+    const nhi = Math.max(b, a + RPM.step);
+    void app.saveSettings({ rpmRange: [nlo, nhi] });
+  };
+  const stalls = app.bags.value.flatMap((b) =>
+    (b.stalls ?? []).map((x, i) => ({
+      bag: b,
+      i,
+      at: x.at,
+      rpm: x.rpm,
+      bean: app.beans.value.find((be) => be.id === b.beanId),
+    })),
+  );
+  return (
+    <div class="field">
+      <div class="grid2">
+        <label>
+          <span>Lowest RPM</span>
+          <select value={lo} onChange={(e) => save(Number(e.currentTarget.value), hi)}>
+            {RPM_STEPS.slice(0, -1).map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Highest RPM</span>
+          <select value={hi} onChange={(e) => save(lo, Number(e.currentTarget.value))}>
+            {RPM_STEPS.slice(1).map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <p class="muted small">
+        Calibration and every RPM recommendation stay inside this range (VS6: 500–1600, steps of
+        100). At {RPM.e006Rpm} RPM and below the card adds E006 advice: start the motor before
+        pouring the beans and feed slowly.
+      </p>
+      {stalls.length > 0 ? (
+        <div>
+          <div class="small">
+            Reported stalls (each raises that bag's floor to the stall + 100):
+          </div>
+          <ul class="small">
+            {stalls.map((x) => (
+              <li key={`${x.bag.id}-${x.i}`}>
+                {x.rpm} RPM · {x.bean ? `${x.bean.roaster} ${x.bean.name}` : 'bag'} ·{' '}
+                {new Date(x.at).toLocaleDateString()}{' '}
+                <button type="button" class="small" onClick={() => void forgetStall(x.bag.id, x.i)}>
+                  forget
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

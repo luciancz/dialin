@@ -17,7 +17,14 @@ import {
   type SetpointPosterior,
   summary,
 } from '../core/setpoint/grid';
-import type { Id, Recommendation, RpmCalibrationRun, Shot, ShotSettings } from '../core/types';
+import type {
+  Id,
+  Recommendation,
+  RpmCalibrationRun,
+  RpmRunStatus,
+  Shot,
+  ShotSettings,
+} from '../core/types';
 import { newMeta, nowIso } from '../data/repo';
 import { diag } from '../diag/log';
 import { app, type PendingShot } from './state';
@@ -127,7 +134,29 @@ export async function computeRecommendation(
     ...(pref ? { pref } : {}),
   });
   calibrationProgress.value = out.calibration;
+  await finishRunIfPlannerStopped(out.calibration);
   return out.rec;
+}
+
+/** The planner has no next slot (complete, early, too noisy, range too narrow): end the run. */
+async function finishRunIfPlannerStopped(p: CalibrationProgress | null): Promise<void> {
+  const repo = app.repo;
+  if (!repo || !p || p.next !== null || !p.stopReason || p.stopReason === 'ended') return;
+  const run = rpmRuns.value.find((r) => r.id === p.runId);
+  if (run?.status !== 'active') return;
+  const at = nowIso();
+  const status: RpmRunStatus =
+    p.stopReason === 'complete' || p.stopReason === 'early' ? 'done' : 'stopped';
+  const ended: RpmCalibrationRun = {
+    ...run,
+    status,
+    endedAt: at,
+    updatedAt: at,
+    note: p.stopReason,
+  };
+  await repo.putRpmRun(ended);
+  rpmRuns.value = rpmRuns.value.map((r) => (r.id === run.id ? ended : r));
+  diag.log('info', `RPM calibration ${status}: ${p.stopReason} after ${p.shotsUsed} shots`);
 }
 
 /** After a shot is saved: replay, recommend, persist, refresh signals. */
@@ -216,6 +245,7 @@ export async function rerunRecommendations(): Promise<RerunRow[]> {
     );
     const epoch = epochs.find((e) => e.id === shot.epochId) ?? epochs[epochs.length - 1];
     if (!epoch) continue;
+    const asOfRun = stored?.createdAt ?? shot.at;
     const result = replay({
       epochs: epochs.filter((e) => e.startedAt <= shot.at || e.id === epoch.id),
       beans,
@@ -224,6 +254,7 @@ export async function rerunRecommendations(): Promise<RerunRow[]> {
       ratings,
       quality,
       recommendations: recsUpTo,
+      rpmRuns: runs.filter((r) => r.createdAt <= asOfRun),
     });
     const ctx = bagContext(result, bag.id);
     const pref = result.prefByBean.get(bean.id);

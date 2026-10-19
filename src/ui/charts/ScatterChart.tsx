@@ -1,4 +1,7 @@
-/** Flow (ln) vs dial lines scatter with the fitted line and ± σ band. */
+/**
+ * Scatter with a fitted line and ± σ band. y is ln plateau flow (ticks in g/s), or with
+ * yMode "lnChange" an ln-flow change (ticks in %), e.g. the RPM effect on the calibration screen.
+ */
 
 interface Point {
   x: number;
@@ -12,11 +15,23 @@ interface Props {
   line: { x: number; y: number; sd: number }[];
   xLabel?: string;
   height?: number;
+  yMode?: 'lnFlow' | 'lnChange';
 }
 
 const W = 480;
 
-export function ScatterChart({ points, line, xLabel = 'lines', height = 200 }: Props) {
+export function ScatterChart({
+  points,
+  line,
+  xLabel = 'lines',
+  height = 200,
+  yMode = 'lnFlow',
+}: Props) {
+  const change = yMode === 'lnChange';
+  const pct = (y: number) => {
+    const v = Math.round(Math.expm1(y) * 100);
+    return v === 0 ? '0 %' : `${v > 0 ? '+' : ''}${v} %`;
+  };
   const H = height;
   const padL = 40;
   const padR = 10;
@@ -39,8 +54,20 @@ export function ScatterChart({ points, line, xLabel = 'lines', height = 200 }: P
           .map((l) => `L${sx(l.x).toFixed(1)},${sy(l.y - l.sd).toFixed(1)}`)
           .join('')}Z`
       : '';
-  const yTicks: number[] = [];
-  for (let f = 0.5; f <= 4; f += 0.5) if (Math.log(f) >= ylo && Math.log(f) <= yhi) yTicks.push(f);
+  // Tick positions in y units (ln flow or ln change) with their labels.
+  const yTicks: { y: number; label: string }[] = [];
+  if (change) {
+    const yStep = yhi - ylo > 0.35 ? 0.1 : 0.05;
+    for (let k = -10; k <= 10; k++) {
+      const y = yStep * k;
+      if (y >= ylo && y <= yhi) yTicks.push({ y, label: pct(y) });
+    }
+  } else {
+    for (let f = 0.5; f <= 4; f += 0.5) {
+      if (Math.log(f) >= ylo && Math.log(f) <= yhi)
+        yTicks.push({ y: Math.log(f), label: `${f.toFixed(1)}g/s` });
+    }
+  }
   const xTicks: number[] = [];
   const step = Math.max(1, Math.round((xhi - xlo) / 6));
   for (let x = Math.ceil(xlo); x <= xhi; x += step) xTicks.push(x);
@@ -51,17 +78,11 @@ export function ScatterChart({ points, line, xLabel = 'lines', height = 200 }: P
       {line.length > 1 ? (
         <path d={path(line)} fill="none" stroke="var(--info)" stroke-width="1.5" />
       ) : null}
-      {yTicks.map((f) => (
-        <g key={f}>
-          <line
-            x1={padL}
-            x2={W - padR}
-            y1={sy(Math.log(f))}
-            y2={sy(Math.log(f))}
-            stroke="var(--line)"
-          />
-          <text x={4} y={sy(Math.log(f)) + 3} font-size="10" fill="var(--fg-2)">
-            {f.toFixed(1)}g/s
+      {yTicks.map((t) => (
+        <g key={t.label}>
+          <line x1={padL} x2={W - padR} y1={sy(t.y)} y2={sy(t.y)} stroke="var(--line)" />
+          <text x={4} y={sy(t.y) + 3} font-size="10" fill="var(--fg-2)">
+            {t.label}
           </text>
         </g>
       ))}
@@ -70,7 +91,7 @@ export function ScatterChart({ points, line, xLabel = 'lines', height = 200 }: P
           {x}
         </text>
       ))}
-      <text x={W - padR} y={H - 6} font-size="10" text-anchor="end" fill="var(--fg-2)">
+      <text x={W - padR} y={padT + 10} font-size="10" text-anchor="end" fill="var(--fg-2)">
         {xLabel}
       </text>
       {points.map((p, i) => (
@@ -82,7 +103,7 @@ export function ScatterChart({ points, line, xLabel = 'lines', height = 200 }: P
           fill={p.learn ? 'var(--accent)' : 'var(--fg-2)'}
           opacity={p.learn ? 0.9 : 0.5}
         >
-          <title>{`${p.label ?? p.x} · ${Math.exp(p.y).toFixed(2)} g/s${p.learn ? '' : ' (excluded)'}`}</title>
+          <title>{`${p.label ?? p.x} · ${change ? pct(p.y) : `${Math.exp(p.y).toFixed(2)} g/s`}${p.learn ? '' : ' (excluded)'}`}</title>
         </circle>
       ))}
     </svg>
