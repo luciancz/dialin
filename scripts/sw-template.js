@@ -1,11 +1,11 @@
 /* Hand-written service worker for the GitHub Pages build.
- * scripts/gen-sw.mjs replaces __PRECACHE__ with the hashed asset list and
- * __VERSION__ with a content hash. It is a Windows-only nicety: WKWebView
+ * scripts/gen-sw.mjs fills in the hashed asset list, the base path and a content hash
+ * (scripts/sw-build.mjs). It is a Windows-only nicety: WKWebView
  * (Bluefy) has no supported service worker path, and the app never depends on it.
  */
-const VERSION = '__VERSION__';
-const BASE = '__BASE__';
-const PRECACHE = __PRECACHE__;
+const VERSION = '__SW_VERSION__';
+const BASE = '__SW_BASE__';
+const PRECACHE = __SW_PRECACHE__;
 const CACHE = `dialin-${VERSION}`;
 
 self.addEventListener('install', (event) => {
@@ -42,7 +42,11 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => putInCache(req, res))
-        .catch(() => caches.match(`${BASE}index.html`)),
+        // index.html is precached under BASE; a navigation with a query (?demo=1) or a hash
+        // still gets the cached shell.
+        .catch(() =>
+          caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match(BASE)),
+        ),
     );
   }
 });

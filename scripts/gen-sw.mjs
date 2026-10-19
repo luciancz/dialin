@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { renderSw } from './sw-build.mjs';
 
 const BASE = '/dialin/';
 const here = dirname(fileURLToPath(import.meta.url));
@@ -26,9 +27,6 @@ const hash = createHash('sha256');
 for (const f of files) hash.update(readFileSync(join(dist, f)));
 const version = hash.digest('hex').slice(0, 12);
 
-const sw = template
-  .replace('__VERSION__', version)
-  .replace('__BASE__', BASE)
-  .replace('__PRECACHE__', JSON.stringify(precache, null, 2));
+const sw = renderSw({ template, precache, version, base: BASE });
 writeFileSync(join(dist, 'sw.js'), sw);
 console.log(`sw.js: version ${version}, ${precache.length} precached files`);
