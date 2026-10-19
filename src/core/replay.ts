@@ -15,9 +15,26 @@ import {
   mu0Roast,
 } from './flowmodel/state';
 import { baseWeight, update } from './flowmodel/update';
-import { MODEL, RULES } from './params';
+import { MODEL, RPM, RULES } from './params';
 import { bagMetaOf, type ShotView } from './recommend';
-import { activeBand, freshnessGateDays, ratioBounds } from './rules/stages';
+import {
+  type Balance,
+  initBalance,
+  refSd,
+  sStarAt,
+  updateBalance,
+  yRef as yRefOf,
+} from './rpm/balance';
+import {
+  beanPrior,
+  type EarlierBean,
+  initPreference,
+  type RpmPreference,
+  updateBody,
+  updateRpmComparison,
+} from './rpm/preference';
+import { uOf } from './rpm/range';
+import { activeBand, freshnessGateDays, ratioBounds, roastGroup } from './rules/stages';
 import {
   applyTasting,
   comparisonValidity,
@@ -25,6 +42,7 @@ import {
   forgetLeverChange,
   initSetpoint,
   recipeMu0,
+  rpmComparisonValidity,
   type SetpointPosterior,
   summary,
 } from './setpoint/grid';
@@ -36,6 +54,7 @@ import type {
   Id,
   Rating,
   Recommendation,
+  RpmCalibrationRun,
   Shot,
   ShotQuality,
 } from './types';
@@ -49,12 +68,15 @@ export interface ReplayInput {
   ratings: Rating[];
   quality: ShotQuality[];
   recommendations: Recommendation[];
+  /** RPM calibration runs (schema v2); omitted = none. */
+  rpmRuns?: RpmCalibrationRun[];
 }
 
 export interface BagReplay {
   views: ShotView[];
   setpoint: SetpointPosterior;
-  shotsSinceRpmChange: number;
+  /** Shots since the last followed body (rpm) move. */
+  shotsSinceBodyMove: number;
   tempCardShown: boolean;
   lastRatedAt: string | null;
 }
@@ -63,6 +85,10 @@ export interface ReplayResult {
   model: FlowModelState;
   epochId: Id;
   bags: Map<Id, BagReplay>;
+  /** Balance shift δ of the current epoch (reset with new burrs). */
+  balance: Balance;
+  /** Preferred-RPM posterior per bean. */
+  prefByBean: Map<Id, RpmPreference>;
 }
 
 export function channelFlagOf(f: Features, r: Rating | null): boolean {
@@ -96,12 +122,34 @@ export function replay(input: ReplayInput): ReplayResult {
       .filter((r) => r.lever === 'temperature' && !r.deleted)
       .map((r) => r.bagId),
   );
+  const recsById = new Map(input.recommendations.map((r) => [r.id, r]));
 
   let model = initFlowModel(first.id, chirpLines(first));
+  let balance = initBalance();
   const bagsOut = new Map<Id, BagReplay>();
   const viewsById = new Map<Id, ShotView>();
   const learnableCountByBag = new Map<Id, number>();
   const predictedInBandByBag = new Map<Id, number>();
+  const prefByBean = new Map<Id, RpmPreference>();
+  /** Beans in the order they were first seen, for the next bean's prior. */
+  const beanOrder: Bean[] = [];
+  /** Last rated view per bag (for the δ pairs). */
+  const lastRatedByBag = new Map<Id, ShotView>();
+
+  const prefFor = (bean: Bean): RpmPreference => {
+    const have = prefByBean.get(bean.id);
+    if (have) return have;
+    const group = roastGroup(bean.roastLevel);
+    const earlier: EarlierBean[] = beanOrder.map((b, i) => ({
+      pref: prefByBean.get(b.id) ?? initPreference(),
+      roastWeight: roastGroup(b.roastLevel) === group ? 1 : RPM.otherRoastWeight,
+      recency: 0.8 ** (beanOrder.length - 1 - i),
+    }));
+    const pr = beanPrior(earlier);
+    prefByBean.set(bean.id, pr);
+    beanOrder.push(bean);
+    return pr;
+  };
 
   for (let ei = 0; ei < epochs.length; ei++) {
     const epoch = epochs[ei];
@@ -117,6 +165,8 @@ export function replay(input: ReplayInput): ReplayResult {
           newChirpLines: chirpLines(epoch),
           ...(epoch.deltaWashers !== undefined ? { deltaWashers: epoch.deltaWashers } : {}),
         });
+        // δ is a burr property like k_r: new burrs start it afresh.
+        if (epoch.kind === 'new_burrs') balance = initBalance();
       }
       // Views are per epoch: a new epoch starts the rule lookback afresh.
       for (const b of bagsOut.values()) b.views = [];
@@ -147,15 +197,19 @@ export function replay(input: ReplayInput): ReplayResult {
         entry = {
           views: [],
           setpoint: initSetpoint(mu0Roast(bean.roastLevel), recipe),
-          shotsSinceRpmChange: 0,
+          shotsSinceBodyMove: 0,
           tempCardShown: tempShown.has(bag.id),
           lastRatedAt: null,
         };
         bagsOut.set(bag.id, entry);
       }
       const prevView = entry.views[entry.views.length - 1] ?? null;
+      const rpm = shot.settings.grind.rpm;
+      const u = uOf(rpm);
+      let pref = prefFor(bean);
       let predictedY: number | null = null;
       let r: number | null = null;
+      let w = 0;
       let skipped = false;
       if (learn && y !== null) {
         if (!bagOf(model, bag.id)) addBag(model, bag.id, bagMetaOf(bean, bag), lines, shot.at);
@@ -189,49 +243,67 @@ export function replay(input: ReplayInput): ReplayResult {
           storageEvents: events,
         });
         r = res.r;
+        w = res.accepted ? res.w : 0;
         skipped = !res.accepted;
         if (res.accepted) learnableCountByBag.set(bag.id, prevCount + 1);
       }
-      // Setpoint: forgetting, then one update per tasting.
+      // Flows referenced to 1000 RPM through the balance shift as it stands before this shot.
+      const yR = y === null ? null : yRefOf(y, balance, u);
+      const predR = predictedY === null ? null : yRefOf(predictedY, balance, u);
+      // Setpoint: forgetting, then one update per tasting. RPM changes no longer forget: the
+      // RPM shift is modelled (δ) and its uncertainty widens the slider likelihood instead.
       const sNow = summary(entry.setpoint);
       let sp = entry.setpoint;
-      if (
-        prevView &&
-        (prevView.shot.settings.grind.rpm !== shot.settings.grind.rpm ||
-          prevView.shot.settings.tempSwitch !== shot.settings.tempSwitch)
-      ) {
+      if (prevView && prevView.shot.settings.tempSwitch !== shot.settings.tempSwitch) {
         sp = forgetLeverChange(sp);
       }
       let inBandAtRating = false;
-      if (rating && y !== null) {
+      if (rating && y !== null && yR !== null) {
         if (entry.lastRatedAt)
           sp = forgetDays(sp, (Date.parse(shot.at) - Date.parse(entry.lastRatedAt)) / 86_400_000);
         const cmpShotId = rating.comparedToShotId ?? prevView?.shot.id ?? null;
         const cmpView = cmpShotId ? (viewsById.get(cmpShotId) ?? null) : null;
         const cmpShot = cmpShotId ? (shotsById.get(cmpShotId) ?? null) : null;
+        const yiRef = cmpView?.y != null ? yRefOf(cmpView.y, balance, cmpView.u) : null;
+        const dDays = cmpShot ? (Date.parse(shot.at) - Date.parse(cmpShot.at)) / 86_400_000 : 0;
         let valid = false;
         if (cmpView && cmpShot) {
-          valid =
-            comparisonValidity({
-              learnJ: learn,
-              learnI: cmpView.learn,
-              channelJ: channelFlag,
-              channelI: cmpView.channelFlag,
-              yieldJ: f.finalYieldG,
-              yieldI: cmpShot.features.finalYieldG,
-              rpmJ: shot.settings.grind.rpm,
-              rpmI: cmpShot.settings.grind.rpm,
-              tempJ: shot.settings.tempSwitch,
-              tempI: cmpShot.settings.tempSwitch,
-              doseJ: shot.settings.doseG,
-              doseI: cmpShot.settings.doseG,
-              yj: y,
-              yi: cmpView.y,
-            }) === null;
+          const facts = {
+            learnJ: learn,
+            learnI: cmpView.learn,
+            channelJ: channelFlag,
+            channelI: cmpView.channelFlag,
+            yieldJ: f.finalYieldG,
+            yieldI: cmpShot.features.finalYieldG,
+            rpmJ: rpm,
+            rpmI: cmpShot.settings.grind.rpm,
+            tempJ: shot.settings.tempSwitch,
+            tempI: cmpShot.settings.tempSwitch,
+            doseJ: shot.settings.doseG,
+            doseI: cmpShot.settings.doseG,
+            yj: yR,
+            yi: yiRef,
+          };
+          if (rpm === cmpShot.settings.grind.rpm) {
+            // Same RPM: the comparison is about flow → the taste setpoint.
+            valid = comparisonValidity(facts) === null;
+          } else if (
+            rating.vsPrevious !== null &&
+            rpmComparisonValidity(facts, RPM.matchedFlowLn) === null
+          ) {
+            // Different RPM at matched flow: the comparison is about RPM → the RPM preference.
+            pref = updateRpmComparison(
+              pref,
+              cmpShot.settings.grind.rpm,
+              rpm,
+              rating.vsPrevious,
+              dDays,
+            );
+          }
         }
         const betaB = activeBand(sNow.sd);
-        const inBand = Math.abs((predictedY ?? y) - sNow.mean) <= betaB;
-        inBandAtRating = Math.abs(y - sNow.mean) <= RULES.beta;
+        const inBand = Math.abs((predR ?? yR) - sNow.mean) <= betaB;
+        inBandAtRating = Math.abs(yR - sNow.mean) <= RULES.beta;
         const { cap, floor } = ratioBounds(bean.roastLevel);
         const ratio = shot.settings.targetYieldG / Math.max(1, shot.settings.doseG);
         const stageC =
@@ -240,10 +312,9 @@ export function replay(input: ReplayInput): ReplayResult {
         const v = rating.sourBitter ?? 0;
         const sliderDrovesYield =
           stageC && inBand && v !== 0 && ratio < cap - 1e-9 && ratio > floor + 1e-9;
-        const dDays = cmpShot ? (Date.parse(shot.at) - Date.parse(cmpShot.at)) / 86_400_000 : 0;
         sp = applyTasting(sp, {
-          yj: y,
-          yi: cmpView?.y ?? null,
+          yj: yR,
+          yi: yiRef,
           vs: rating.vsPrevious,
           comparisonValid: valid,
           dDays,
@@ -251,17 +322,52 @@ export function replay(input: ReplayInput): ReplayResult {
           chips: rating.chips,
           overall: rating.overall1to9 ?? null,
           sliderDrovesYield,
+          refSd: refSd(balance, u),
         }).sp;
         entry.lastRatedAt = shot.at;
+        // Body: every thin–heavy rating informs the preferred RPM ("hollow" alone counts as −1).
+        if (!channelFlag) {
+          if (rating.thinHeavy !== null) pref = updateBody(pref, rpm, rating.thinHeavy);
+          else if (rating.chips.includes('hollow')) pref = updateBody(pref, rpm, -1);
+        }
+        // Balance shift δ: sour–bitter on two shots of this bag at different RPMs, close in time.
+        const prevRated = lastRatedByBag.get(bag.id) ?? null;
+        if (
+          prevRated?.rating?.sourBitter != null &&
+          rating.sourBitter !== null &&
+          prevRated.y !== null &&
+          learn &&
+          prevRated.learn &&
+          !channelFlag &&
+          !prevRated.channelFlag &&
+          Math.abs(prevRated.u - u) >= 1 &&
+          Date.parse(shot.at) - Date.parse(prevRated.shot.at) <=
+            RPM.deltaMaxPairHours * 3_600_000 &&
+          Math.abs(y - prevRated.y) <= RPM.deltaMaxDyLn &&
+          Math.abs(Math.log(f.finalYieldG / prevRated.shot.features.finalYieldG)) < 0.1 &&
+          prevRated.shot.settings.tempSwitch === shot.settings.tempSwitch &&
+          Math.abs(prevRated.shot.settings.doseG - shot.settings.doseG) <= 0.3
+        ) {
+          balance = updateBalance(balance, {
+            uI: prevRated.u,
+            uJ: u,
+            vI: prevRated.rating.sourBitter,
+            vJ: rating.sourBitter,
+            yI: prevRated.y,
+            yJ: y,
+          });
+        }
       }
       entry.setpoint = sp;
-      if (predictedY !== null && Math.abs(predictedY - sNow.mean) <= RULES.beta) {
+      prefByBean.set(bean.id, pref);
+      if (predR !== null && Math.abs(predR - sNow.mean) <= RULES.beta) {
         predictedInBandByBag.set(bag.id, (predictedInBandByBag.get(bag.id) ?? 0) + 1);
       }
-      entry.shotsSinceRpmChange =
-        prevView && prevView.shot.settings.grind.rpm !== shot.settings.grind.rpm
+      const followedRec = shot.recommendationId ? recsById.get(shot.recommendationId) : undefined;
+      entry.shotsSinceBodyMove =
+        followedRec?.lever === 'rpm' && shot.deviation !== 'ignored'
           ? 0
-          : entry.shotsSinceRpmChange + 1;
+          : entry.shotsSinceBodyMove + 1;
       const view: ShotView = {
         shot,
         rating,
@@ -274,13 +380,24 @@ export function replay(input: ReplayInput): ReplayResult {
         r,
         skipped,
         inBandAtRating,
+        u,
+        yRef: yR,
+        w,
       };
       entry.views.push(view);
       viewsById.set(shot.id, view);
+      if (rating && y !== null) lastRatedByBag.set(bag.id, view);
     }
   }
   const lastEpoch = epochs[epochs.length - 1] ?? first;
-  return { model, epochId: lastEpoch.id, bags: bagsOut };
+  return { model, epochId: lastEpoch.id, bags: bagsOut, balance, prefByBean };
+}
+
+/** Balanced flow at an RPM for a bag: setpoint mean (at 1000 RPM) + δ̂·u. */
+export function balancedAt(result: ReplayResult, bagId: Id, rpm: number): number | null {
+  const ctx = result.bags.get(bagId);
+  if (!ctx) return null;
+  return sStarAt(summary(ctx.setpoint).mean, result.balance, uOf(rpm));
 }
 
 /** Convenience: the inputs recommend() needs for one bag, from a replay result. */
@@ -289,7 +406,7 @@ export function bagContext(result: ReplayResult, bagId: Id): BagReplay {
     result.bags.get(bagId) ?? {
       views: [],
       setpoint: initSetpoint(0.65),
-      shotsSinceRpmChange: 0,
+      shotsSinceBodyMove: 0,
       tempCardShown: false,
       lastRatedAt: null,
     }

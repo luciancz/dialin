@@ -354,6 +354,9 @@ describe('recommend() properties', () => {
           r: res.r,
           skipped: !res.accepted,
           inBandAtRating: rng() < 0.5,
+          u: (shot.settings.grind.rpm - 1000) / 100,
+          yRef: y,
+          w: res.accepted ? res.w : 0,
         });
       }
       let sp = initSetpoint(mu0Roast('light'));
@@ -375,7 +378,7 @@ describe('recommend() properties', () => {
         setpoint: sp,
         current,
         now: '2026-10-20T00:00:00.000Z',
-        shotsSinceRpmChange: Math.floor(rng() * 5),
+        shotsSinceBodyMove: Math.floor(rng() * 5),
         tempCardShown: rng() < 0.5,
       };
       const { rec } = recommend(input);
@@ -421,7 +424,7 @@ describe('recommend() properties', () => {
       setpoint: initSetpoint(mu0Roast('light')),
       current,
       now: '2026-10-20T00:00:00.000Z',
-      shotsSinceRpmChange: 0,
+      shotsSinceBodyMove: 0,
       tempCardShown: false,
     });
     expect(rec.sentence).toMatch(/first shot|earlier bags/);

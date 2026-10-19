@@ -17,6 +17,8 @@ import {
 } from './flowmodel/state';
 import { phi } from './math/normal';
 import { MODEL, RULES } from './params';
+import { type Balance, initBalance, sStarAt } from './rpm/balance';
+import { uOf } from './rpm/range';
 import {
   firstShotSentence,
   grindSentence,
@@ -63,6 +65,12 @@ export interface ShotView {
   skipped: boolean;
   /** Realised flow within β of the setpoint when it was rated (temperature rule). */
   inBandAtRating: boolean;
+  /** u = (RPM − 1000)/100 of the shot. */
+  u: number;
+  /** y referenced to 1000 RPM through the balance shift: y − δ̂·u (null when y is). */
+  yRef: number | null;
+  /** Huber weight the flow model gave the shot (0 when skipped or not learnable). */
+  w: number;
 }
 
 export type RecommendationCore = Omit<Recommendation, keyof Meta>;
@@ -77,8 +85,11 @@ export interface RecommendInput {
   setpoint: SetpointPosterior;
   current: ShotSettings;
   now: string;
-  shotsSinceRpmChange: number;
+  /** Shots pulled since the last followed body (rpm) move. */
+  shotsSinceBodyMove: number;
   tempCardShown: boolean;
+  /** Balance shift δ (s* moves by δ·u with RPM); none = no shift. */
+  balance?: Balance;
 }
 
 export interface RecommendOutput {
@@ -134,7 +145,9 @@ export function recommend(input: RecommendInput): RecommendOutput {
   const pred = predictAt(model, bag.id, curLines, current.grind.rpm, current.doseG);
   const yHatCur = pred?.yHat ?? null;
   const sp = summary(input.setpoint);
-  const sStar = sp.mean;
+  // The setpoint posterior is for 1000 RPM; the balanced flow at the current RPM is shifted by δ.
+  const balance = input.balance ?? initBalance();
+  const sStar = sStarAt(sp.mean, balance, uOf(current.grind.rpm));
   const betaB = activeBand(sp.sd);
   const kg = kGrind(model);
   const ageDays = Math.max(0, (Date.parse(input.now) - Date.parse(bag.roastDate)) / 86_400_000);
@@ -173,7 +186,7 @@ export function recommend(input: RecommendInput): RecommendOutput {
     doseG: current.doseG,
     targetYieldG: current.targetYieldG,
     rpm: current.grind.rpm,
-    shotsSinceRpmChange: input.shotsSinceRpmChange,
+    shotsSinceRpmChange: input.shotsSinceBodyMove,
     allowLowRpm: input.allowLowRpm,
     tempCardShown: input.tempCardShown,
     outlierPending,

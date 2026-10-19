@@ -94,7 +94,8 @@ export async function computeRecommendation(
     setpoint: ctx.setpoint,
     current,
     now: nowIso(),
-    shotsSinceRpmChange: ctx.shotsSinceRpmChange,
+    shotsSinceBodyMove: ctx.shotsSinceBodyMove,
+    balance: r.balance,
     tempCardShown: ctx.tempCardShown,
   });
   return out.rec;
@@ -205,7 +206,8 @@ export async function rerunRecommendations(): Promise<RerunRow[]> {
       setpoint: ctx.setpoint,
       current: shot.settings,
       now: stored?.createdAt ?? shot.at,
-      shotsSinceRpmChange: ctx.shotsSinceRpmChange,
+      shotsSinceBodyMove: ctx.shotsSinceBodyMove,
+      balance: result.balance,
       tempCardShown: ctx.tempCardShown,
     });
     const identical =

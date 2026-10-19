@@ -283,7 +283,8 @@ function pullShot(w: World, bagIndex: number, day: number, k: number): SimStep {
     setpoint: ctx.setpoint,
     current: settings,
     now: new Date(atMs + 60_000).toISOString(),
-    shotsSinceRpmChange: ctx.shotsSinceRpmChange,
+    shotsSinceBodyMove: ctx.shotsSinceBodyMove,
+    balance: result.balance,
     tempCardShown: ctx.tempCardShown,
   });
   w.recommendations.push({ ...w.rows.meta(atMs + 60_000), ...out.rec });
@@ -356,7 +357,8 @@ function recommendOnly(w: World, bagIndex: number, atMs: number): void {
     setpoint: ctx.setpoint,
     current,
     now: new Date(atMs).toISOString(),
-    shotsSinceRpmChange: ctx.shotsSinceRpmChange,
+    shotsSinceBodyMove: ctx.shotsSinceBodyMove,
+    balance: result.balance,
     tempCardShown: ctx.tempCardShown,
   });
   w.recommendations.push({ ...w.rows.meta(atMs), ...out.rec });

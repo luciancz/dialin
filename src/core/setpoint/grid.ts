@@ -140,30 +140,47 @@ export function updatePreference(
 }
 
 /** L_v(s) = 0.25 + 0.75·Φ(sgn(v)·(s − y_j)/0.10)^{|v|/3}. v = −1 (sour) favours s < y_j: finer. */
-export function sliderLikelihood(s: number, yj: number, v: number): number {
+export function sliderLikelihood(
+  s: number,
+  yj: number,
+  v: number,
+  scale: number = SETPOINT.sliderScale,
+): number {
   const sign = v < 0 ? -1 : 1;
-  const base = phi((sign * (s - yj)) / SETPOINT.sliderScale);
+  const base = phi((sign * (s - yj)) / scale);
   return SETPOINT.sliderFloor + (1 - SETPOINT.sliderFloor) * base ** (Math.abs(v) / 3);
 }
 
-export function updateSlider(sp: SetpointPosterior, yj: number, v: number): SetpointPosterior {
+/**
+ * Slider update. `scale` widens beyond 0.10 when y_j is referenced to 1000 RPM through an
+ * uncertain balance shift δ (√(0.10² + (sd(δ)·u)²)), so that uncertainty is counted once.
+ */
+export function updateSlider(
+  sp: SetpointPosterior,
+  yj: number,
+  v: number,
+  scale: number = SETPOINT.sliderScale,
+): SetpointPosterior {
   if (v === 0) return sp;
   const out = cloneSetpoint(sp);
-  out.p = out.p.map((pv, i) => pv * sliderLikelihood(out.grid[i] ?? 0, yj, v));
+  out.p = out.p.map((pv, i) => pv * sliderLikelihood(out.grid[i] ?? 0, yj, v, scale));
   out.updates += 1;
   return normalize(out);
 }
 
 /** balanced with overall ≥ 7: a bump at the realised flow. */
-export function updateBalanced(sp: SetpointPosterior, yj: number): SetpointPosterior {
+export function updateBalanced(
+  sp: SetpointPosterior,
+  yj: number,
+  scale: number = SETPOINT.sliderScale,
+): SetpointPosterior {
   const out = cloneSetpoint(sp);
-  const peak = normalPdf(0, 0, SETPOINT.sliderScale);
+  const peak = normalPdf(0, 0, scale);
   out.p = out.p.map(
     (pv, i) =>
       pv *
       (SETPOINT.sliderFloor +
-        (1 - SETPOINT.sliderFloor) *
-          (normalPdf(out.grid[i] ?? 0, yj, SETPOINT.sliderScale) / peak)),
+        (1 - SETPOINT.sliderFloor) * (normalPdf(out.grid[i] ?? 0, yj, scale) / peak)),
   );
   out.updates += 1;
   return normalize(out);
@@ -189,6 +206,8 @@ export interface TastingInput {
   overall: number | null;
   /** True when the slider has just driven the yield rule (stage C): skip the slider update. */
   sliderDrovesYield: boolean;
+  /** Extra sd on y_j from referencing it to 1000 RPM (sd(δ)·|u|); 0 when omitted. */
+  refSd?: number;
 }
 
 /** One tasting → one update at most (preference first; pseudo-likelihoods otherwise). */
@@ -204,16 +223,17 @@ export function applyTasting(
     out = updatePreference(out, t.yj, t.yi, 'same', t.dDays);
   }
   if (t.sliderDrovesYield) return { sp: out, applied: t.vs === 'same' ? 'preference' : 'none' };
+  const scale = Math.sqrt(SETPOINT.sliderScale ** 2 + (t.refSd ?? 0) ** 2);
   const v = t.sourBitter;
-  if (v !== null && v !== 0) return { sp: updateSlider(out, t.yj, v), applied: 'slider' };
+  if (v !== null && v !== 0) return { sp: updateSlider(out, t.yj, v, scale), applied: 'slider' };
   const cv = chipSlider(t.chips);
-  if (cv !== null) return { sp: updateSlider(out, t.yj, cv), applied: 'chip' };
+  if (cv !== null) return { sp: updateSlider(out, t.yj, cv, scale), applied: 'chip' };
   if (
     t.chips.includes('balanced') &&
     t.overall !== null &&
     t.overall >= SETPOINT.balancedMinOverall
   ) {
-    return { sp: updateBalanced(out, t.yj), applied: 'balanced' };
+    return { sp: updateBalanced(out, t.yj, scale), applied: 'balanced' };
   }
   return { sp: out, applied: t.vs === 'same' && t.comparisonValid ? 'preference' : 'none' };
 }
@@ -235,18 +255,42 @@ export interface ComparisonFacts {
   yi: number | null;
 }
 
-/** Why a better/worse comparison is invalid (null = valid). */
-export function comparisonValidity(c: ComparisonFacts): string | null {
+/** Checks shared by both comparison routes (null = passes). */
+function commonValidity(c: ComparisonFacts): string | null {
   if (c.yj === null || c.yi === null) return 'plateau flow missing on one of the shots';
   if (!c.learnJ || !c.learnI) return 'one of the shots is excluded from learning';
   if (c.channelJ || c.channelI) return 'one of the shots channelled';
   if (Math.abs(Math.log(c.yieldJ / c.yieldI)) >= SETPOINT.maxLnYieldDiff)
     return 'yields differ by more than 10 %';
-  if (c.rpmJ !== c.rpmI) return 'RPM changed between the shots';
   if (c.tempJ !== c.tempI) return 'temperature switch changed between the shots';
   if (Math.abs(c.doseJ - c.doseI) > SETPOINT.maxDoseDiffG) return 'dose changed by more than 0.3 g';
-  if (Math.abs(c.yj - c.yi) < SETPOINT.minLnFlowDiff)
+  return null;
+}
+
+/**
+ * Why a better/worse comparison is invalid for the FLOW setpoint (null = valid). Same RPM only:
+ * comparisons across RPMs go to the RPM preference model instead (rpmComparisonValidity).
+ */
+export function comparisonValidity(c: ComparisonFacts): string | null {
+  const common = commonValidity(c);
+  if (common) return common;
+  if (c.rpmJ !== c.rpmI) return 'RPM changed between the shots';
+  if (Math.abs((c.yj ?? 0) - (c.yi ?? 0)) < SETPOINT.minLnFlowDiff)
     return 'flows within 4 %: comparison uninformative';
+  return null;
+}
+
+/**
+ * Why a better/worse comparison is invalid for the RPM preference (null = valid): different RPM
+ * and MATCHED flow (|Δ y_ref| ≤ matchedFlowLn, flows referenced to 1000 RPM), so the answer is
+ * about RPM rather than flow.
+ */
+export function rpmComparisonValidity(c: ComparisonFacts, matchedFlowLn: number): string | null {
+  const common = commonValidity(c);
+  if (common) return common;
+  if (c.rpmJ === c.rpmI) return 'same RPM';
+  if (Math.abs((c.yj ?? 0) - (c.yi ?? 0)) > matchedFlowLn)
+    return 'flows differ by more than 7 %: not a fair RPM comparison';
   return null;
 }
 
