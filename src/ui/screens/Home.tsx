@@ -6,6 +6,7 @@ import { formatDial } from '../../core/units';
 import { PosteriorBar } from '../charts/PosteriorBar';
 import { ConnectionPill } from '../components/ConnectionPill';
 import { RecommendationCard } from '../components/RecommendationCard';
+import { ThreeView } from '../components/ThreeView';
 
 function SetpointCard() {
   const m = modelSummary.value;
@@ -104,6 +105,7 @@ export function Home() {
           </a>
         </div>
       )}
+      <ThreeView view="setup" height={240} />
       <RecommendationCard rec={app.lastRecommendation.value} />
       <SetpointCard />
       <a

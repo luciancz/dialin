@@ -6,6 +6,14 @@ import { signal } from '@preact/signals';
 import { reportStall } from '../../app/calibration';
 import { isDemo } from '../../app/mode';
 import { navigate } from '../../app/router';
+import {
+  backToPlan,
+  grindStartedAt,
+  openGrindStep,
+  openWeighStep,
+  preStep,
+  weighOpenedAt,
+} from '../../app/shotFlow';
 import { app } from '../../app/state';
 import { allowedRpmRange, e006Guidance } from '../../core/rpm/range';
 import type { Chip, Rating, SliderValue, TempSwitch, VsPrevious } from '../../core/types';
@@ -15,12 +23,9 @@ import { doseNote, openWeigh, weighStep } from '../../shot/weigh';
 import { CurveChart } from '../charts/CurveChart';
 import { ConnectionPill } from '../components/ConnectionPill';
 import { DialPicker } from '../components/DialPicker';
+import { ThreeView } from '../components/ThreeView';
 
 const rpmConfirmedThisSession = signal(false);
-/** Pre-shot step: the plan card, weighing the beans, grinding. */
-const preStep = signal<'plan' | 'weigh' | 'grind'>('plan');
-/** When the weighing step was opened (a tare after this zeroes the dosing cup). */
-const weighOpenedAt = signal(0);
 const deviation = signal<'followed' | 'partly' | 'ignored' | null>(null);
 
 // ---- rating sheet state ----
@@ -137,14 +142,19 @@ function PreShot() {
             class={doseWeighed ? 'small' : 'primary'}
             disabled={!connected}
             onClick={() => {
-              weighOpenedAt.value = realClock.now();
-              preStep.value = 'weigh';
+              openWeighStep();
             }}
           >
             {doseWeighed ? 'Weigh again' : 'Weigh beans'}
           </button>
           {doseWeighed ? (
-            <button type="button" class="small" onClick={() => (preStep.value = 'grind')}>
+            <button
+              type="button"
+              class="small"
+              onClick={() => {
+                openGrindStep();
+              }}
+            >
               Grind view
             </button>
           ) : null}
@@ -321,7 +331,7 @@ function WeighBeans() {
   const use = (g: number) => {
     app.weighedDose.value = { g, plannedG: planned };
     app.nextSettings.value = { ...ns, doseG: g };
-    preStep.value = 'grind';
+    openGrindStep();
   };
   const grams = w?.grams ?? null;
   const instruction =
@@ -340,7 +350,7 @@ function WeighBeans() {
         <h1>Weigh beans</h1>
         <ConnectionPill />
       </div>
-      <ThreeSlot view="weigh" />
+      <ThreeView view="weigh" height={250} />
       <div class={`card ${st.phase === 'captured' ? 'accent' : ''}`} style="text-align:center">
         <div class="big-number">{grams === null ? '—' : `${grams.toFixed(1)} g`}</div>
         <p class="small">{instruction}</p>
@@ -365,12 +375,7 @@ function WeighBeans() {
           Tare now
         </button>
       </div>
-      <button
-        type="button"
-        class="small"
-        style="margin-top:8px"
-        onClick={() => (preStep.value = 'plan')}
-      >
+      <button type="button" class="small" style="margin-top:8px" onClick={backToPlan}>
         Back (keep {ns.doseG.toFixed(1)} g)
       </button>
     </div>
@@ -388,7 +393,7 @@ function Grind() {
         <h1>Grind</h1>
         <ConnectionPill />
       </div>
-      <ThreeSlot view="grind" />
+      <ThreeView view="grind" height={290} />
       <div class="card accent">
         <p>
           Tip the <b>{ns.doseG.toFixed(1)} g</b> into the hopper, set{' '}
@@ -402,10 +407,22 @@ function Grind() {
         ))}
       </div>
       <div class="grid2">
-        <button type="button" class="primary" onClick={() => (preStep.value = 'plan')}>
+        <button
+          type="button"
+          class="primary"
+          onClick={() => {
+            backToPlan();
+          }}
+        >
           Ground: prep and arm
         </button>
-        <button type="button" onClick={() => (preStep.value = 'weigh')}>
+        <button
+          type="button"
+          onClick={() => {
+            grindStartedAt.value = null;
+            preStep.value = 'weigh';
+          }}
+        >
           Back to weighing
         </button>
       </div>
@@ -427,11 +444,6 @@ function Grind() {
   );
 }
 
-/** Placeholder for the 3D views (filled in by the 3D build step). */
-function ThreeSlot(_props: { view: 'weigh' | 'grind' | 'marax' }) {
-  return null;
-}
-
 function tailEstimate(): number {
   const shots = app.shotsOfBag.value.slice(-5);
   const tails = shots.map((s) => s.features.tailMassG).filter((t) => t > 0 && t < 5);
@@ -449,11 +461,18 @@ function Armed() {
         <h1>Armed</h1>
         <ConnectionPill />
       </div>
+      <ThreeView view="marax" height={280} />
       <div class="card accent" style="text-align:center">
         <div class="big-number">{w ? w.grams.toFixed(1) : '—'} g</div>
         <div class={`small ${rec.armed?.stable ? 'ok' : 'warn'}`}>
           {rec.armed?.stable ? 'scale stable' : 'waiting for a stable reading'}
         </div>
+        {app.settings.value?.autoTare === false ? null : app.lastAutoTareAt.value !== null &&
+          now - app.lastAutoTareAt.value < 20_000 ? (
+          <div class="small ok">cup tared automatically</div>
+        ) : (
+          <div class="small muted">Put the cup on the scale: it tares by itself.</div>
+        )}
       </div>
       {rec.prompt === 'forgot_tap' ? (
         <div class="card warn">
@@ -567,6 +586,7 @@ function Live() {
           settling…
         </button>
       )}
+      <ThreeView view="marax" height={300} />
       <div class="card">
         <CurveChart
           series={series}
@@ -660,7 +680,7 @@ function RateSheet() {
           }
         : null;
     await app.saveShot(rating);
-    preStep.value = 'plan';
+    backToPlan();
     resetRating();
     deviation.value = null;
     navigate(isDemo() ? '/demo' : '/');

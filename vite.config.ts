@@ -13,5 +13,7 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
+    // three.js is one lazily loaded chunk (≈ 600 kB, 150 kB gzip) used only by the 3D views.
+    chunkSizeWarningLimit: 700,
   },
 });

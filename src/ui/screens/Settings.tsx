@@ -365,6 +365,36 @@ export function Settings() {
       <div class="card">
         <h3>Grinder & machine</h3>
         <RpmRangeSettings />
+        <label class="row" style="align-items:center;gap:8px">
+          <input
+            type="checkbox"
+            checked={s?.autoTare !== false}
+            onChange={(e) => void app.saveSettings({ autoTare: e.currentTarget.checked })}
+          />
+          Auto-tare when a cup or the dosing cup is put on the scale
+        </label>
+        <label class="row" style="align-items:center;gap:8px">
+          <input
+            type="checkbox"
+            checked={s?.show3d !== false}
+            onChange={(e) => void app.saveSettings({ show3d: e.currentTarget.checked })}
+          />
+          3D views of the grinder, machine and scale (off saves battery)
+        </label>
+        <label>
+          <span>Grinder colour (3D)</span>
+          <select
+            value={s?.grinderColor ?? 'black'}
+            onChange={(e) =>
+              void app.saveSettings({
+                grinderColor: e.currentTarget.value === 'white' ? 'white' : 'black',
+              })
+            }
+          >
+            <option value="black">black</option>
+            <option value="white">white</option>
+          </select>
+        </label>
         <label>
           <span>VS6 shows 0500 after power-on?</span>
           <select
