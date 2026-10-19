@@ -1,9 +1,9 @@
 /**
  * Vetoes on any model proposal: step and range clamps happen in the inversion; here the
- * compass check (never coarser when sour and fast, never finer when bitter and slow) and
- * the RPM floor.
+ * compass check (never coarser when sour and fast, never finer when bitter and slow).
+ * RPM limits live in rpm/range.ts (clampRpm, allowedRpmRange).
  */
-import { MODEL, RULES } from '../params';
+import { MODEL } from '../params';
 
 export interface CompassFacts {
   /** Sour–bitter slider of the last rated shot, if any. */
@@ -29,9 +29,4 @@ export function compassVeto(f: CompassFacts): { deltaLines: number; veto: string
     };
   }
   return { deltaLines: f.deltaLines, veto: null };
-}
-
-export function clampRpm(rpm: number, allowLowRpm: boolean): number {
-  const lo = allowLowRpm ? RULES.rpmOptInMin : RULES.rpmMin;
-  return Math.max(lo, Math.min(RULES.rpmMax, Math.round(rpm / 100) * 100));
 }

@@ -5,10 +5,19 @@
  */
 import { signal } from '@preact/signals';
 import { aBag, kDose, kGrind, kRpm } from '../core/flowmodel/state';
+import { RPM } from '../core/params';
 import { type RecommendationCore, recommend } from '../core/recommend';
 import { bagContext, channelFlagOf, type ReplayResult, replay } from '../core/replay';
-import { comparisonValidity, type SetpointPosterior, summary } from '../core/setpoint/grid';
-import type { Id, Recommendation, Shot, ShotSettings } from '../core/types';
+import { yRef } from '../core/rpm/balance';
+import type { CalibrationProgress } from '../core/rpm/calibration';
+import { uOf } from '../core/rpm/range';
+import {
+  comparisonValidity,
+  rpmComparisonValidity,
+  type SetpointPosterior,
+  summary,
+} from '../core/setpoint/grid';
+import type { Id, Recommendation, RpmCalibrationRun, Shot, ShotSettings } from '../core/types';
 import { newMeta, nowIso } from '../data/repo';
 import { diag } from '../diag/log';
 import { app, type PendingShot } from './state';
@@ -29,10 +38,15 @@ export interface ModelSummary {
 export const modelSummary = signal<ModelSummary | null>(null);
 export const lastReplay = signal<ReplayResult | null>(null);
 
+/** RPM calibration runs as of the last replay. */
+export const rpmRuns = signal<RpmCalibrationRun[]>([]);
+/** Progress of the active calibration run on the current bag (from the last recommendation). */
+export const calibrationProgress = signal<CalibrationProgress | null>(null);
+
 export async function replayAll(): Promise<ReplayResult | null> {
   const repo = app.repo;
   if (!repo) return null;
-  const [epochs, beans, bags, shots, ratings, quality, recs] = await Promise.all([
+  const [epochs, beans, bags, shots, ratings, quality, recs, runs] = await Promise.all([
     repo.listEpochs(),
     repo.listBeans(true),
     repo.listBags(true),
@@ -40,11 +54,22 @@ export async function replayAll(): Promise<ReplayResult | null> {
     repo.listRatings(),
     repo.listQuality(),
     repo.db.getAll('recommendations'),
+    repo.listRpmRuns(),
   ]);
   if (epochs.length === 0) return null;
   const t0 = performance.now();
-  const result = replay({ epochs, beans, bags, shots, ratings, quality, recommendations: recs });
+  const result = replay({
+    epochs,
+    beans,
+    bags,
+    shots,
+    ratings,
+    quality,
+    recommendations: recs,
+    rpmRuns: runs,
+  });
   diag.log('info', `replay: ${shots.length} shots in ${(performance.now() - t0).toFixed(0)} ms`);
+  rpmRuns.value = runs;
   lastReplay.value = result;
   return result;
 }
@@ -84,11 +109,11 @@ export async function computeRecommendation(
   const r = result ?? (await replayAll());
   if (!bag || !bean || !epoch || !settings || !r) return null;
   const ctx = bagContext(r, bag.id);
+  const pref = r.prefByBean.get(bean.id);
   const out = recommend({
     bag,
     bean,
     epoch,
-    allowLowRpm: settings.allowLowRpm,
     shots: ctx.views,
     model: r.model,
     setpoint: ctx.setpoint,
@@ -97,7 +122,11 @@ export async function computeRecommendation(
     shotsSinceBodyMove: ctx.shotsSinceBodyMove,
     balance: r.balance,
     tempCardShown: ctx.tempCardShown,
+    rpmRange: settings.rpmRange,
+    rpmRuns: rpmRuns.value,
+    ...(pref ? { pref } : {}),
   });
+  calibrationProgress.value = out.calibration;
   return out.rec;
 }
 
@@ -167,7 +196,7 @@ export async function rerunRecommendations(): Promise<RerunRow[]> {
   const bean = app.currentBean.value;
   const settings = app.settings.value;
   if (!repo || !bag || !bean || !settings) return [];
-  const [epochs, beans, bags, allShots, ratings, quality, recs] = await Promise.all([
+  const [epochs, beans, bags, allShots, ratings, quality, recs, runs] = await Promise.all([
     repo.listEpochs(),
     repo.listBeans(true),
     repo.listBags(true),
@@ -175,6 +204,7 @@ export async function rerunRecommendations(): Promise<RerunRow[]> {
     repo.listRatings(),
     repo.listQuality(),
     repo.db.getAll('recommendations'),
+    repo.listRpmRuns(),
   ]);
   const rows: RerunRow[] = [];
   const bagShots = allShots.filter((s) => s.bagId === bag.id);
@@ -196,19 +226,23 @@ export async function rerunRecommendations(): Promise<RerunRow[]> {
       recommendations: recsUpTo,
     });
     const ctx = bagContext(result, bag.id);
+    const pref = result.prefByBean.get(bean.id);
+    const asOf = stored?.createdAt ?? shot.at;
     const out = recommend({
       bag,
       bean,
       epoch,
-      allowLowRpm: settings.allowLowRpm,
       shots: ctx.views,
       model: result.model,
       setpoint: ctx.setpoint,
       current: shot.settings,
-      now: stored?.createdAt ?? shot.at,
+      now: asOf,
       shotsSinceBodyMove: ctx.shotsSinceBodyMove,
       balance: result.balance,
       tempCardShown: ctx.tempCardShown,
+      rpmRange: settings.rpmRange,
+      rpmRuns: runs.filter((r) => r.createdAt <= asOf),
+      ...(pref ? { pref } : {}),
     });
     const identical =
       stored !== null &&
@@ -230,11 +264,19 @@ export function comparisonReasonFor(p: PendingShot): string | null {
   const prevView = views.find((v) => v.shot.id === prev.id) ?? null;
   const prevRating = app.ratingsOfBag.value.find((r) => r.shotId === prev.id) ?? null;
   const settings = app.nextSettings.value;
+  const balance = result?.balance;
+  const ref = (y: number | null, rpm: number) =>
+    y === null ? null : balance ? yRef(y, balance, uOf(rpm)) : y;
   const yj =
     p.features.plateauFlow !== null && p.features.plateauFlow > 0
       ? Math.log(p.features.plateauFlow)
       : null;
-  return comparisonValidity({
+  const yi =
+    prevView?.y ??
+    (prev.features.plateauFlow !== null && prev.features.plateauFlow > 0
+      ? Math.log(prev.features.plateauFlow)
+      : null);
+  const facts = {
     learnJ: p.learn,
     learnI:
       prevView?.learn ??
@@ -250,13 +292,14 @@ export function comparisonReasonFor(p: PendingShot): string | null {
     tempI: prev.settings.tempSwitch,
     doseJ: settings.doseG,
     doseI: prev.settings.doseG,
-    yj,
-    yi:
-      prevView?.y ??
-      (prev.features.plateauFlow !== null && prev.features.plateauFlow > 0
-        ? Math.log(prev.features.plateauFlow)
-        : null),
-  });
+    yj: ref(yj, settings.grind.rpm),
+    yi: ref(yi, prev.settings.grind.rpm),
+  };
+  // Same RPM: a flow comparison for the setpoint. Different RPM: an RPM comparison, valid at
+  // matched flow (it teaches the preferred RPM instead).
+  return settings.grind.rpm === prev.settings.grind.rpm
+    ? comparisonValidity(facts)
+    : rpmComparisonValidity(facts, RPM.matchedFlowLn);
 }
 
 /** Current bag's setpoint posterior and the rated shots' flows, for the posterior bar. */

@@ -215,14 +215,6 @@ export const RULES = {
   ratioFloor: { light: 1.8, medium: 1.6, dark: 1.4 },
   yieldStepG: 2,
   yieldBigStepG: 4,
-  /** RPM lever. */
-  rpmHold: 1000,
-  rpmStep: 200,
-  rpmMin: 700,
-  rpmMax: 1400,
-  rpmOptInMin: 500,
-  rpmMinShotsBetween: 3,
-  rpmTextureSlider: 2,
   /** Temperature card: ≥ 4 rated in-band shots with mean |v| ≥ 1.5, once per bag. */
   tempMinRated: 4,
   tempMeanSlider: 1.5,

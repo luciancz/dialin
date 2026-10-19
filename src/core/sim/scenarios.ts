@@ -12,6 +12,7 @@ import { mulberry32, type Rng, randn, uniform } from '../math/rng';
 import { MODEL, RULES, SIM } from '../params';
 import { type RecommendationCore, recommend } from '../recommend';
 import { bagContext, replay } from '../replay';
+import { initPreference } from '../rpm/preference';
 import { summary } from '../setpoint/grid';
 import type {
   Bag,
@@ -277,7 +278,7 @@ function pullShot(w: World, bagIndex: number, day: number, k: number): SimStep {
     bag,
     bean,
     epoch,
-    allowLowRpm: false,
+    pref: result.prefByBean.get(bean.id) ?? initPreference(),
     shots: ctx.views,
     model: result.model,
     setpoint: ctx.setpoint,
@@ -351,7 +352,7 @@ function recommendOnly(w: World, bagIndex: number, atMs: number): void {
     bag,
     bean,
     epoch,
-    allowLowRpm: false,
+    pref: result.prefByBean.get(bean.id) ?? initPreference(),
     shots: ctx.views,
     model: result.model,
     setpoint: ctx.setpoint,

@@ -51,14 +51,70 @@ export function waitSentence(a: {
   return `Rest this bean (${a.ageDays} days since roast). Keep ${formatDial(a.dial)} / ${a.rpm} / ${a.yieldG.toFixed(0)} g; grind conclusions are suppressed until day ${a.gateDay}.`;
 }
 
-export function rpmSentence(a: {
-  dial: DialPosition;
+function dialMove(from: DialPosition, to: DialPosition, deltaLines: number): string {
+  if (deltaLines === 0) return `keep the dial at ${formatDial(from)}`;
+  const n = Math.abs(deltaLines);
+  return `go ${n} line${n === 1 ? '' : 's'} ${deltaLines < 0 ? 'finer' : 'coarser'} (${formatDial(from)} → ${formatDial(to)})`;
+}
+
+/** Body move: RPM toward the preferred body with the dial compensated. */
+export function bodySentence(a: {
   rpm: number;
   prevRpm: number;
-  texture: 'thin' | 'heavy';
-  k: number;
+  from: DialPosition;
+  to: DialPosition;
+  deltaLines: number;
+  thetaMean: number;
+  band: [number, number];
+  targetY: number;
 }): string {
-  return `Hold ${formatDial(a.dial)}; set ${a.rpm} RPM (was ${a.prevRpm}). Texture read ${a.texture} on ${a.k} of the last 3 shots. Flow may move either way; next shot re-dials.`;
+  const dir = a.rpm > a.prevRpm ? 'more body' : 'more clarity';
+  return `Set ${a.rpm} RPM (was ${a.prevRpm}) and ${dialMove(a.from, a.to, a.deltaLines)} to hold ${gps(a.targetY)} g/s: your ratings point to ${dir}, preferred ≈ ${Math.round(a.thetaMean / 50) * 50} RPM (band ${a.band[0]}–${a.band[1]}).`;
+}
+
+/** One slot of an RPM calibration run. */
+export function calibrationSentence(a: {
+  slot: number;
+  total: number;
+  rpm: number;
+  prevRpm: number;
+  from: DialPosition;
+  to: DialPosition;
+  deltaLines: number;
+  targetY: number;
+  prep: string[] | null;
+  repeat: boolean;
+}): string {
+  const head = `RPM calibration ${a.slot + 1}/${a.total}${a.repeat ? ' (repeat)' : ''}: set ${a.rpm} RPM${a.rpm === a.prevRpm ? '' : ` (was ${a.prevRpm})`} and ${dialMove(a.from, a.to, a.deltaLines)}, compensated to hold ${gps(a.targetY)} g/s.`;
+  const tail =
+    ' Feed the beans the same way as always, rate body (thin–heavy) and compare with the last shot.';
+  const prep =
+    a.prep && a.prep.length > 0
+      ? ` The last shot looked channelled (${a.prep.join(', ')}): WDT and a level tamp before this one.`
+      : '';
+  return head + prep + tail;
+}
+
+/** Backup flow lever: the dial is at a limit, RPM covers the rest. */
+export function backupSentence(a: {
+  rpm: number;
+  prevRpm: number;
+  limit: 'chirp' | 'end';
+}): string {
+  const where = a.limit === 'chirp' ? 'the finest safe setting' : 'the end of the dial';
+  return ` The dial is at ${where}, so set ${a.rpm} RPM (was ${a.prevRpm}) to cover the rest of the flow change.`;
+}
+
+/** Fine trim smaller than one dial line. */
+export function trimSentence(a: {
+  rpm: number;
+  prevRpm: number;
+  dial: DialPosition;
+  before: number;
+  after: number;
+}): string {
+  const pct = (x: number) => `${(Math.abs(Math.expm1(x)) * 100).toFixed(0)} %`;
+  return `Fine trim: keep ${formatDial(a.dial)} and set ${a.rpm} RPM (was ${a.prevRpm}); predicted flow ${pct(a.before)} off target becomes ${pct(a.after)}, a smaller step than one dial line.`;
 }
 
 const SWITCH = ['0', 'I', 'II'];

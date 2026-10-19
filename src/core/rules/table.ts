@@ -2,9 +2,24 @@
  * Rule table (plan "Rule layer"), evaluated top to bottom; the first matching row wins.
  * Pure: takes the facts the arbitration layer computed and returns the lever decision.
  */
-import { MODEL, RULES } from '../params';
+import { MODEL, RPM, RULES } from '../params';
+import type { PreferenceSummary } from '../rpm/preference';
 import type { Chip, Lever, SliderValue, VsPrevious } from '../types';
 import { ratioBounds } from './stages';
+
+/** RPM facts the arbitration layer computed for rows 9 and 13. */
+export interface RpmFacts {
+  /** sd(k_r) ≤ 0.015: the RPM flow effect is known well enough to compensate. */
+  calibrated: boolean;
+  krSd: number;
+  /** Preferred-RPM summary for this bean (null before any model). */
+  pref: PreferenceSummary | null;
+  shotsSinceBodyMove: number;
+  /** Where a body move would go (Bayes RPM, step-capped, inside the range). */
+  bodyTarget: number;
+  /** P(the body move improves the cup). */
+  probImprove: number;
+}
 
 export interface RuleShot {
   y: number | null;
@@ -37,8 +52,9 @@ export interface RuleFacts {
   doseG: number;
   targetYieldG: number;
   rpm: number;
-  shotsSinceRpmChange: number;
-  allowLowRpm: boolean;
+  rpmFacts: RpmFacts;
+  /** Next slot of an active RPM calibration run, if any. */
+  calibration: { slot: number; rpm: number } | null;
   tempCardShown: boolean;
   /** Last shot skipped as an outlier and not yet re-anchored. */
   outlierPending: boolean;
@@ -52,10 +68,11 @@ export type RuleDecision =
   | { row: 4; lever: 'grind'; target: number }
   | { row: 5 | 7; lever: 'yield'; newYieldG: number; taste: 'sour' | 'bitter' }
   | { row: 6 | 8; lever: 'grind'; target: number; taste: 'sour' | 'bitter' }
-  | { row: 9; lever: 'rpm'; newRpm: number; texture: 'thin' | 'heavy'; k: number }
+  | { row: 9; lever: 'rpm'; newRpm: number; thetaMean: number; band: [number, number] }
   | { row: 10; lever: 'temperature'; taste: 'sour' | 'bitter'; k: number; n: number }
   | { row: 11; lever: 'none'; reason: 'dialled_in' }
-  | { row: 12; lever: 'grind'; target: 'setpoint_search' };
+  | { row: 12; lever: 'grind'; target: 'setpoint_search' }
+  | { row: 13; lever: 'calibrate'; slot: number; rpm: number; prep: string[] | null };
 
 export function lastRated(shots: RuleShot[]): RuleShot | null {
   for (let i = shots.length - 1; i >= 0; i--) {
@@ -76,18 +93,32 @@ export function evaluateRules(f: RuleFacts): { decision: RuleDecision; whyNot: s
   const ratio = f.targetYieldG / Math.max(1, f.doseG);
 
   // 1. Channeling on the last shot.
-  if (
-    last &&
+  const channelled =
+    last !== null &&
     (last.channelFlag ||
       chips.includes('channelled') ||
-      (chips.includes('astringent') && chips.includes('harsh')))
-  ) {
-    const signs: string[] = [];
-    if (last.channelFlag) signs.push('spike or dips in the flow');
+      (chips.includes('astringent') && chips.includes('harsh')));
+  const signs: string[] = [];
+  if (channelled) {
+    if (last?.channelFlag) signs.push('spike or dips in the flow');
     if (chips.includes('channelled')) signs.push('the channelled chip');
     if (chips.includes('astringent')) signs.push('astringency');
-    return { decision: { row: 1, lever: 'prep', signs }, whyNot };
   }
+  // 13. An active RPM calibration run: pull the next slot (a channelled slot is repeated by the
+  // planner; the card adds the prep advice).
+  if (f.calibration) {
+    return {
+      decision: {
+        row: 13,
+        lever: 'calibrate',
+        slot: f.calibration.slot,
+        rpm: f.calibration.rpm,
+        prep: channelled ? signs : null,
+      },
+      whyNot,
+    };
+  }
+  if (channelled) return { decision: { row: 1, lever: 'prep', signs }, whyNot };
   whyNot.push('not prep: no channeling signs on the last shot');
 
   // 2. Freshness gate.
@@ -146,44 +177,45 @@ export function evaluateRules(f: RuleFacts): { decision: RuleDecision; whyNot: s
     v === null ? 'not yield: last shot unrated or slider at 0' : 'not yield: slider at 0',
   );
 
-  // 9. RPM as the texture lever.
+  // 9. Body move: RPM toward the preferred body, with the dial compensated so flow holds.
   const last3 = f.shots.filter((s) => s.learn).slice(-3);
   const converged =
     last3.filter((s) => s.predictedY !== null && Math.abs(s.predictedY - f.sStar) <= RULES.beta)
       .length >= 2;
-  const rated3 = f.shots.filter((s) => s.rating).slice(-3);
-  const thin = rated3.filter(
-    (s) => (s.rating?.h ?? 0) <= -RULES.rpmTextureSlider || s.rating?.chips.includes('hollow'),
-  ).length;
-  const heavy = rated3.filter((s) => (s.rating?.h ?? 0) >= RULES.rpmTextureSlider).length;
-  if (f.setpointSd <= RULES.setpointSdConverged) {
-    if (
-      converged &&
-      f.shotsSinceRpmChange >= RULES.rpmMinShotsBetween &&
-      (thin >= 2 || heavy >= 2)
-    ) {
-      const dir = thin >= 2 ? 1 : -1;
-      const lo = f.allowLowRpm ? RULES.rpmOptInMin : RULES.rpmMin;
-      const newRpm = Math.max(lo, Math.min(RULES.rpmMax, f.rpm + dir * RULES.rpmStep));
-      if (newRpm !== f.rpm) {
-        return {
-          decision: {
-            row: 9,
-            lever: 'rpm',
-            newRpm,
-            texture: dir > 0 ? 'thin' : 'heavy',
-            k: dir > 0 ? thin : heavy,
-          },
-          whyNot,
-        };
-      }
-      whyNot.push(`not RPM: already at the ${newRpm} RPM limit`);
-    } else if (!converged)
-      whyNot.push('not RPM: flow not yet converged (2 of the last 3 shots predicted in band)');
-    else if (f.shotsSinceRpmChange < RULES.rpmMinShotsBetween)
-      whyNot.push(`not RPM: only ${f.shotsSinceRpmChange} shots since the last RPM change`);
-    else whyNot.push('not RPM: texture chips do not agree on 2 of the last 3 rated shots');
-  } else whyNot.push(`not RPM: setpoint not yet found (±${(f.setpointSd * 100).toFixed(0)} %)`);
+  const rf = f.rpmFacts;
+  const pref = rf.pref;
+  if (f.setpointSd > RULES.setpointSdConverged) {
+    whyNot.push(`not body: taste setpoint not yet found (±${(f.setpointSd * 100).toFixed(0)} %)`);
+  } else if (!converged) {
+    whyNot.push('not body: flow not yet settled (2 of the last 3 shots predicted in band)');
+  } else if (!rf.calibrated) {
+    whyNot.push(
+      `not body: RPM not calibrated yet (flow effect ±${rf.krSd.toFixed(3)} per 100 RPM)`,
+    );
+  } else if (!pref) {
+    whyNot.push('not body: no body ratings yet (use the thin–heavy slider)');
+  } else if (rf.shotsSinceBodyMove < RPM.bodyMinShotsBetween) {
+    whyNot.push(`not body: only ${rf.shotsSinceBodyMove} shots since the last body move`);
+  } else if (pref.pInsensitive >= RPM.pInsensitiveMax) {
+    whyNot.push(`not body: RPM barely changes body for you (P ${pref.pInsensitive.toFixed(2)})`);
+  } else if (f.rpm >= pref.band[0] && f.rpm <= pref.band[1]) {
+    whyNot.push(`not body: already within your ${pref.band[0]}–${pref.band[1]} RPM band`);
+  } else if (rf.bodyTarget === f.rpm || rf.probImprove < RPM.bodyImproveProb) {
+    whyNot.push(
+      `not body: a move is not clearly better yet (P ${rf.probImprove.toFixed(2)}, preferred ${Math.round(pref.thetaMean)} ± ${Math.round(pref.thetaSd)} RPM)`,
+    );
+  } else {
+    return {
+      decision: {
+        row: 9,
+        lever: 'rpm',
+        newRpm: rf.bodyTarget,
+        thetaMean: pref.thetaMean,
+        band: pref.band,
+      },
+      whyNot,
+    };
+  }
 
   // 10. Temperature suggestion, once per bag.
   const ratedInBand = f.shots.filter((s) => s.rating && s.rating.v !== null && s.inBandAtRating);
@@ -240,10 +272,11 @@ export const RULE_NAMES: Record<number, string> = {
   6: 'sour at ratio cap → finer',
   7: 'bitter → shorter ratio',
   8: 'bitter at ratio floor → coarser',
-  9: 'texture → RPM',
+  9: 'body → compensated RPM',
   10: 'temperature suggestion',
   11: 'dialled in',
   12: 'setpoint search',
+  13: 'RPM calibration slot',
 };
 
 export function leverOf(d: RuleDecision): Lever {

@@ -80,8 +80,10 @@ export function invert(
   const probeStep = kg.sd > MODEL.kGrindSdConverged;
   const maxStep = probeStep ? MODEL.probeStepLines : MODEL.stepMaxLines;
   let delta = raw - currentLines;
-  if (Math.abs(delta) > MODEL.stepAbsMaxLines) {
-    vetoes.push(`step of ${Math.round(delta)} lines clamped to ${MODEL.stepAbsMaxLines}`);
+  if (Math.abs(delta) > maxStep + 0.5) {
+    vetoes.push(
+      `step of ${Math.round(delta)} lines clamped to ${maxStep}${probeStep ? ' while the grinder gain is still being learned' : ''}`,
+    );
   }
   delta = Math.max(-maxStep, Math.min(maxStep, delta));
   let L = Math.round(currentLines + delta);

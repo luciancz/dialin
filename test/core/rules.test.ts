@@ -4,6 +4,7 @@ import { update } from '../../src/core/flowmodel/update';
 import { mulberry32 } from '../../src/core/math/rng';
 import { RULES } from '../../src/core/params';
 import { type RecommendInput, recommend, type ShotView } from '../../src/core/recommend';
+import { initPreference, type PreferenceSummary, updateBody } from '../../src/core/rpm/preference';
 import { evaluateRules, type RuleFacts, type RuleShot } from '../../src/core/rules/table';
 import { compassVeto } from '../../src/core/rules/veto';
 import { initSetpoint, updateSlider } from '../../src/core/setpoint/grid';
@@ -13,6 +14,7 @@ import type {
   CalibrationEpoch,
   Features,
   Rating,
+  RpmCalibrationRun,
   Shot,
   ShotQuality,
   ShotSettings,
@@ -50,14 +52,45 @@ function facts(over: Partial<RuleFacts> = {}): RuleFacts {
     doseG: 18,
     targetYieldG: 40,
     rpm: 1000,
-    shotsSinceRpmChange: 5,
-    allowLowRpm: false,
+    rpmFacts: {
+      calibrated: true,
+      krSd: 0.01,
+      pref: null,
+      shotsSinceBodyMove: 5,
+      bodyTarget: 1000,
+      probImprove: 0,
+    },
+    calibration: null,
     tempCardShown: false,
     outlierPending: false,
     learnableCount: 3,
     ...over,
   };
 }
+
+const prefSummary = (over: Partial<PreferenceSummary> = {}): PreferenceSummary => ({
+  thetaMean: 800,
+  thetaSd: 80,
+  pInsensitive: 0.1,
+  bayesRpm: 800,
+  band: [700, 900],
+  ratings: 6,
+  ...over,
+});
+
+/** Facts where a body move toward 800 RPM should fire from 1100 RPM. */
+const bodyReady = (over: Partial<RuleFacts['rpmFacts']> = {}): Partial<RuleFacts> => ({
+  rpm: 1100,
+  rpmFacts: {
+    calibrated: true,
+    krSd: 0.01,
+    pref: prefSummary(),
+    shotsSinceBodyMove: 5,
+    bodyTarget: 800,
+    probImprove: 0.9,
+    ...over,
+  },
+});
 
 const rated = (v: number, h = 0, chips: Rating['chips'] = []) =>
   ruleShot({
@@ -130,22 +163,41 @@ describe('rule table, one case per row', () => {
     expect(d.row).toBe(8);
     if (d.row === 8) expect(d.target).toBeGreaterThan(sStar);
   });
-  it('9 texture → RPM ±200 within 700–1400, only when converged and 3 shots since the last change', () => {
-    const thin = [rated(0, -2), rated(0, -2), rated(0, 0)];
-    expect(evaluateRules(facts({ shots: thin })).decision).toMatchObject({
+  it('9 body move toward the preferred RPM once calibrated, settled and outside the band', () => {
+    expect(evaluateRules(facts(bodyReady())).decision).toMatchObject({
       row: 9,
-      newRpm: 1200,
-      texture: 'thin',
+      lever: 'rpm',
+      newRpm: 800,
     });
-    const heavy = [rated(0, 2), rated(0, 0, ['hollow']), rated(0, 3)];
-    expect(evaluateRules(facts({ shots: heavy })).decision).toMatchObject({ row: 9, newRpm: 800 });
-    expect(evaluateRules(facts({ shots: thin, shotsSinceRpmChange: 2 })).decision.row).not.toBe(9);
-    expect(evaluateRules(facts({ shots: thin, setpointSd: 0.1 })).decision.row).not.toBe(9);
-    expect(evaluateRules(facts({ shots: heavy, rpm: 700 })).decision.row).not.toBe(9);
-    expect(
-      evaluateRules(facts({ shots: heavy, rpm: 700, allowLowRpm: true })).decision,
-    ).toMatchObject({ row: 9, newRpm: 500 });
-    expect(evaluateRules(facts({ shots: thin, rpm: 1400 })).decision.row).not.toBe(9);
+    const blocked: [Partial<RuleFacts>, RegExp][] = [
+      [{ ...bodyReady(), setpointSd: 0.1 }, /setpoint/],
+      [bodyReady({ calibrated: false }), /not calibrated/],
+      [bodyReady({ pref: null }), /no body ratings/],
+      [bodyReady({ shotsSinceBodyMove: 2 }), /since the last body move/],
+      [bodyReady({ pref: prefSummary({ pInsensitive: 0.85 }) }), /barely changes body/],
+      [{ ...bodyReady(), rpm: 900 }, /already within/],
+      [bodyReady({ probImprove: 0.5 }), /not clearly better/],
+    ];
+    for (const [over, why] of blocked) {
+      const r = evaluateRules(facts(over));
+      expect(r.decision.row, String(why)).not.toBe(9);
+      expect(r.whyNot.join(' | ')).toMatch(why);
+    }
+  });
+  it('13 an active calibration run takes the slot first, with prep advice after a channelled shot', () => {
+    const cal = { slot: 2, rpm: 1300 };
+    expect(evaluateRules(facts({ calibration: cal, ageDays: 1 })).decision).toMatchObject({
+      row: 13,
+      lever: 'calibrate',
+      slot: 2,
+      rpm: 1300,
+      prep: null,
+    });
+    const d = evaluateRules(
+      facts({ calibration: cal, shots: [ruleShot({ channelFlag: true })] }),
+    ).decision;
+    expect(d.row).toBe(13);
+    if (d.row === 13) expect(d.prep?.length).toBeGreaterThan(0);
   });
   it('10 temperature once per bag after 4 rated in-band shots leaning sour', () => {
     const sour = [rated(-2), rated(-1), rated(-2), rated(-2)].map((s) => ({
@@ -281,9 +333,13 @@ function mkShot(i: number, lines: number, plateau: number, rpm = 1000): Shot {
 }
 
 describe('recommend() properties', () => {
-  it('always picks exactly one lever, never a step over 15 lines, never RPM below 700 without opt-in', () => {
+  it('one lever per card; RPM moves are compensated, in range, in 100s, with E006 guidance at ≤ 600', () => {
     const rng = mulberry32(77);
+    const levels = [500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600];
     for (let trial = 0; trial < 150; trial++) {
+      const krTrue = (rng() - 0.5) * 0.08;
+      const rpmOf = () =>
+        rng() < 0.4 ? (levels[Math.floor(rng() * levels.length)] ?? 1000) : 1000;
       const model = initFlowModel('e1', 250);
       addBag(
         model,
@@ -299,9 +355,10 @@ describe('recommend() properties', () => {
         250,
         '2026-10-01T00:00:00.000Z',
       );
-      const n = 1 + Math.floor(rng() * 8);
+      const n = 1 + Math.floor(rng() * 14);
       const views: ShotView[] = [];
       let lines = 250;
+      let pref = initPreference();
       const quality: ShotQuality = {
         id: 'q',
         createdAt: 'x',
@@ -314,8 +371,14 @@ describe('recommend() properties', () => {
       };
       for (let i = 0; i < n; i++) {
         lines = Math.max(235, Math.min(400, lines + Math.round((rng() - 0.5) * 12)));
-        const y = mu0Roast('light') + 0.05 * (lines - 250) + (rng() - 0.5) * 0.3;
-        const shot = mkShot(i, lines, Math.exp(y), rng() < 0.2 ? 1200 : 1000);
+        const rpmI = rpmOf();
+        const y =
+          mu0Roast('light') +
+          0.05 * (lines - 250) +
+          krTrue * ((rpmI - 1000) / 100) +
+          (rng() - 0.5) * 0.3;
+        const shot = mkShot(i, lines, Math.exp(y), rpmI);
+        if (rng() < 0.5) pref = updateBody(pref, rpmI, Math.floor(rng() * 7) - 3);
         const res = update(model, {
           bagId: 'bag',
           shotId: shot.id,
@@ -368,11 +431,23 @@ describe('recommend() properties', () => {
         ...last.shot.settings,
         targetYieldG: 18 * (1.6 + rng() * 1.3),
       };
+      const run: RpmCalibrationRun | null =
+        rng() < 0.25
+          ? {
+              id: 'run1',
+              createdAt: '2026-10-01T00:00:00.000Z',
+              updatedAt: '2026-10-01T00:00:00.000Z',
+              deviceId: 'd',
+              epochId: 'e1',
+              bagId: 'bag',
+              startedAt: '2026-10-01T00:00:00.000Z',
+              status: 'active',
+            }
+          : null;
       const input: RecommendInput = {
         bag,
         bean,
         epoch,
-        allowLowRpm: false,
         shots: views,
         model,
         setpoint: sp,
@@ -380,23 +455,46 @@ describe('recommend() properties', () => {
         now: '2026-10-20T00:00:00.000Z',
         shotsSinceBodyMove: Math.floor(rng() * 5),
         tempCardShown: rng() < 0.5,
+        pref,
+        rpmRange: [500, 1600],
+        rpmRuns: run ? [run] : [],
       };
       const { rec } = recommend(input);
       const curLines = toLines(current.grind.dialPos, DEFAULT_DIAL_SPEC);
       const nextLines = toLines(rec.next.grind.dialPos, DEFAULT_DIAL_SPEC);
+      const rpmChanged = rec.next.grind.rpm !== current.grind.rpm;
       const changed = [
         nextLines !== curLines,
-        rec.next.grind.rpm !== current.grind.rpm,
+        rpmChanged,
         Math.abs(rec.next.targetYieldG - current.targetYieldG) > 1e-9,
       ].filter(Boolean).length;
-      expect(changed, `lever ${rec.lever}`).toBeLessThanOrEqual(1);
-      if (rec.lever === 'grind') expect(nextLines).not.toBe(curLines);
-      if (rec.lever !== 'grind') expect(nextLines).toBe(curLines);
-      if (rec.lever !== 'rpm') expect(rec.next.grind.rpm).toBe(current.grind.rpm);
+      // RPM levers move RPM and dial together; every other lever changes at most one field.
+      if (rec.lever === 'rpm' || rec.lever === 'calibrate' || rec.lever === 'grind') {
+        expect(Math.abs(rec.next.targetYieldG - current.targetYieldG)).toBeLessThan(1e-9);
+      } else {
+        expect(changed, `lever ${rec.lever}`).toBeLessThanOrEqual(1);
+        expect(rpmChanged, `lever ${rec.lever}`).toBe(false);
+      }
+      if (rec.lever === 'yield' || rec.lever === 'none' || rec.lever === 'wait')
+        expect(nextLines).toBe(curLines);
+      if (rec.lever === 'grind') expect(nextLines !== curLines || rpmChanged).toBe(true);
+      // Compensated moves hold the flow at the target unless the dial hit a limit.
+      if (
+        (rec.lever === 'rpm' || rec.lever === 'calibrate') &&
+        !rec.vetoes.some((x) => /clamped/.test(x))
+      )
+        expect(Math.abs(rec.predictedLnFlow - rec.targetLnFlow)).toBeLessThanOrEqual(RULES.beta);
+      if (rec.lever === 'calibrate') {
+        expect(run).not.toBeNull();
+        expect(rec.calibration?.plannedRpm).toBe(rec.next.grind.rpm);
+      }
+      if (rec.lever === 'rpm') expect(rec.bodyConfidence ?? 0).toBeGreaterThanOrEqual(0.7);
       expect(Math.abs(nextLines - curLines)).toBeLessThanOrEqual(15);
       expect(nextLines).toBeGreaterThanOrEqual(235);
-      expect(rec.next.grind.rpm).toBeGreaterThanOrEqual(700);
-      expect(rec.next.grind.rpm).toBeLessThanOrEqual(1400);
+      expect(rec.next.grind.rpm).toBeGreaterThanOrEqual(500);
+      expect(rec.next.grind.rpm).toBeLessThanOrEqual(1600);
+      expect(rec.next.grind.rpm % 100).toBe(0);
+      if (rec.next.grind.rpm <= 600) expect(rec.guidance?.join(' ') ?? '').toMatch(/E006/);
       expect(rec.confidence).toBeGreaterThanOrEqual(0);
       expect(rec.confidence).toBeLessThanOrEqual(1);
       expect(rec.sentence.length).toBeGreaterThan(10);
@@ -418,7 +516,6 @@ describe('recommend() properties', () => {
       bag,
       bean,
       epoch,
-      allowLowRpm: false,
       shots: [],
       model,
       setpoint: initSetpoint(mu0Roast('light')),
