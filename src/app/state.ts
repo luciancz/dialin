@@ -375,7 +375,8 @@ class AppState {
 
   /**
    * Tare once when a cup or the dosing cup is put down and the reading settles. Off while a
-   * shot records or waits for its rating, and when Settings → auto-tare is off.
+   * shot records or waits for its rating, and when Settings → auto-tare is off. Every frame
+   * then goes to the hands-free hook with the tare it produced.
    */
   private maybeAutoTare(tRxMs: number): void {
     const phase = this.recorder.value.phase;
@@ -383,6 +384,12 @@ class AppState {
     const enabled = idle && !this.pending.value && this.settings.value?.autoTare !== false;
     const r = autoTareStep(this.autoTare, this.ring, tRxMs, enabled);
     this.autoTare = r.state;
+    const tare = r.tare && this.client ? { placedG: r.placedG } : null;
+    try {
+      this.onScaleFrame?.(tRxMs, tare);
+    } catch (err) {
+      diag.log('error', `hands-free: ${String(err)}`);
+    }
     if (!r.tare || !this.client) return;
     void this.client
       .send(commands.tare())
@@ -392,6 +399,17 @@ class AppState {
         diag.log('info', 'auto-tare: cup put down');
       })
       .catch((err) => diag.log('warn', `auto-tare failed: ${String(err)}`));
+  }
+
+  /** Hook for hands-free (src/app/handsFree.ts): every frame, with the auto-tare it fired. */
+  onScaleFrame: ((tRxMs: number, tare: { placedG: number } | null) => void) | null = null;
+
+  /** Pre-alert lead: the mean drip tail of the bag's last five shots (1 g without any). */
+  tailEstimate(): number {
+    const shots = this.shotsOfBag.value.slice(-5);
+    const tails = shots.map((s) => s.features.tailMassG).filter((t) => t > 0 && t < 5);
+    if (tails.length === 0) return REC.tailEstimateDefaultG;
+    return tails.reduce((a, b) => a + b, 0) / tails.length;
   }
 
   /** Beep a cue on the scale (Settings → beep cues). */

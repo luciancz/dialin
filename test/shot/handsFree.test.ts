@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import type { ShotSettings } from '../../src/core/types';
 import {
+  deviationFromCard,
   type HfAction,
   type HfInput,
   type HfState,
@@ -17,6 +19,8 @@ class Rig {
   phase: Phase = 'IDLE';
   pending = false;
   dosingCupG: number | null = null;
+  /** The pre-shot step on screen, moved by the actions as the app does. */
+  preStep: HfInput['preStep'] = 'plan';
   actions: HfAction[] = [];
 
   frame(g: number, tare: { placedG: number } | null = null): void {
@@ -31,12 +35,16 @@ class Rig {
       tare,
       plannedDoseG: 18,
       dosingCupG: this.dosingCupG,
+      preStep: this.preStep,
     };
     const r = handsFreeStep(this.st, inp);
     this.st = r.state;
     this.actions.push(...r.actions);
     for (const a of r.actions) {
       if (a.type === 'arm') this.phase = 'ARMED';
+      if (a.type === 'openWeigh') this.preStep = 'weigh';
+      if (a.type === 'useDose') this.preStep = 'grind';
+      if (a.type === 'toPlan') this.preStep = 'plan';
       if (a.type === 'useDose' && a.dosingCupG !== null) this.dosingCupG = a.dosingCupG;
     }
   }
@@ -128,5 +136,70 @@ describe('hands-free flow', () => {
     r.hold(-92, 500);
     expect(r.st.step).toBe('ready');
     expect(r.types()).toEqual(['openWeigh', 'cue:weigh', 'toPlan']);
+  });
+
+  it('follows the manual buttons: armed by hand, dose taken by hand, weighing opened by hand', () => {
+    const r = new Rig();
+    r.hold(0, 500);
+    r.phase = 'ARMED'; // the Arm button
+    r.frame(0);
+    expect(r.st.step).toBe('armed');
+    expect(r.actions).toEqual([]);
+
+    const w = new Rig();
+    w.dosingCupG = 92.4;
+    w.hold(0, 500);
+    w.preStep = 'weigh'; // "Weigh beans" tapped, then a different cup put down
+    w.frame(0, { placedG: 60 });
+    expect(w.st.step).toBe('weigh');
+    for (let i = 1; i <= 10; i++) w.frame(1.8 * i);
+    w.preStep = 'grind'; // "Use 18.0 g" tapped before the controller took it
+    w.hold(18, 300);
+    expect(w.st.step).toBe('grind');
+    expect(w.types()).not.toContain('useDose');
+    // That cup back with the grounds (dose from the plan) is still not the espresso cup.
+    w.hold(-78, 1500);
+    w.frame(0, { placedG: 60 + 17.9 });
+    expect(w.st.step).toBe('grind');
+    w.hold(-78, 1500);
+    w.frame(0, { placedG: 168 });
+    expect(w.st.step).toBe('armed');
+  });
+
+  it('back to weighing from the grind step re-opens the weighing', () => {
+    const r = new Rig();
+    r.hold(0, 500);
+    r.frame(0, { placedG: 92.4 });
+    for (let i = 1; i <= 20; i++) r.frame((18 * i) / 20);
+    r.hold(18, 3000);
+    expect(r.st.step).toBe('grind');
+    r.preStep = 'weigh';
+    r.frame(18);
+    expect(r.st.step).toBe('weigh');
+  });
+});
+
+describe('hands-free: deviation from the card', () => {
+  const card: ShotSettings = {
+    grind: { dialPos: { rev: 1, number: 8, line: 2 }, rpm: 1100, rpmConfirmed: false },
+    doseG: 18,
+    targetYieldG: 40,
+    tempSwitch: 1,
+  };
+  it('a weighed dose still follows the card; a hand edit is partly', () => {
+    expect(deviationFromCard(card, card, null)).toBe('followed');
+    expect(deviationFromCard({ ...card, doseG: 18.3 }, card, 18.3)).toBe('followed');
+    expect(deviationFromCard({ ...card, doseG: 18.5 }, card, null)).toBe('partly');
+    expect(deviationFromCard({ ...card, targetYieldG: 38 }, card, null)).toBe('partly');
+    expect(
+      deviationFromCard({ ...card, grind: { ...card.grind, rpmConfirmed: true } }, card, null),
+    ).toBe('followed');
+    expect(
+      deviationFromCard(
+        { ...card, grind: { ...card.grind, dialPos: { rev: 1, number: 8, line: 3 } } },
+        card,
+        null,
+      ),
+    ).toBe('partly');
   });
 });

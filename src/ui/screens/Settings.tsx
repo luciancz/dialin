@@ -367,11 +367,60 @@ export function Settings() {
         <label class="row" style="align-items:center;gap:8px">
           <input
             type="checkbox"
+            checked={s?.handsFree !== false}
+            onChange={(e) => void app.saveSettings({ handsFree: e.currentTarget.checked })}
+          />
+          The scale moves the shot on: dosing cup → weigh, steady dose → grind, espresso cup →
+          armed, the scale's timer button → START
+        </label>
+        {s?.autoTare === false ? (
+          <p class="small warn">Needs auto-tare (Grinder & machine below).</p>
+        ) : null}
+        <label class="row" style="align-items:center;gap:8px">
+          <input
+            type="checkbox"
             checked={s?.beepCues !== false}
             onChange={(e) => void app.saveSettings({ beepCues: e.currentTarget.checked })}
           />
           Beep cues on the scale: 1 cup tared, 2 dose taken, 1 armed, 3 at the pre-alert
         </label>
+        <label class="row" style="align-items:center;gap:8px">
+          <input
+            type="checkbox"
+            checked={s?.autoStartFallback !== false}
+            onChange={(e) => void app.saveSettings({ autoStartFallback: e.currentTarget.checked })}
+          />
+          Start by itself at the first drops when the scale's timer was not pressed
+        </label>
+        <label>
+          <span>Dosing cup, empty (g): learned at the first weighing</span>
+          <div class="row">
+            <input
+              type="number"
+              step="0.1"
+              placeholder="not learned yet"
+              value={s?.dosingCupG ?? ''}
+              onChange={(e) => {
+                const v = Number(e.currentTarget.value);
+                void app.saveSettings({
+                  dosingCupG: e.currentTarget.value !== '' && v > 0 ? v : null,
+                });
+              }}
+            />
+            <button
+              type="button"
+              class="small"
+              disabled={s?.dosingCupG === undefined || s.dosingCupG === null}
+              onClick={() => void app.saveSettings({ dosingCupG: null })}
+            >
+              Forget
+            </button>
+          </div>
+        </label>
+        <p class="muted small">
+          A cup that is not the dosing cup arms straight away, so a shot without weighing needs no
+          taps either.
+        </p>
       </div>
 
       <div class="card">
