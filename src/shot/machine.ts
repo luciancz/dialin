@@ -5,6 +5,9 @@
  *
  * Phases: IDLE → ARMED → RUNNING → ENDING → SETTLING → RATE → SAVED, with RECOVERING
  * (link lost mid-shot) and ABORTED on the side. See docs/ALGORITHM.md "Recorder".
+ *
+ * A shot starts on the START tap, on the scale's own timer button (the timer starts rising
+ * while armed) or, armed hands-free, by itself at the first drops.
  */
 import { REC } from '../core/params';
 import type { EndedBy, ShotStatus } from '../core/types';
@@ -37,7 +40,8 @@ export interface ShotDraft {
   t0Ms: number;
   tapMs: number | null;
   status: ShotStatus;
-  startCmd: 'tareStart' | 'start' | 'none';
+  /** What started the scale timer: the app's 07 or 04, the scale's own button, or nothing. */
+  startCmd: 'tareStart' | 'start' | 'button' | 'none';
   samples: ShotSample[];
   gaps: [number, number][];
   openGapStartS: number | null;
@@ -85,6 +89,8 @@ export interface RecorderState {
     sinceMs: number;
     /** Hands-free: start by itself when coffee starts to rise in the cup (no START tap). */
     autoStart: boolean;
+    /** Scale timer value last seen and since when (receive time), to spot its button. */
+    timer: { ms: number; sinceMs: number } | null;
   } | null;
   prompt: 'forgot_tap' | null;
   /** Live flow estimate (g/s) for the UI. */
@@ -233,24 +239,49 @@ function riseWindowStart(state: RecorderState, now: number, ms: number): number 
   return Math.max(now - ms, afterTare);
 }
 
-/** Start the pull from a tap or an accepted forgot-tap prompt. */
+/** The scale's timer button: the timer value it started from and the frame that showed it. */
+interface ButtonStart {
+  baseMs: number;
+  timerMs: number;
+  tRxMs: number;
+}
+
+/**
+ * Start the pull from a tap, an accepted forgot-tap prompt, the first drops (hands-free) or
+ * the scale's timer button.
+ */
 function startShot(
   state: RecorderState,
   now: number,
   ring: RingBuffer,
-  mode: 'tap' | 'forgot' | 'auto',
+  mode: 'tap' | 'forgot' | 'auto' | 'button',
+  button?: ButtonStart,
 ): [RecorderState, Effect[]] {
   const armed = state.armed;
   if (!armed) return [state, []];
   const d = newDraft(now, armed);
   const effects: Effect[] = [{ type: 'shot_running', running: true }];
+  // The timer button: the shot began when the timer did (t0 = receive time − timer).
+  const startMs = button ? button.tRxMs - (button.timerMs - button.baseMs) : now;
   // Rise window: the last 2 s, but never before the last tare had settled. A window with a
   // placement jump is a cup put down (not coffee): that is never a late tap.
-  const from = riseWindowStart(state, now, REC.lateTapWindowMs);
+  const from = riseWindowStart(state, startMs, REC.lateTapWindowMs);
   const rise = ring.riseSince(from);
   const placed = ring.maxJumpBetween(from, now) >= REC.placementJumpG;
-  const late = mode !== 'tap' || (rise > REC.lateTapRiseG && !placed);
-  if (!late) {
+  const late = mode === 'forgot' || mode === 'auto' || (rise > REC.lateTapRiseG && !placed);
+  if (!late && button) {
+    // Lever up and the scale's timer pressed together: first drip known, nothing to send
+    // (auto-tare zeroed the cup). An untared cup is decided on the first frames, as for 07:
+    // the button may tare (FIELD_TEST), else the reading before the press is the tare.
+    d.t0Ms = startMs;
+    d.startCmd = 'button';
+    d.modeHint = 'timer';
+    d.anchorOffsetS = -button.baseMs / 1000;
+    const med = ring.medianBetween(from, startMs);
+    d.preTapMedianG = Number.isNaN(med) ? 0 : med;
+    d.tareDecided = Math.abs(d.preTapMedianG) <= REC.tareSettleG;
+    d.notes.push('started by the scale timer button');
+  } else if (!late) {
     d.startCmd = 'tareStart';
     const med = ring.medianBetween(from, now);
     d.preTapMedianG = Number.isNaN(med) ? (ring.last()?.grams ?? 0) : med;
@@ -267,7 +298,8 @@ function startShot(
       const pump = pumpOnset(ring, onsetRx, state.armed?.sinceMs ?? onsetRx - 15_000);
       d.pumpLeadMs = pump === null ? null : onsetRx - pump;
     }
-    d.startCmd = 'start';
+    d.startCmd = button ? 'button' : 'start';
+    if (button) d.modeHint = 'timer';
     d.preTapSpliceS = (now - onsetRx) / 1000;
     for (const s of ring.between(onsetRx, now)) {
       d.samples.push({
@@ -289,12 +321,17 @@ function startShot(
         ? `no tap: start estimated from the weight rise, ${d.preTapSpliceS.toFixed(1)} s recovered`
         : mode === 'auto'
           ? `hands-free: started at the first drops, ${d.preTapSpliceS.toFixed(1)} s spliced in${d.pumpLeadMs !== null ? `; pump vibration ${(d.pumpLeadMs / 1000).toFixed(1)} s before` : ''}`
-          : `late tap: ${d.preTapSpliceS.toFixed(1)} s of pre-tap frames spliced in`,
+          : mode === 'button'
+            ? `late scale timer: ${d.preTapSpliceS.toFixed(1)} s of earlier frames spliced in`
+            : `late tap: ${d.preTapSpliceS.toFixed(1)} s of pre-tap frames spliced in`,
     );
     // 06 first: after the previous shot's 05 the timer is frozen and 04 alone is ignored
     // (docs/PROTOCOL.md), which would stall the scale timer the samples are anchored to.
-    effects.push({ type: 'send', cmd: 'reset' });
-    effects.push({ type: 'send', cmd: 'start' });
+    // The timer button already started it.
+    if (!button) {
+      effects.push({ type: 'send', cmd: 'reset' });
+      effects.push({ type: 'send', cmd: 'start' });
+    }
     if (mode !== 'auto')
       effects.push({
         type: 'warn',
@@ -302,10 +339,27 @@ function startShot(
         msg:
           mode === 'forgot'
             ? 'Shot start estimated from the weight rise.'
-            : 'Late tap: pre-tap frames recovered, first-drip time unknown.',
+            : mode === 'button'
+              ? 'Scale timer started after the first drops: first-drip time unknown.'
+              : 'Late tap: pre-tap frames recovered, first-drip time unknown.',
       });
   }
   return [{ ...state, phase: 'RUNNING', draft: d, prompt: null, liveFlow: 0 }, effects];
+}
+
+/**
+ * The scale's timer started on this frame: it rises from 0, or moves off a value it had
+ * stood at (frozen by the last 05). Base is where it counts from (resumed, or restarted).
+ */
+function buttonStart(
+  held: { ms: number; sinceMs: number },
+  timerMs: number,
+  tRxMs: number,
+): ButtonStart | null {
+  if (timerMs <= 0 || timerMs === held.ms) return null;
+  if (held.ms !== 0 && tRxMs - held.sinceMs < REC.timerStillMs) return null;
+  if (held.ms !== 0 && timerMs < held.ms && timerMs > REC.timerFreshMs) return null;
+  return { baseMs: timerMs > held.ms ? held.ms : 0, timerMs, tRxMs };
 }
 
 function endShot(
@@ -313,20 +367,19 @@ function endShot(
   now: number,
   by: EndedBy,
   tRxMs?: number,
+  sendStop = true,
 ): [RecorderState, Effect[]] {
   const d = state.draft;
   if (!d) return [state, []];
-  const last = d.samples[d.samples.length - 1];
   const rx = tRxMs ?? now;
-  const endAt = last
-    ? Math.max(last.t, (rx - d.t0Ms) / 1000 - (d.anchorOffsetS === null ? 0 : 0))
-    : (rx - d.t0Ms) / 1000;
-  d.endAt = last ? last.t + Math.max(0, (rx - last.tRxMs) / 1000) : endAt;
+  // The last frame at or before the end (a stop seen late, like the timer button, is earlier).
+  const last = d.samples.findLast((s) => s.tRxMs <= rx) ?? d.samples[d.samples.length - 1];
+  d.endAt = last ? last.t + Math.max(0, (rx - last.tRxMs) / 1000) : (rx - d.t0Ms) / 1000;
   d.endAtRxMs = rx;
   d.endedBy = by;
   d.settleUntilMs = now + REC.settleMs;
   const effects: Effect[] = [];
-  if (by === 'tap' || by === 'auto') effects.push({ type: 'send', cmd: 'stop' });
+  if (sendStop && (by === 'tap' || by === 'auto')) effects.push({ type: 'send', cmd: 'stop' });
   return [{ ...state, phase: 'ENDING', draft: d }, effects];
 }
 
@@ -375,6 +428,7 @@ export function reduce(
     case 'arm': {
       if (state.phase !== 'IDLE' && state.phase !== 'SAVED' && state.phase !== 'ABORTED')
         return [state, []];
+      const timerMs = ring.last()?.timerMs;
       return [
         {
           phase: 'ARMED',
@@ -385,12 +439,15 @@ export function reduce(
             autoStart: ev.autoStart === true,
             stable: ring.rangeOver(REC.stableWindowMs, ev.now) < REC.stableDeltaG,
             sinceMs: ev.now,
+            timer: timerMs === undefined ? null : { ms: timerMs, sinceMs: ev.now },
           },
           prompt: null,
           liveFlow: 0,
           tareAtMs: state.tareAtMs,
         },
-        [],
+        // 06: a timer the last shot's 05 froze reads 0 again, so the scale's own timer button
+        // starts it from zero (06 is ignored while the timer runs; docs/PROTOCOL.md).
+        [{ type: 'send', cmd: 'reset' }],
       ];
     }
     case 'disarm': {
@@ -403,7 +460,14 @@ export function reduce(
       return [{ ...state, tareAtMs: ev.now }, []];
     case 'tap': {
       if (state.phase === 'ARMED') return startShot(state, ev.now, ring, 'tap');
-      if (state.phase === 'RUNNING') return endShot(state, ev.now, 'tap');
+      if (state.phase === 'RUNNING') {
+        // START tapped just after the shot started by itself: the screen had already turned
+        // into STOP under the finger.
+        const d = state.draft;
+        const untapped = d?.startCmd === 'button' || d?.status === 'auto_start';
+        if (d && untapped && ev.now - (d.tapMs ?? 0) < REC.stopGuardMs) return [state, []];
+        return endShot(state, ev.now, 'tap');
+      }
       if (state.phase === 'RECOVERING') {
         // User ends a shot the link lost: close it with what we have.
         const d = state.draft;
@@ -531,13 +595,23 @@ function onFrame(
         ring.riseSince(from) > REC.forgotTapRiseG &&
         ring.maxJumpBetween(from, ev.now) < REC.placementJumpG &&
         ring.flowOver(Math.min(REC.liveFlowWindowMs, ev.now - from), ev.now) > REC.forgotTapFlowGps;
+      // The scale's own timer button (pressed as the lever goes up) starts the shot; this
+      // frame is its first sample.
+      const button = armed.timer ? buttonStart(armed.timer, ev.timerMs, ev.tRxMs) : null;
+      if (button) {
+        const [s1, e1] = startShot(state, ev.now, ring, 'button', button);
+        const [s2, e2] = onFrame(s1, ev, ring);
+        return [s2, [...e1, ...e2]];
+      }
+      const timer =
+        armed.timer?.ms === ev.timerMs ? armed.timer : { ms: ev.timerMs, sinceMs: ev.tRxMs };
       // Hands-free: coffee is rising in the cup, so the shot starts by itself.
       if (pouring && armed.autoStart) return startShot(state, ev.now, ring, 'auto');
       if (prompt === null && pouring) {
         prompt = 'forgot_tap';
         effects.push({ type: 'prompt', kind: 'forgot_tap' });
       }
-      return [{ ...state, armed: { ...armed, stable }, prompt }, effects];
+      return [{ ...state, armed: { ...armed, stable, timer }, prompt }, effects];
     }
     case 'RUNNING':
     case 'RECOVERING':
@@ -568,9 +642,10 @@ function onFrame(
           });
         }
       }
-      // Tare settling after a scale tare.
+      // Tare settling after a scale tare (07, or the timer button if it tares).
+      const scaleTare = d.startCmd === 'tareStart' || (d.startCmd === 'button' && !d.tareDecided);
       if (
-        d.startCmd === 'tareStart' &&
+        scaleTare &&
         d.tapMs !== null &&
         ev.tRxMs - d.tapMs < REC.tareSettleMs &&
         Math.abs(ev.grams) > REC.tareSettleG
@@ -579,7 +654,7 @@ function onFrame(
       }
       // Did the scale actually tare on 07? If the stream still shows the pre-tap weight after
       // the settle window (Auto mode ignores 07), tare in software instead.
-      if (!d.tareDecided && d.startCmd === 'tareStart') {
+      if (!d.tareDecided && scaleTare) {
         d.tareDecided = true;
         if (Math.abs(ev.grams) > REC.tareSettleG && Math.abs(ev.grams - d.preTapMedianG) < 1.0) {
           d.tareOffsetG = d.preTapMedianG;
@@ -593,9 +668,12 @@ function onFrame(
       }
       const g = ev.grams - d.tareOffsetG;
       const t = sampleTime(d, ev.timerMs, ev.tRxMs);
+      // Each timer value is kept with the frame that first showed it (drift, and a timer
+      // that stops).
       if (ev.timerMs > 0 && d.modeHint !== 'auto' && d.endAt === null) {
         if (!d.firstTimer) d.firstTimer = { tRxMs: ev.tRxMs, timerMs: ev.timerMs };
-        d.lastTimer = { tRxMs: ev.tRxMs, timerMs: ev.timerMs };
+        if (d.lastTimer?.timerMs !== ev.timerMs)
+          d.lastTimer = { tRxMs: ev.tRxMs, timerMs: ev.timerMs };
       }
       if (d.openGapStartS !== null) {
         d.gaps.push([d.openGapStartS, t]);
@@ -611,6 +689,24 @@ function onFrame(
       const liveFlow = liveFlowOf(d.samples, REC.liveFlowWindowMs / 1000);
 
       if (phase === 'RUNNING') {
+        // The scale's timer stopped (its button pressed as the lever came down): the shot
+        // ended when the timer did; frames since then go on the receive clock.
+        const stoppedAt = timerStoppedAt(d, ev.timerMs, ev.tRxMs);
+        if (stoppedAt !== null) {
+          const freezeT = d.samples.find((s) => s.tRxMs >= stoppedAt)?.t ?? t;
+          for (const s of d.samples) {
+            if (s.tRxMs > stoppedAt) s.t = freezeT + (s.tRxMs - stoppedAt) / 1000;
+          }
+          d.notes.push('ended by the scale timer button');
+          const [s2, e2] = endShot(
+            { ...state, phase, draft: d, liveFlow },
+            ev.now,
+            'tap',
+            stoppedAt,
+            false,
+          );
+          return [s2, [...effects, ...e2]];
+        }
         if (!d.alertFired && g >= d.targetYieldG - d.tailEstimateG) {
           d.alertFired = true;
           effects.push({ type: 'pre_alert' });
@@ -644,6 +740,16 @@ function onFrame(
     default:
       return [state, []];
   }
+}
+
+/**
+ * Receive time at which a running scale timer stopped (its value has stood still for
+ * `timerStillMs` after advancing in this shot), or null while it runs.
+ */
+function timerStoppedAt(d: ShotDraft, timerMs: number, tRxMs: number): number | null {
+  if (d.modeHint !== 'timer' || !d.firstTimer || !d.lastTimer) return null;
+  if (d.lastTimer.timerMs <= d.firstTimer.timerMs || timerMs !== d.lastTimer.timerMs) return null;
+  return tRxMs - d.lastTimer.tRxMs >= REC.timerStillMs ? d.lastTimer.tRxMs : null;
 }
 
 /** Timer drift of the scale against the receive clock, in percent (NaN when unknown). */

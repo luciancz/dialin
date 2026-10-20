@@ -15,6 +15,13 @@ with its source.
    shot (`partial_disconnect` when the 25–75 % window is affected). If the scale ignores
    `07` (Auto mode), the stream still shows the pre-tap weight after the 400 ms settle
    window and a software tare is applied; five zero-timer frames set `modeHint = 'auto'`.
+   Arming sends `06`, so a timer frozen by the last shot's `05` reads 0. The scale's own
+   timer button then starts the shot: in ARMED, a timer that rises from 0 (or moves off a
+   value it stood at for 400 ms) sets t0 = receive time − timer, status `ok`, and nothing
+   is sent; coffee already in the cup makes it a late start, spliced like a late tap. A
+   timer that stops while running (the button again) ends the shot at that moment, and the
+   drip window continues on the receive clock. Armed hands-free, the first drops start the
+   shot when the button was not pressed (`auto_start`, spliced to the rise onset).
 2. **Features** (`src/core/curve/features.ts`): 100 ms grid, Savitzky–Golay derivative
    (window 11, order 2, exact for quadratics; one-sided regression at edges and next to
    masked cells). Plateau flow = (w(t75) − w(t25))/(t75 − t25) with interpolated crossings.
