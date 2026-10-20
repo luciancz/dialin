@@ -65,6 +65,19 @@ async function submit(): Promise<void> {
   navigate('/');
 }
 
+async function confirmDeleteBean(bean: Bean, beanBags: Bag[]): Promise<void> {
+  const repo = app.repo;
+  if (!repo) return;
+  const shots = (await Promise.all(beanBags.map((b) => repo.listShotsForBag(b.id)))).flat().length;
+  const n = beanBags.length;
+  if (
+    confirm(
+      `Delete ${bean.roaster} · ${bean.name} with its ${n} bag${n === 1 ? '' : 's'} and ${shots} shot${shots === 1 ? '' : 's'}? This cannot be undone (export a backup first to keep them).`,
+    )
+  )
+    await app.deleteBean(bean.id);
+}
+
 export function Beans() {
   const beans = app.beans.value;
   const bags = app.bags.value;
@@ -242,14 +255,18 @@ export function Beans() {
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                class="small"
-                style="margin-top:6px"
-                onClick={() => (newBagFor.value = bean.id)}
-              >
-                New bag of this bean
-              </button>
+              <div class="row" style="margin-top:6px">
+                <button type="button" class="small" onClick={() => (newBagFor.value = bean.id)}>
+                  New bag of this bean
+                </button>
+                <button
+                  type="button"
+                  class="small danger"
+                  onClick={() => void confirmDeleteBean(bean, beanBags)}
+                >
+                  Delete bean
+                </button>
+              </div>
             )}
           </div>
         );

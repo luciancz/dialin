@@ -51,6 +51,7 @@ service worker with the precache list into `dist/`).
    check the Timer-mode test, keep-awake and the capability table. Everything measured is
    stored in `settings.bleCaps` and included in exports.
 3. **Beans → Add bean**: roaster, name, roast level, process, roast date, dose, starting RPM.
+   "Delete bean" removes it with all its bags and their shots.
 4. **Shot**: Plan → **Weigh beans** → Grind → Arm → pour. Hands-free (the default, see
    below) moves through these steps from the scale; every step also has its button.
    - **Weigh beans:** put the empty dosing cup on the scale and it tares itself. Pour in the
@@ -70,8 +71,10 @@ service worker with the precache list into `dist/`).
    the app moves body at the same flow, uses RPM when the dial is at a limit, and trims
    below one dial line. "Grinder stalled (E006)" on the shot screen raises the bag's RPM
    floor to the stall + 100.
-8. **History**: badges, include / exclude a shot from learning (with a note), flow-vs-dial
-   scatter with the fitted line, overlay of two curves.
+8. **History**: badges, include / exclude a shot from learning (with a note), delete a shot,
+   flow-vs-dial scatter with the fitted line, overlay of two curves. A deleted shot or bean
+   is kept as a tombstone, so importing an older backup does not bring it back; the model
+   replays without it and the card is recomputed.
 9. **Settings → Backup**: export (share sheet → download → clipboard) and import with a
    dry-run merge preview. Export every few shots; the app nags at 5 shots or 7 days.
 

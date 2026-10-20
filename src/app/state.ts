@@ -692,6 +692,56 @@ class AppState {
     await this.reloadAll();
   }
 
+  // ---- deleting ----
+
+  /** Hook for the recommender: shots were deleted; replay without them and redo the card. */
+  afterShotsDeleted: (() => Promise<void>) | null = null;
+
+  /** A shot is being pulled or waits for its rating. */
+  private shotInProgress(): boolean {
+    const p = this.recorder.value.phase;
+    return (
+      this.pending.value !== null ||
+      p === 'RUNNING' ||
+      p === 'ENDING' ||
+      p === 'SETTLING' ||
+      p === 'RECOVERING' ||
+      p === 'RATE'
+    );
+  }
+
+  /** Delete a saved shot (History); refused mid-shot, as the new shot is compared with the last. */
+  async deleteShot(shotId: Id): Promise<boolean> {
+    if (this.shotInProgress()) {
+      this.toast('warn', 'Finish or discard the shot in progress first.');
+      return false;
+    }
+    if (!(await this.mustRepo().deleteShot(shotId))) return false;
+    await this.reloadAll();
+    await this.afterShotsDeleted?.();
+    this.toast('info', 'Shot deleted.');
+    return true;
+  }
+
+  /** Delete a bean with its bags and their shots; if its bag was current, another is selected. */
+  async deleteBean(beanId: Id): Promise<boolean> {
+    const wasCurrent = this.currentBean.value?.id === beanId;
+    if (wasCurrent && this.shotInProgress()) {
+      this.toast('warn', 'Finish or discard the shot in progress first.');
+      return false;
+    }
+    const bean = this.beans.value.find((b) => b.id === beanId);
+    const n = await this.mustRepo().deleteBean(beanId);
+    if (wasCurrent) await this.selectBag(null);
+    await this.reloadAll();
+    if (n.shots > 0) await this.afterShotsDeleted?.();
+    const what = bean ? `${bean.roaster} · ${bean.name}` : 'Bean';
+    const bags = `${n.bags} bag${n.bags === 1 ? '' : 's'}`;
+    const shots = `${n.shots} shot${n.shots === 1 ? '' : 's'}`;
+    this.toast('info', `${what} deleted with ${bags} and ${shots}.`);
+    return true;
+  }
+
   backupNag(): 'none' | 'amber' | 'red' {
     const s = this.settings.value;
     if (!s) return 'none';

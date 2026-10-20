@@ -1,6 +1,6 @@
 /**
- * History: per-bag shot list with badges and the learn toggle, flow-vs-lines scatter with
- * the fitted line ± σ, and an overlay of two curves.
+ * History: per-bag shot list with badges, the learn toggle and delete, flow-vs-lines scatter
+ * with the fitted line ± σ, and an overlay of two curves.
  */
 import { signal } from '@preact/signals';
 import { lastReplay, refreshModelSummary } from '../../app/recommender';
@@ -49,6 +49,15 @@ async function flipLearn(q: ShotQuality, note: string): Promise<void> {
   const bagId = app.currentBagId.value;
   if (bagId) await app.loadBagRows(bagId);
   await refreshModelSummary();
+}
+
+async function confirmDeleteShot(s: Shot): Promise<void> {
+  const when = new Date(s.at).toLocaleString();
+  if (
+    !confirm(`Delete the shot of ${when}? Its curve and rating go with it; the model forgets it.`)
+  )
+    return;
+  if (await app.deleteShot(s.id)) overlay.value = overlay.value.filter((x) => x !== s.id);
 }
 
 function badge(
@@ -187,6 +196,13 @@ export function History() {
                         {q.learn ? 'exclude' : 'include'}
                       </button>
                     ) : null}
+                    <button
+                      type="button"
+                      class="small danger"
+                      onClick={() => void confirmDeleteShot(s)}
+                    >
+                      delete
+                    </button>
                     {noteFor.value === s.id && q ? (
                       <div class="row" style="margin-top:4px">
                         <input
