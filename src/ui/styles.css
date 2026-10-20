@@ -504,3 +504,33 @@ pre {
   pointer-events: none;
   opacity: 0.8;
 }
+
+/* Hands-free strip (src/ui/components/HandsFreeStrip.tsx) */
+.hf-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.hf-steps > span {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75rem;
+  padding: 2px 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--fg-2);
+}
+.hf-steps > span.done {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.hf-steps > span.now {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+.hf-strip b {
+  display: block;
+  font-size: 1.05rem;
+}
