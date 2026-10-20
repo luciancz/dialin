@@ -1,5 +1,5 @@
 /**
- * Moving parts: the two coffee streams from the spout, the grounds falling from the VS6 chute,
+ * Moving parts: the coffee stream from the bottomless basket, the grounds falling from the VS6 chute,
  * and the beans heaped in a dosing cup. Each exposes update(dt, …) and keeps its own buffers.
  */
 import {
@@ -25,22 +25,29 @@ export interface Streams {
   dispose(): void;
 }
 
-export function buildStreams(mat: Material): Streams {
+/**
+ * `count` streams (two from a spout, one from a bottomless basket). A single stream also gets
+ * the short cone under the basket where the drips from its holes run together.
+ */
+export function buildStreams(mat: Material, count = 2): Streams {
   const geo = new CylinderGeometry(1, 0.85, 1, 18, 1, true);
-  const meshes = [0, 1].map(() => {
+  const coneGeo = new CylinderGeometry(1, 0, 1, 24, 1, true);
+  const streams = Array.from({ length: count }, () => {
     const m = mesh(geo, mat);
     m.visible = false;
     return m;
   });
+  const cone = count === 1 ? mesh(coneGeo, mat) : null;
+  if (cone) cone.visible = false;
   let r = 0;
   return {
-    meshes,
+    meshes: cone ? [...streams, cone] : streams,
     update(dtS, flowGps, from, toY, timeS) {
-      const target = streamRadiusMm(flowGps);
+      const target = streamRadiusMm(flowGps, count);
       const prev = r;
       r = approach(r, target, dtS, target > r ? 0.25 : 0.6);
       if (r < 0.15) r = target > 0 ? r : 0;
-      meshes.forEach((m, i) => {
+      streams.forEach((m, i) => {
         const p = from[i];
         if (!p || r <= 0.05) {
           m.visible = false;
@@ -53,10 +60,21 @@ export function buildStreams(mat: Material): Streams {
         m.scale.set(r * (1 + wob), len, r * (1 - wob));
         m.position.set(p.x, toY + len / 2, p.z);
       });
+      const p0 = from[0];
+      if (cone) {
+        cone.visible = !!p0 && r > 0.05;
+        if (p0 && cone.visible) {
+          const rc = Math.min(11, 2.8 * r);
+          const hc = Math.min(p0.y - toY, 6 + 2 * r);
+          cone.scale.set(rc, hc, rc);
+          cone.position.set(p0.x, p0.y - hc / 2, p0.z);
+        }
+      }
       return Math.abs(r - prev) > 1e-3 || r > 0;
     },
     dispose() {
       geo.dispose();
+      coneGeo.dispose();
     },
   };
 }

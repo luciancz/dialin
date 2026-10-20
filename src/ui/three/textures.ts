@@ -334,6 +334,28 @@ export function maraxPanelPrint(o: {
   return tex(c);
 }
 
+/** A perforated basket bottom: brushed steel with a hex pattern of small holes. */
+export function basketHoles(): CanvasTexture {
+  const S = 512;
+  const [c, g] = canvas(S, S);
+  if (g) {
+    g.fillStyle = '#cfd2d5';
+    g.fillRect(0, 0, S, S);
+    g.fillStyle = '#1a1b1d';
+    const step = 15;
+    const r = S / 2 - 18;
+    for (let row = 0, y = 18; y < S - 18; row++, y += step * 0.866) {
+      for (let x = 18 + (row % 2) * (step / 2); x < S - 18; x += step) {
+        if (Math.hypot(x - S / 2, y - S / 2) > r) continue;
+        g.beginPath();
+        g.arc(x, y, 3.2, 0, Math.PI * 2);
+        g.fill();
+      }
+    }
+  }
+  return tex(c);
+}
+
 /** The Mara X V1 badge: white LELIT on red. */
 export function lelitBadge(): CanvasTexture {
   const [c, g] = canvas(384, 120);

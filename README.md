@@ -87,7 +87,8 @@ dimensions, Varia's product photos and Lelit's V1 manual drawings (sources in
   tube drops into the magnetic dosing cup; the RPM knob is on the base's right side. Black or
   white (Settings → Grinder & machine).
 - **Mara X (V1).** The E61-style group with its side fins and the brew lever on its right,
-  which hangs down and lifts towards you. The dual gauge (steam over pump), six-lobed knobs
+  which hangs down and lifts towards you, and the Normcore 58 mm all-stainless bottomless
+  portafilter (straight lay-flat bar handle): the shot runs as one stream from the basket. The dual gauge (steam over pump), six-lobed knobs
   on the corner valves (steam left, hot water right) with their wands, the pilot lights, the
   lit I/O button and the red LELIT badge. The 0/I/II rocker sits in the drip-tray bay, with
   wire grates on the tray and on top beside the tank lid.

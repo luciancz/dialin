@@ -9,14 +9,15 @@ import { toLines } from '../../core/units';
 const ESPRESSO_G_PER_ML = 1.0;
 
 /**
- * Radius of one of the two spout streams for a total flow (g/s). A free-falling stream of
- * cross-section A at speed v carries ρ·A·v; v ≈ √(2·g·h) over the last few cm, so the radius
- * goes as √flow. Calibrated so 2 g/s reads as two ≈ 1.6 mm streams; clamped to stay visible.
+ * Radius of one of `streams` equal streams for a total flow (g/s): two from a spout, one from
+ * a bottomless basket. A free-falling stream of cross-section A at speed v carries ρ·A·v;
+ * v ≈ √(2·g·h) over the last few cm, so the radius goes as √flow. Calibrated so 1 g/s per
+ * stream reads as ≈ 1.6 mm; clamped to stay visible.
  */
-export function streamRadiusMm(flowGps: number): number {
+export function streamRadiusMm(flowGps: number, streams = 2): number {
   if (!(flowGps > 0.02)) return 0;
-  const perStream = flowGps / 2;
-  return Math.min(3.2, Math.max(0.35, 1.6 * Math.sqrt(perStream / 1)));
+  const perStream = flowGps / Math.max(1, streams);
+  return Math.min(3.6, Math.max(0.35, 1.6 * Math.sqrt(perStream / 1)));
 }
 
 /** Liquid height (mm) in a cylindrical cup of inner radius r for `grams` of espresso. */

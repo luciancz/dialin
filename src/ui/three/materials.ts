@@ -20,7 +20,7 @@ export interface Mats {
   stainless: MeshPhysicalMaterial;
   /** Gloss black glass (display windows). */
   glossBlack: MeshPhysicalMaterial;
-  /** Polished black resin (Mara X knobs, lever knob, portafilter handle). */
+  /** Polished black resin (Mara X knobs and lever knob). */
   resin: MeshPhysicalMaterial;
   /** Polished wire (grates). */
   wire: MeshStandardMaterial;
