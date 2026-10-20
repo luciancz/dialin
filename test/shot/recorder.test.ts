@@ -609,8 +609,9 @@ describe('recorder: the scale timer button', () => {
     h.idle(10_000);
     expect(h.state.phase).toBe('RATE');
     const sends = h.effects.filter((e) => e.type === 'send').map((e) => e.type === 'send' && e.cmd);
-    // Only the auto-end's 05 (and the pre-alert beep) after the press: no 07, 06 or 04.
-    expect(sends.slice(sentBefore).filter((c) => c !== 'beep' && c !== 'stop')).toEqual([]);
+    // Only the auto-end's 05 after the press: no 07, 06 or 04 (the app beeps the pre-alert).
+    expect(sends.slice(sentBefore)).toEqual(['stop']);
+    expect(h.has('pre_alert')).toBe(true);
     const xs = h.state.draft?.samples ?? [];
     // The first drip is where the curve has it: times run from the press.
     const drip = xs.find((s) => s.g >= 0.5);

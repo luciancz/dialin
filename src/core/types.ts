@@ -353,6 +353,8 @@ export interface Settings {
   transport?: 'webbt' | 'fake' | 'replay';
   /** Tare automatically when a cup or the dosing cup is put on the scale (default on). */
   autoTare?: boolean;
+  /** The scale beeps the cues of a shot: cup tared, dose taken, armed, pre-alert (default on). */
+  beepCues?: boolean;
   /** Show the 3D grinder, machine and scale views (default on). */
   show3d?: boolean;
   /** Grinder colour in the 3D views. */
