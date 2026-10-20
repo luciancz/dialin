@@ -29,6 +29,16 @@ export const REC = {
   autoEndFlowGps: 0.15,
   autoEndQuietMs: 3000,
   autoEndOvershootG: 3,
+  /**
+   * Scale timer: it ticks every 100 ms while running, so a value held this long is stopped.
+   * While armed, a stopped timer that starts to rise is the scale's own timer button (the
+   * shot starts); while running, a timer that stops is the button pressed again (it ends).
+   */
+  timerStillMs: 400,
+  /** A timer restarted from zero shows at most this much on its first frame. */
+  timerFreshMs: 2000,
+  /** A tap this soon after a shot started by itself (timer button, first drops) is ignored. */
+  stopGuardMs: 2000,
   /** Pre-alert at target − tailEstimate (default 1.0 g, later the bag's mean tail). */
   tailEstimateDefaultG: 1.0,
   /** Drip window after stop, then final yield = median of the last 1 s. */

@@ -31,6 +31,11 @@ class Harness {
   connected = true;
   /** Scale persona: honour 04/07 (timer mode) or ignore them (auto mode). */
   mode: 'timer' | 'auto' = 'timer';
+  /** The scale's own timer button: resume a frozen timer (else restart from 0), tare too. */
+  buttonResumes = false;
+  buttonTares = false;
+  /** Lose 06 (a frozen timer then survives the arm). */
+  ignoreReset = false;
 
   dispatch(ev: RecorderEvent): Effect[] {
     const [s, fx] = reduce(this.state, ev, this.ring);
@@ -58,13 +63,27 @@ class Harness {
       this.tareG = this.cupG;
     } else if (cmd === 'reset') {
       // 06 zeroes the timer only when it is stopped (docs/PROTOCOL.md).
-      if (!this.timerRunning) this.timerFrozenMs = 0;
+      if (!this.timerRunning && !this.ignoreReset) this.timerFrozenMs = 0;
     } else if (cmd === 'stop') {
       if (this.timerRunning) {
         this.timerFrozenMs = this.timerMs();
         this.timerRunning = false;
       }
     }
+  }
+
+  /** The timer button on the scale: stops a running timer, else starts it. */
+  pressTimerButton(): void {
+    if (this.timerRunning) {
+      this.timerFrozenMs = this.timerMs();
+      this.timerRunning = false;
+      return;
+    }
+    if (this.buttonTares) this.tareG = this.cupG;
+    const fromMs = this.buttonResumes ? this.timerFrozenMs : 0;
+    this.timerRunning = true;
+    this.timerStartedAt = this.now - fromMs / 0.993;
+    this.timerFrozenMs = 0;
   }
 
   timerMs(): number {
@@ -499,7 +518,8 @@ describe('recorder: hands-free start', () => {
     const d = h.state.draft;
     expect(d?.status).toBe('auto_start');
     expect(d?.samples[0]?.g ?? 99).toBeLessThan(0.5);
-    expect(h.sent('reset')).toBe(1);
+    expect(h.sent('reset')).toBe(2); // on arm, and before 04
+    expect(h.sent('start')).toBe(1);
     expect(h.has('warn', 'late_tap')).toBe(false);
     expect(learnGate('auto_start', true)).toBe(true);
   });
@@ -531,5 +551,175 @@ describe('recorder: hands-free start', () => {
     for (let i = 0; i < 120; i++)
       quiet.push({ tRxMs: i * 100, grams: 0, flowScale: 0, timerMs: 0 });
     expect(pumpOnset(quiet, 12_000, 0)).toBeNull();
+  });
+});
+
+/** Cup down and auto-tared, armed hands-free (auto-start on as the fallback). */
+function armedHandsFree(h: Harness, cupG = 175): void {
+  h.autoTareOn = true;
+  h.idle(2500, 0);
+  h.idle(3000, cupG);
+  h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36, autoStart: true });
+  h.idle(1500);
+  expect(h.state.phase).toBe('ARMED');
+}
+
+/** Play the pour from the pump start; `atS` runs once at that curve time. */
+function pour(h: Harness, base: number, untilS: number, at?: [number, () => void]): void {
+  let done = false;
+  h.playCurve(curve, base, untilS, (tS) => {
+    if (at && !done && tS >= at[0]) {
+      done = true;
+      at[1]();
+    }
+  });
+}
+
+describe('recorder: the scale timer button', () => {
+  it('arm sends 06, so a timer frozen by the last shot reads 0 again', () => {
+    const h = new Harness();
+    armed(h);
+    h.dispatch({ type: 'tap', now: h.now });
+    h.playCurve(curve, 120, curve.endAt);
+    h.dispatch({ type: 'tap', now: h.now });
+    h.idle(7000);
+    h.dispatch({ type: 'rated', now: h.now });
+    expect(h.timerMs()).toBeGreaterThan(20_000); // frozen by 05
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36 });
+    expect(h.sent('reset')).toBe(2);
+    h.idle(1000);
+    expect(h.timerMs()).toBe(0);
+    expect(h.state.phase).toBe('ARMED');
+  });
+
+  it('starts the shot from the scale timer: t0 from the timer, status ok, no commands', () => {
+    const h = new Harness();
+    armedHandsFree(h);
+    const sentBefore = h.effects.filter((e) => e.type === 'send').length;
+    // Lever up and the scale's timer pressed; the pump runs, first drops at 8 s.
+    h.pressTimerButton();
+    const pressedAt = h.now;
+    h.step(175);
+    expect(h.state.phase).toBe('RUNNING');
+    const d = h.state.draft;
+    expect(d?.status).toBe('ok');
+    expect(d?.startCmd).toBe('button');
+    expect(Math.abs((d?.t0Ms ?? 0) - pressedAt)).toBeLessThanOrEqual(5);
+    pour(h, 175, curve.endAt);
+    h.idle(10_000);
+    expect(h.state.phase).toBe('RATE');
+    const sends = h.effects.filter((e) => e.type === 'send').map((e) => e.type === 'send' && e.cmd);
+    // Only the auto-end's 05 (and the pre-alert beep) after the press: no 07, 06 or 04.
+    expect(sends.slice(sentBefore).filter((c) => c !== 'beep' && c !== 'stop')).toEqual([]);
+    const xs = h.state.draft?.samples ?? [];
+    // The first drip is where the curve has it: times run from the press.
+    const drip = xs.find((s) => s.g >= 0.5);
+    const want = curve.t[curve.g.findIndex((g) => g >= 0.5)] ?? 0;
+    expect(Math.abs((drip?.t ?? 99) - want)).toBeLessThan(0.25);
+    expect(xs[0]?.t ?? 99).toBeLessThan(0.2);
+    expect(h.state.draft?.status).toBe('ok');
+    expect(h.state.draft?.modeHint).toBe('timer');
+    expect(h.has('warn')).toBe(false);
+  });
+
+  it('a timer the 06 did not zero: the button resumes it and times still run from the press', () => {
+    const h = new Harness();
+    h.ignoreReset = true;
+    h.buttonResumes = true;
+    h.timerFrozenMs = 31_400;
+    armedHandsFree(h);
+    h.pressTimerButton();
+    const pressedAt = h.now;
+    pour(h, 175, 15);
+    const d = h.state.draft;
+    expect(d?.status).toBe('ok');
+    expect(Math.abs((d?.t0Ms ?? 0) - pressedAt)).toBeLessThanOrEqual(5);
+    const last = d?.samples[d.samples.length - 1];
+    expect(Math.abs((last?.t ?? 0) - 15)).toBeLessThan(0.3);
+  });
+
+  it('pressed after the first drops: spliced like a late tap, still no commands', () => {
+    const h = new Harness();
+    armedHandsFree(h);
+    h.dispatch({ type: 'disarm', now: h.now });
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36 }); // no auto-start
+    const sentBefore = h.effects.filter((e) => e.type === 'send').length;
+    pour(h, 175, 12, [11, () => h.pressTimerButton()]);
+    const d = h.state.draft;
+    expect(d?.status).toBe('late_tap');
+    expect(d?.startCmd).toBe('button');
+    expect(d?.preTapSpliceS ?? 0).toBeGreaterThan(0.5);
+    expect(Math.abs(d?.samples[0]?.g ?? 99)).toBeLessThan(0.5);
+    expect(h.effects.filter((e) => e.type === 'send').length).toBe(sentBefore);
+    expect(h.has('warn', 'late_tap')).toBe(true);
+  });
+
+  it('an untared cup is tared in software, unless the button tared it', () => {
+    for (const buttonTares of [false, true]) {
+      const h = new Harness();
+      h.buttonTares = buttonTares;
+      armed(h); // 120 g cup, auto-tare off
+      h.pressTimerButton();
+      pour(h, 120, 20);
+      const d = h.state.draft;
+      expect(d?.status).toBe('ok');
+      expect(d?.tareOffsetG ?? -1).toBeCloseTo(buttonTares ? 0 : 120, 0);
+      const last = d?.samples[d.samples.length - 1];
+      const i20 = curve.t.findIndex((t) => t >= 20);
+      expect(Math.abs((last?.g ?? 0) - (curve.g[i20] ?? 0))).toBeLessThan(0.3);
+      expect(h.has('warn', 'software_tare')).toBe(!buttonTares);
+    }
+  });
+
+  it('pressing the timer again ends the shot when the timer stopped, sending nothing', () => {
+    const h = new Harness();
+    armedHandsFree(h);
+    h.pressTimerButton();
+    let stoppedAtS = 0;
+    pour(h, 175, curve.endAt + 1, [
+      curve.endAt,
+      () => {
+        stoppedAtS = h.state.draft?.samples.at(-1)?.t ?? 0;
+        h.pressTimerButton();
+      },
+    ]);
+    expect(['ENDING', 'SETTLING']).toContain(h.state.phase);
+    const d = h.state.draft;
+    expect(d?.endedBy).toBe('tap');
+    expect(Math.abs((d?.endAt ?? 0) - stoppedAtS)).toBeLessThan(0.15);
+    expect(h.sent('stop')).toBe(0);
+    h.idle(7000);
+    expect(h.state.phase).toBe('RATE');
+    // The drip window keeps its own clock: times keep rising after the frozen timer.
+    const xs = h.state.draft?.samples ?? [];
+    for (let i = 1; i < xs.length; i++) {
+      expect(xs[i]?.t ?? 0).toBeGreaterThan(xs[i - 1]?.t ?? 0);
+    }
+    expect((xs[xs.length - 1]?.t ?? 0) - (d?.endAt ?? 0)).toBeGreaterThan(6);
+  });
+
+  it('START tapped just after the timer button started the shot is not a STOP', () => {
+    const h = new Harness();
+    armedHandsFree(h);
+    h.pressTimerButton();
+    h.idle(600);
+    expect(h.state.phase).toBe('RUNNING');
+    h.dispatch({ type: 'tap', now: h.now });
+    expect(h.state.phase).toBe('RUNNING');
+    h.idle(2000);
+    h.dispatch({ type: 'tap', now: h.now });
+    expect(h.state.phase).toBe('ENDING');
+  });
+
+  it('a running timer while armed (pressed before arming) is not a start', () => {
+    const h = new Harness();
+    h.autoTareOn = true;
+    h.idle(2500, 0);
+    h.idle(3000, 175);
+    h.pressTimerButton();
+    h.idle(1000);
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36 });
+    h.idle(3000);
+    expect(h.state.phase).toBe('ARMED');
   });
 });
