@@ -9,6 +9,8 @@ import type {
   Curve,
   Features,
   Meta,
+  Rating,
+  Recommendation,
   RpmCalibrationRun,
   Settings,
   Shot,
@@ -122,6 +124,22 @@ function curve(shotId: string, n = 50): Curve {
 function quality(shotId: string): ShotQuality {
   return { ...meta(), shotId, status: 'ok', learn: true, notes: [] };
 }
+function rating(shotId: string): Rating {
+  return {
+    ...meta(),
+    shotId,
+    comparedToShotId: null,
+    vsPrevious: null,
+    sourBitter: 0,
+    thinHeavy: 0,
+    chips: [],
+    drink: 'black',
+  };
+}
+/** Only the fields the repo reads; the rest of a recommendation does not matter here. */
+function rec(bagId: string, afterShotId: string | null): Recommendation {
+  return { ...meta(), bagId, afterShotId } as unknown as Recommendation;
+}
 function settings(deviceId: string): Settings {
   return {
     id: 'settings',
@@ -198,6 +216,100 @@ describe('schema and repo', () => {
       });
     }
     expect((await repo.listRawRecordings()).length).toBe(5);
+  });
+
+  it('deletes a shot as tombstones with its satellites and the recommendation after it', async () => {
+    const b = bean();
+    const bg = bag(b.id);
+    const epochId = id();
+    await repo.putBean(b);
+    await repo.putBag(bg);
+    const s1 = shot(bg.id, epochId);
+    const s2 = { ...shot(bg.id, epochId), at: '2026-10-01T10:05:00.000Z' };
+    const r1 = rec(bg.id, s1.id);
+    const r2 = rec(bg.id, s2.id);
+    await repo.saveShotBundle({ shot: s1, curve: curve(s1.id), quality: quality(s1.id) });
+    await repo.saveShotBundle({
+      shot: s2,
+      curve: curve(s2.id),
+      quality: quality(s2.id),
+      rating: rating(s2.id),
+      recommendation: r2,
+    });
+    await repo.putRecommendation(r1);
+    for (const shotId of [s1.id, s2.id])
+      await repo.putRawRecording({ ...meta(), shotId, transport: 'fake', frames: [] });
+    const before = await readSnapshot(db, false);
+
+    expect(await repo.deleteShot(s2.id)).toBe(bg.id);
+    expect((await repo.listShotsForBag(bg.id)).map((s) => s.id)).toEqual([s1.id]);
+    expect((await repo.listShots()).length).toBe(1);
+    expect(await repo.listRatings()).toEqual([]);
+    expect((await repo.listQuality()).map((q) => q.shotId)).toEqual([s1.id]);
+    expect((await repo.listRecommendationsForBag(bg.id)).map((r) => r.id)).toEqual([r1.id]);
+    expect((await repo.listRawRecordings()).map((r) => r.shotId)).toEqual([s1.id]);
+    // Tombstones, newer than the rows they replace, so a merge keeps the deletion.
+    const gone = await repo.getShot(s2.id);
+    expect(gone?.deleted).toBe(true);
+    expect((gone?.updatedAt ?? '') > s2.updatedAt).toBe(true);
+    expect((await repo.getCurveForShot(s2.id))?.deleted).toBe(true);
+    expect((await repo.getQualityForShot(s2.id))?.deleted).toBe(true);
+    expect((await repo.getRatingForShot(s2.id))?.deleted).toBe(true);
+    expect(await repo.deleteShot(s2.id)).toBeNull();
+    expect(await repo.deleteShot(id())).toBeNull();
+
+    const after = await readSnapshot(db, false);
+    for (const [a, b2] of [
+      [after, before],
+      [before, after],
+    ] as const) {
+      const m = mergeSnapshots(a, b2);
+      expect(m.plan.conflicts).toEqual([]);
+      expect(m.result.shots.find((s) => s.id === s2.id)?.deleted).toBe(true);
+      expect(m.result.curves.find((c) => c.shotId === s2.id)?.deleted).toBe(true);
+      expect(m.result.ratings.find((r) => r.shotId === s2.id)?.deleted).toBe(true);
+      expect(m.result.recommendations.find((r) => r.id === r2.id)?.deleted).toBe(true);
+      expect(m.result.shots.find((s) => s.id === s1.id)?.deleted).toBeUndefined();
+    }
+  });
+
+  it('deletes a bean with its bags, their shots, recommendations and RPM runs', async () => {
+    const b = bean();
+    const other = bean();
+    const bagA = bag(b.id);
+    const bagB = { ...bag(b.id), archived: true };
+    const bagC = bag(other.id);
+    const epochId = id();
+    for (const x of [b, other]) await repo.putBean(x);
+    for (const x of [bagA, bagB, bagC]) await repo.putBag(x);
+    const shots = [bagA, bagB, bagC].map((x) => shot(x.id, epochId));
+    for (const s of shots)
+      await repo.saveShotBundle({ shot: s, curve: curve(s.id), quality: quality(s.id) });
+    const [sA, sB, sC] = shots as [Shot, Shot, Shot];
+    await repo.putRecommendation(rec(bagA.id, sA.id));
+    await repo.putRecommendation(rec(bagB.id, null));
+    await repo.putRecommendation(rec(bagC.id, sC.id));
+    const run: RpmCalibrationRun = {
+      ...meta(),
+      epochId,
+      bagId: bagA.id,
+      startedAt: '2026-10-01T10:00:00.000Z',
+      status: 'active',
+    };
+    await repo.putRpmRun(run);
+
+    expect(await repo.deleteBean(b.id)).toEqual({ bags: 2, shots: 2 });
+    expect((await repo.listBeans()).map((x) => x.id)).toEqual([other.id]);
+    expect((await repo.listBags()).map((x) => x.id)).toEqual([bagC.id]);
+    expect((await repo.listShots()).map((x) => x.id)).toEqual([sC.id]);
+    expect((await repo.listQuality()).map((x) => x.shotId)).toEqual([sC.id]);
+    expect(await repo.listRecommendationsForBag(bagA.id)).toEqual([]);
+    expect(await repo.listRecommendationsForBag(bagB.id)).toEqual([]);
+    expect((await repo.listRecommendationsForBag(bagC.id)).length).toBe(1);
+    expect(await repo.listRpmRuns()).toEqual([]);
+    expect((await repo.getShot(sB.id))?.deleted).toBe(true);
+    expect((await repo.getBean(b.id))?.deleted).toBe(true);
+    expect(await repo.deleteBean(b.id)).toEqual({ bags: 0, shots: 0 });
   });
 });
 

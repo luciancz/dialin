@@ -373,6 +373,13 @@ app.onBagLoaded = async () => {
     diag.log('error', `model summary failed: ${String(err)}`);
   }
 };
+app.afterShotsDeleted = async () => {
+  try {
+    await recommendAfterRating();
+  } catch (err) {
+    diag.log('error', `recommend after delete failed: ${String(err)}`);
+  }
+};
 app.afterShotSaved = async (shot) => {
   try {
     await recommendAfterShot(shot);

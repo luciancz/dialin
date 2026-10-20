@@ -1,4 +1,6 @@
 /** Typed CRUD and queries over the dialin database. */
+
+import type { IDBPTransaction, StoreNames } from 'idb';
 import { uuidv7 } from '../core/ids';
 import { BACKUP } from '../core/params';
 import type {
@@ -16,7 +18,7 @@ import type {
   Shot,
   ShotQuality,
 } from '../core/types';
-import type { Db } from './db';
+import type { Db, DialinDB } from './db';
 
 export function nowIso(): string {
   return new Date().toISOString();
@@ -42,6 +44,50 @@ export function newMeta(deviceId: Id, id = newId(), at = nowIso()): Meta {
 
 export function touched<T extends Meta>(row: T, at = nowIso()): T {
   return { ...row, updatedAt: at };
+}
+
+function tombstone<T extends Meta>(row: T, at: string): T {
+  return { ...row, deleted: true, updatedAt: at };
+}
+
+/** The stores a shot's deletion writes to. */
+const SHOT_STORES = [
+  'shots',
+  'curves',
+  'quality',
+  'ratings',
+  'recommendations',
+  'rawRecordings',
+] as const;
+
+type ShotStore = (typeof SHOT_STORES)[number];
+
+/**
+ * Tombstone shots with their satellite rows and the recommendations after them (with
+ * `wholeBag`, every recommendation in `recs`); drop their raw recordings.
+ */
+async function tombstoneShots<S extends StoreNames<DialinDB>>(
+  tx: IDBPTransaction<DialinDB, (ShotStore | S)[], 'readwrite'>,
+  shots: Shot[],
+  recs: Recommendation[],
+  at: string,
+  wholeBag = false,
+): Promise<void> {
+  const ids = new Set(shots.map((s) => s.id));
+  for (const shot of shots) {
+    await tx.objectStore('shots').put(tombstone(shot, at));
+    for (const store of ['curves', 'quality', 'ratings'] as const) {
+      const row = await tx.objectStore(store).index('shotId').get(shot.id);
+      if (row && !row.deleted) await tx.objectStore(store).put(tombstone(row, at));
+    }
+    for (const key of await tx.objectStore('rawRecordings').index('shotId').getAllKeys(shot.id))
+      await tx.objectStore('rawRecordings').delete(key);
+  }
+  for (const r of recs) {
+    if (r.deleted) continue;
+    if (wholeBag || (r.afterShotId !== null && ids.has(r.afterShotId)))
+      await tx.objectStore('recommendations').put(tombstone(r, at));
+  }
 }
 
 export class Repo {
@@ -212,6 +258,59 @@ export class Repo {
 
   async putRpmRun(r: RpmCalibrationRun): Promise<void> {
     await this.db.put('rpmRuns', touched(r));
+  }
+
+  // ---- deleting ----
+  /**
+   * Delete a shot: it and its curve, quality, rating and the recommendations made after it
+   * become tombstones (so an import of an older backup cannot bring them back); its raw
+   * recordings, which are never merged by tombstone age, are dropped. Returns the shot's bag.
+   */
+  async deleteShot(shotId: Id): Promise<Id | null> {
+    const tx = this.db.transaction(SHOT_STORES, 'readwrite');
+    const shot = await tx.objectStore('shots').get(shotId);
+    if (!shot || shot.deleted) {
+      await tx.done;
+      return null;
+    }
+    const recs = await tx.objectStore('recommendations').index('bagId').getAll(shot.bagId);
+    await tombstoneShots(tx, [shot], recs, nowIso());
+    await tx.done;
+    return shot.bagId;
+  }
+
+  /**
+   * Delete a bean with all its bags, their shots (as deleteShot), recommendations and RPM
+   * calibration runs. Returns how many bags and shots went with it.
+   */
+  async deleteBean(beanId: Id): Promise<{ bags: number; shots: number }> {
+    const tx = this.db.transaction([...SHOT_STORES, 'beans', 'bags', 'rpmRuns'], 'readwrite');
+    const at = nowIso();
+    const bean = await tx.objectStore('beans').get(beanId);
+    if (!bean || bean.deleted) {
+      await tx.done;
+      return { bags: 0, shots: 0 };
+    }
+    const bags = (await tx.objectStore('bags').index('beanId').getAll(beanId)).filter(
+      (b) => !b.deleted,
+    );
+    let shotCount = 0;
+    for (const bag of bags) {
+      const shots = (await tx.objectStore('shots').index('bagId').getAll(bag.id)).filter(
+        (s) => !s.deleted,
+      );
+      const recs = await tx.objectStore('recommendations').index('bagId').getAll(bag.id);
+      // Recommendations made with no shot yet (afterShotId null) go with the bag too.
+      await tombstoneShots(tx, shots, recs, at, true);
+      shotCount += shots.length;
+      for (const run of await tx.objectStore('rpmRuns').index('bagId').getAll(bag.id)) {
+        if (!run.deleted) await tx.objectStore('rpmRuns').put(tombstone(run, at));
+      }
+      await tx.objectStore('bags').put(tombstone(bag, at));
+    }
+    await tx.objectStore('beans').put(tombstone(bean, at));
+    await tx.done;
+    return { bags: bags.length, shots: shotCount };
   }
 
   async counts(): Promise<Record<string, number>> {
