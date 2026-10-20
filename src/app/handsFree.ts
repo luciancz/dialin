@@ -61,8 +61,8 @@ function run(a: HfAction, tRxMs: number): void {
       const ns = app.nextSettings.value;
       app.weighedDose.value = { g: a.g, plannedG: app.weighedDose.value?.plannedG ?? ns.doseG };
       app.nextSettings.value = { ...ns, doseG: a.g };
-      if (a.dosingCupG !== null && a.dosingCupG !== s?.dosingCupG)
-        void app.saveSettings({ dosingCupG: Math.round(a.dosingCupG * 10) / 10 });
+      const cupG = a.dosingCupG === null ? null : Math.round(a.dosingCupG * 10) / 10;
+      if (cupG !== null && cupG !== s?.dosingCupG) void app.saveSettings({ dosingCupG: cupG });
       openGrindStep();
       return;
     }
