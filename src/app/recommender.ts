@@ -197,6 +197,15 @@ export async function recommendAfterEpoch(): Promise<Recommendation | null> {
   return rec;
 }
 
+/**
+ * A rating added after the shot was saved (Home → Rate earlier shots): replay with it and
+ * recompute the card from the bag's last shot, as if that shot had just been saved.
+ */
+export async function recommendAfterRating(): Promise<Recommendation | null> {
+  const last = app.shotsOfBag.value[app.shotsOfBag.value.length - 1];
+  return last ? recommendAfterShot(last) : null;
+}
+
 /** Refresh the model summary for the current bag (on load / bag change). */
 export async function refreshModelSummary(): Promise<void> {
   const result = await replayAll();
