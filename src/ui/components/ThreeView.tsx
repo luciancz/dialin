@@ -111,7 +111,7 @@ export function ThreeView({ view, height = 260 }: { view: View; height?: number 
             : view === 'grind'
               ? 'Varia VS6 grinding into the dosing cup'
               : view === 'weigh'
-                ? 'Beans in the dosing cup on the scale, next to the Varia VS6'
+                ? 'Beans in the Varia dosing cup on the scale'
                 : 'Your setup: Lelit Mara X, Bookoo Themis Mini and Varia VS6'
         }
       />

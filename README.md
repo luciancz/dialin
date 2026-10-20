@@ -78,12 +78,23 @@ service worker with the precache list into `dist/`).
 ### 3D views and weighing
 
 The VS6, the Mara X and the Themis Mini are drawn in 3D with three.js, from the published
-dimensions in `src/ui/three/dims.ts`. three.js is a lazily loaded chunk of about 150 kB gzip.
+dimensions, Varia's product photos and Lelit's V1 manual drawings (sources in
+`src/ui/three/dims.ts`). three.js is a lazily loaded chunk of about 165 kB gzip.
 
+- **VS6.** The C-shaped body leans 13.5° forward on its level base. The head carries the
+  stepped index collar, the hopper with the scale (numbers 0–9, ten lines each, dots for the
+  turn) and the feed ring with six screws, and the red LED display on its top face. The chute
+  tube drops into the magnetic dosing cup; the RPM knob is on the base's right side. Black or
+  white (Settings → Grinder & machine).
+- **Mara X (V1).** The E61-style group with its side fins and the brew lever on its right,
+  which hangs down and lifts towards you. The dual gauge (steam over pump), six-lobed knobs
+  on the corner valves (steam left, hot water right) with their wands, the pilot lights, the
+  lit I/O button and the red LELIT badge. The 0/I/II rocker sits in the drip-tray bay, with
+  wire grates on the tray and on top beside the tank lid.
 - **What moves.** The VS6 hopper turns to the card's dial, its LED shows the RPM, and grounds
-  fall into the dosing cup while grinding. The Mara X lever lifts, the pump gauge ramps, and two
-  streams thicken with the live flow. The cup fills to the live weight, and the scale shows the
-  reading.
+  fall into the dosing cup while grinding. The Mara X lever lifts, the pump needle ramps, the
+  steam needle follows the temperature switch, and two streams thicken with the live flow. The
+  cup fills to the live weight, and the scale shows the reading.
 - **Where.** Home, the weigh and grind steps, Armed and the live shot, and the demo's
   "Watch a shot". "Watch a shot" scripts only the simulated scale (cups, beans, the lever,
   its timer button) and lets the hands-free flow and the real recorder do the rest.

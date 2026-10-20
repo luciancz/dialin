@@ -24,7 +24,7 @@ import {
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { DialSpec } from '../../core/types';
-import { approach, brewPressureBar, gaugeAngle, grindRateGps } from './anim';
+import { approach, brewPressureBar, grindRateGps, steamBarAt } from './anim';
 import { VS6 } from './dims';
 import { buildBeans, buildGrounds, buildStreams } from './effects';
 import { makeMaterials } from './materials';
@@ -74,7 +74,8 @@ export interface SceneHandle {
 const CAMERAS: Record<View, [number, number, number]> = {
   marax: [0.42, 0.36, 0.83],
   grind: [0.5, 0.42, 0.76],
-  weigh: [0.2, 0.8, 0.58],
+  // Steep enough to see the beans at the bottom of the 78 mm dosing cup.
+  weigh: [0.16, 1, 0.42],
   setup: [0.24, 0.36, 0.9],
 };
 
@@ -112,7 +113,8 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
 
   // ---- compose the view ----
   const showMarax = view === 'marax' || view === 'setup';
-  const showVs6 = view !== 'marax';
+  // The weigh view frames the scale closely: a grinder beside it would only show cut off.
+  const showVs6 = view === 'grind' || view === 'setup';
   const marax = showMarax ? buildMarax(mats) : null;
   const vs6 = showVs6 ? buildVs6(mats, o.spec, o.grinderColor === 'black') : null;
   const maraxRoot = new Group();
@@ -126,8 +128,8 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
   if (vs6) {
     vs6Root.add(vs6.group);
     disposers.push(vs6.dispose);
-    if (view === 'setup') vs6Root.position.set(165, 0, 205 - VS6.depth / 2 - 30);
-    if (view === 'weigh') vs6Root.position.set(-95, 0, -20);
+    // Beside the machine, its base level with the front of the drip tray's bay.
+    if (view === 'setup') vs6Root.position.set(160, 0, 80);
     scene.add(vs6Root);
   }
   // Scale + espresso cup on the drip tray.
@@ -140,21 +142,19 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
     cup.group.position.set(under.x, under.y + themis.topY, under.z);
     scene.add(themis.group, cup.group);
   } else if (view === 'weigh') {
-    themis.group.position.set(115, 0, 50);
     scene.add(themis.group);
   }
-  // Weigh view: the dosing cup with beans on the scale, its bay on the VS6 empty.
+  // Weigh view: the dosing cup with the beans on the scale.
   let beans: ReturnType<typeof buildBeans> | null = null;
   /** What the camera frames: the whole scene, or just the scale and cup while weighing. */
   const frameRoots: Object3D[] = [scene];
-  if (view === 'weigh' && vs6) {
-    vs6.setCupInBay(false);
+  if (view === 'weigh') {
     const dc = buildDosingCup(mats);
-    dc.group.position.set(115, themis.topY, 50);
+    dc.group.position.set(0, themis.topY, 0);
     scene.add(dc.group);
     frameRoots.splice(0, 1, themis.group, dc.group);
-    beans = buildBeans(mats.beans, VS6.cupInnerR, 0);
-    beans.mesh.position.set(115, themis.topY, 50);
+    beans = buildBeans(mats.beans, VS6.cupInnerR, VS6.cupFloor);
+    beans.mesh.position.set(0, themis.topY, 0);
     scene.add(beans.mesh);
     disposers.push(beans.dispose);
   }
@@ -194,8 +194,8 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
     });
   }
   const sphere = bounds.getBoundingSphere(new Sphere());
-  // Small framings (the scale and cup while weighing) keep some context around them.
-  sphere.radius = Math.max(sphere.radius, 170);
+  // Small framings (the scale and cup while weighing) keep a margin around them.
+  sphere.radius = Math.max(sphere.radius, view === 'weigh' ? 120 : 170);
   const fitDistance = () => {
     const v = (camera.fov * Math.PI) / 180;
     const h = 2 * Math.atan(Math.tan(v / 2) * camera.aspect);
@@ -251,7 +251,7 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
   // ---- animation state ----
   let hopper = 0;
   let lever = 0;
-  let pump = gaugeAngle(0, 16);
+  let pump = 0;
   let lastT = performance.now();
   let raf = 0;
   let disposed = false;
@@ -279,10 +279,10 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
       if (Math.abs(nl - lever) > 1e-4) active = true;
       lever = nl;
       marax.setLever(lever);
-      const np = approach(pump, gaugeAngle(brewPressureBar(s.shotTimeS, s.running), 16), dtS, 0.35);
-      if (Math.abs(np - pump) > 1e-4) active = true;
+      const np = approach(pump, brewPressureBar(s.shotTimeS, s.running), dtS, 0.35);
+      if (Math.abs(np - pump) > 1e-3) active = true;
       pump = np;
-      marax.setGauges(pump, gaugeAngle(1.2, 3));
+      marax.setGauges(pump, steamBarAt(s.tempSwitch));
       marax.setTempSwitch(s.tempSwitch);
     }
     const text = fmtG(s.scaleG);
