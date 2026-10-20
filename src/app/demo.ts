@@ -184,6 +184,7 @@ function draftFor(
     alertFired: true,
     preTapMedianG: 0,
     tareDecided: true,
+    pumpLeadMs: null,
     notes: ['simulated shot (demo mode)'],
     recoveringFrom: null,
   };

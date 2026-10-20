@@ -138,6 +138,10 @@ export interface Context {
   /** The dose was weighed on the scale (bean weighing step): the exact grams and the plan. */
   doseWeighed?: { g: number; plannedG: number };
   /** Future drop-ins (Gicar tap, pump reed, pressure). Nothing writes these yet. */
+  /**
+   * Future drop-ins. pumpOnAtMs is written today by the hands-free start: when the pump's
+   * vibration showed on the scale, in ms relative to t0 (negative = before the first drops).
+   */
   sensors?: { gicar?: unknown; pumpOnAtMs?: number; pressureBar?: number[] };
 }
 
@@ -211,6 +215,8 @@ export type ShotStatus =
   | 'ok'
   | 'late_tap'
   | 'no_tap_recovered'
+  /** Hands-free: started by itself at the first drops (no START tap). */
+  | 'auto_start'
   | 'partial_disconnect'
   | 'aborted'
   | 'manual_entry'

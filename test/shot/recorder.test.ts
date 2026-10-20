@@ -6,6 +6,7 @@ import {
   type Effect,
   initialState,
   learnGate,
+  pumpOnset,
   type RecorderEvent,
   type RecorderState,
   reduce,
@@ -478,5 +479,57 @@ describe('recorder: cup put down, auto-tare and restarts', () => {
     const b = xs[xs.length - 1];
     // The clock keeps running (it would stall on a frozen timer).
     expect((b?.t ?? 0) - (a?.t ?? 0)).toBeGreaterThan(1.5);
+  });
+});
+
+describe('recorder: hands-free start', () => {
+  it('armed with autoStart, the first drops start the shot by itself and it is learned', () => {
+    const h = new Harness();
+    h.autoTareOn = true;
+    h.idle(2500, 0);
+    h.idle(3000, 175); // cup down, auto-tared
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36, autoStart: true });
+    h.idle(1500);
+    expect(h.state.phase).toBe('ARMED');
+    // Coffee into the cup: no tap at all.
+    const idx = curve.t.findIndex((t) => t >= 12);
+    for (let i = 0; i <= idx; i++) h.step(175 + (curve.g[i] ?? 0));
+    expect(h.state.phase).toBe('RUNNING');
+    expect(h.state.prompt).toBeNull();
+    const d = h.state.draft;
+    expect(d?.status).toBe('auto_start');
+    expect(d?.samples[0]?.g ?? 99).toBeLessThan(0.5);
+    expect(h.sent('reset')).toBe(1);
+    expect(h.has('warn', 'late_tap')).toBe(false);
+    expect(learnGate('auto_start', true)).toBe(true);
+  });
+
+  it('putting the cup down while armed for hands-free does not start a shot', () => {
+    const h = new Harness();
+    h.idle(2500, 0);
+    h.dispatch({ type: 'arm', now: h.now, targetYieldG: 36, autoStart: true });
+    h.idle(4000, 190);
+    expect(h.state.phase).toBe('ARMED');
+  });
+
+  it('finds the pump vibration before the first drops when the scale shows it', () => {
+    const ring = new RingBuffer();
+    let t = 0;
+    const push = (g: number) => {
+      t += 100;
+      ring.push({ tRxMs: t, grams: g, flowScale: 0, timerMs: 0 });
+    };
+    for (let i = 0; i < 60; i++) push(i % 7 === 0 ? 0.1 : 0); // armed, quiet
+    const pumpAt = t;
+    for (let i = 0; i < 70; i++) push(i % 2 === 0 ? 0.3 : -0.2); // pump buzzing, no coffee yet
+    const onset = t;
+    const found = pumpOnset(ring, onset, 0);
+    expect(found).not.toBeNull();
+    expect(Math.abs((found ?? 0) - pumpAt)).toBeLessThanOrEqual(1000);
+    // A quiet scale reports nothing.
+    const quiet = new RingBuffer();
+    for (let i = 0; i < 120; i++)
+      quiet.push({ tRxMs: i * 100, grams: 0, flowScale: 0, timerMs: 0 });
+    expect(pumpOnset(quiet, 12_000, 0)).toBeNull();
   });
 });

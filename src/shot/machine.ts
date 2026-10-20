@@ -65,6 +65,11 @@ export interface ShotDraft {
   /** Median weight over the 2 s before the tap: the software tare if 07 did not zero the scale. */
   preTapMedianG: number;
   tareDecided: boolean;
+  /**
+   * Pump vibration seen on the scale before the first drip (hands-free start): ms before t0,
+   * null when none was detected. Measurement only, for the field test (FIELD_TEST C).
+   */
+  pumpLeadMs: number | null;
   notes: string[];
   /** Phase at which the link dropped, to resume correctly. */
   recoveringFrom: 'RUNNING' | 'ENDING' | 'SETTLING' | null;
@@ -73,7 +78,14 @@ export interface ShotDraft {
 export interface RecorderState {
   phase: Phase;
   draft: ShotDraft | null;
-  armed: { targetYieldG: number; tailEstimateG: number; stable: boolean; sinceMs: number } | null;
+  armed: {
+    targetYieldG: number;
+    tailEstimateG: number;
+    stable: boolean;
+    sinceMs: number;
+    /** Hands-free: start by itself when coffee starts to rise in the cup (no START tap). */
+    autoStart: boolean;
+  } | null;
   prompt: 'forgot_tap' | null;
   /** Live flow estimate (g/s) for the UI. */
   liveFlow: number;
@@ -82,7 +94,7 @@ export interface RecorderState {
 }
 
 export type RecorderEvent =
-  | { type: 'arm'; now: number; targetYieldG: number; tailEstimateG?: number }
+  | { type: 'arm'; now: number; targetYieldG: number; tailEstimateG?: number; autoStart?: boolean }
   | { type: 'disarm'; now: number }
   | { type: 'tap'; now: number }
   | { type: 'frame'; now: number; grams: number; flow: number; timerMs: number; tRxMs: number }
@@ -111,8 +123,47 @@ export function initialState(): RecorderState {
   return { phase: 'IDLE', draft: null, armed: null, prompt: null, liveFlow: 0, tareAtMs: null };
 }
 
+/**
+ * Learned: a normal tap, a late tap and a hands-free start (all timed from the first drops at
+ * worst, which plateau flow does not depend on). Not learned: a forgotten tap accepted from
+ * the prompt, aborted and partial shots.
+ */
 export function learnGate(status: ShotStatus, featuresValid: boolean): boolean {
-  return (status === 'ok' || status === 'late_tap') && featuresValid;
+  return (status === 'ok' || status === 'late_tap' || status === 'auto_start') && featuresValid;
+}
+
+/**
+ * When the Mara X's vibration pump started, from the scale (on the drip tray it picks up the
+ * pump's buzz as frame-to-frame jitter): the earliest time before `onsetMs` from which the
+ * jitter stays above 3× the armed baseline (and above 0.06 g). Null when the scale shows no
+ * such step (no buzz, a damped tray, or too little armed history). Measurement only.
+ */
+export function pumpOnset(ring: RingBuffer, onsetMs: number, armedAtMs: number): number | null {
+  const xs = ring.between(Math.max(armedAtMs, onsetMs - 20_000), onsetMs);
+  if (xs.length < 30) return null;
+  const jit: { t: number; d: number }[] = [];
+  for (let i = 1; i < xs.length; i++) {
+    const a = xs[i - 1];
+    const b = xs[i];
+    if (a && b) jit.push({ t: b.tRxMs, d: Math.abs(b.grams - a.grams) });
+  }
+  const meanBetween = (t0: number, t1: number) => {
+    const w = jit.filter((j) => j.t >= t0 && j.t < t1);
+    return w.length < 4 ? Number.NaN : w.reduce((s, j) => s + j.d, 0) / w.length;
+  };
+  const first = jit[0];
+  if (!first) return null;
+  const baseline = meanBetween(first.t, first.t + 3000);
+  if (Number.isNaN(baseline)) return null;
+  const threshold = Math.max(0.06, 3 * baseline);
+  // Walk back from the onset in 0.5 s steps while each 1 s window stays above the threshold.
+  let start: number | null = null;
+  for (let t = onsetMs - 1000; t >= first.t + 3000; t -= 500) {
+    const m = meanBetween(t, t + 1000);
+    if (Number.isNaN(m) || m < threshold) break;
+    start = t;
+  }
+  return start;
 }
 
 function newDraft(now: number, armed: NonNullable<RecorderState['armed']>): ShotDraft {
@@ -147,6 +198,7 @@ function newDraft(now: number, armed: NonNullable<RecorderState['armed']>): Shot
     alertFired: false,
     preTapMedianG: 0,
     tareDecided: false,
+    pumpLeadMs: null,
     notes: [],
     recoveringFrom: null,
   };
@@ -186,7 +238,7 @@ function startShot(
   state: RecorderState,
   now: number,
   ring: RingBuffer,
-  mode: 'tap' | 'forgot',
+  mode: 'tap' | 'forgot' | 'auto',
 ): [RecorderState, Effect[]] {
   const armed = state.armed;
   if (!armed) return [state, []];
@@ -197,7 +249,7 @@ function startShot(
   const from = riseWindowStart(state, now, REC.lateTapWindowMs);
   const rise = ring.riseSince(from);
   const placed = ring.maxJumpBetween(from, now) >= REC.placementJumpG;
-  const late = mode === 'forgot' || (rise > REC.lateTapRiseG && !placed);
+  const late = mode !== 'tap' || (rise > REC.lateTapRiseG && !placed);
   if (!late) {
     d.startCmd = 'tareStart';
     const med = ring.medianBetween(from, now);
@@ -210,7 +262,11 @@ function startShot(
     const tare = ring.medianBetween(onsetRx - REC.lateTapWindowMs, onsetRx);
     d.tareOffsetG = Number.isNaN(tare) ? (ring.at(onsetRx)?.grams ?? 0) : tare;
     d.t0Ms = onsetRx;
-    d.status = mode === 'forgot' ? 'no_tap_recovered' : 'late_tap';
+    d.status = mode === 'forgot' ? 'no_tap_recovered' : mode === 'auto' ? 'auto_start' : 'late_tap';
+    if (mode === 'auto') {
+      const pump = pumpOnset(ring, onsetRx, state.armed?.sinceMs ?? onsetRx - 15_000);
+      d.pumpLeadMs = pump === null ? null : onsetRx - pump;
+    }
     d.startCmd = 'start';
     d.preTapSpliceS = (now - onsetRx) / 1000;
     for (const s of ring.between(onsetRx, now)) {
@@ -231,20 +287,23 @@ function startShot(
     d.notes.push(
       mode === 'forgot'
         ? `no tap: start estimated from the weight rise, ${d.preTapSpliceS.toFixed(1)} s recovered`
-        : `late tap: ${d.preTapSpliceS.toFixed(1)} s of pre-tap frames spliced in`,
+        : mode === 'auto'
+          ? `hands-free: started at the first drops, ${d.preTapSpliceS.toFixed(1)} s spliced in${d.pumpLeadMs !== null ? `; pump vibration ${(d.pumpLeadMs / 1000).toFixed(1)} s before` : ''}`
+          : `late tap: ${d.preTapSpliceS.toFixed(1)} s of pre-tap frames spliced in`,
     );
     // 06 first: after the previous shot's 05 the timer is frozen and 04 alone is ignored
     // (docs/PROTOCOL.md), which would stall the scale timer the samples are anchored to.
     effects.push({ type: 'send', cmd: 'reset' });
     effects.push({ type: 'send', cmd: 'start' });
-    effects.push({
-      type: 'warn',
-      code: mode === 'forgot' ? 'no_tap_recovered' : 'late_tap',
-      msg:
-        mode === 'forgot'
-          ? 'Shot start estimated from the weight rise.'
-          : 'Late tap: pre-tap frames recovered, first-drip time unknown.',
-    });
+    if (mode !== 'auto')
+      effects.push({
+        type: 'warn',
+        code: mode === 'forgot' ? 'no_tap_recovered' : 'late_tap',
+        msg:
+          mode === 'forgot'
+            ? 'Shot start estimated from the weight rise.'
+            : 'Late tap: pre-tap frames recovered, first-drip time unknown.',
+      });
   }
   return [{ ...state, phase: 'RUNNING', draft: d, prompt: null, liveFlow: 0 }, effects];
 }
@@ -323,6 +382,7 @@ export function reduce(
           armed: {
             targetYieldG: ev.targetYieldG,
             tailEstimateG: ev.tailEstimateG ?? REC.tailEstimateDefaultG,
+            autoStart: ev.autoStart === true,
             stable: ring.rangeOver(REC.stableWindowMs, ev.now) < REC.stableDeltaG,
             sinceMs: ev.now,
           },
@@ -467,12 +527,13 @@ function onFrame(
       let prompt = state.prompt;
       // A cup put down (a placement jump) or the tare that follows is not a running shot.
       const from = riseWindowStart(state, ev.now, REC.forgotTapWindowMs);
-      if (
-        prompt === null &&
+      const pouring =
         ring.riseSince(from) > REC.forgotTapRiseG &&
         ring.maxJumpBetween(from, ev.now) < REC.placementJumpG &&
-        ring.flowOver(Math.min(REC.liveFlowWindowMs, ev.now - from), ev.now) > REC.forgotTapFlowGps
-      ) {
+        ring.flowOver(Math.min(REC.liveFlowWindowMs, ev.now - from), ev.now) > REC.forgotTapFlowGps;
+      // Hands-free: coffee is rising in the cup, so the shot starts by itself.
+      if (pouring && armed.autoStart) return startShot(state, ev.now, ring, 'auto');
+      if (prompt === null && pouring) {
         prompt = 'forgot_tap';
         effects.push({ type: 'prompt', kind: 'forgot_tap' });
       }

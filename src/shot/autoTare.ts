@@ -25,6 +25,8 @@ export function initAutoTare(): AutoTareState {
 export interface AutoTareResult {
   state: AutoTareState;
   tare: boolean;
+  /** Weight of what was just put down (the step), when tare is true. */
+  placedG: number;
 }
 
 /**
@@ -38,25 +40,26 @@ export function autoTareStep(
   enabled: boolean,
 ): AutoTareResult {
   const last = ring.last();
-  if (!last) return { state: st, tare: false };
+  if (!last) return { state: st, tare: false, placedG: 0 };
   let state = st;
   if (!state.armed && last.grams <= -REC.autoTareRemovedG) state = { ...state, armed: true };
-  if (!enabled || !state.armed) return { state, tare: false };
+  if (!enabled || !state.armed) return { state, tare: false, placedG: 0 };
   if (state.lastTareAtMs !== null && nowMs - state.lastTareAtMs < REC.autoTareCooldownMs) {
-    return { state, tare: false };
+    return { state, tare: false, placedG: 0 };
   }
-  if (Math.abs(last.grams) <= REC.autoTareBandG) return { state, tare: false };
+  if (Math.abs(last.grams) <= REC.autoTareBandG) return { state, tare: false, placedG: 0 };
   const settleFrom = nowMs - REC.autoTareSettleMs;
   if (ring.rangeOver(REC.autoTareSettleMs, nowMs) > 2 * REC.autoTareBandG) {
-    return { state, tare: false };
+    return { state, tare: false, placedG: 0 };
   }
   // The settle window must be covered by samples (not one frame after a gap).
   const first = ring.samples[0];
-  if (!first || first.tRxMs > settleFrom) return { state, tare: false };
+  if (!first || first.tRxMs > settleFrom) return { state, tare: false, placedG: 0 };
   const from = settleFrom - REC.autoTareLookbackMs;
   const before = ring.at(from) ?? first;
   const step = last.grams - before.grams;
   const jump = ring.maxJumpBetween(from, nowMs);
-  if (step < REC.autoTareStepG || jump < REC.placementJumpG) return { state, tare: false };
-  return { state: { armed: false, lastTareAtMs: nowMs }, tare: true };
+  if (step < REC.autoTareStepG || jump < REC.placementJumpG)
+    return { state, tare: false, placedG: 0 };
+  return { state: { armed: false, lastTareAtMs: nowMs }, tare: true, placedG: step };
 }

@@ -67,6 +67,7 @@ function badge(
     };
   if (skipped) return { text: 'outlier', cls: 'bad' };
   if (q?.status === 'late_tap') return { text: 'late tap', cls: 'ok' };
+  if (q?.status === 'auto_start') return { text: 'hands-free', cls: 'ok' };
   if (shot.endedBy === 'disconnect') return { text: 'partial', cls: 'warn' };
   return { text: 'ok', cls: 'ok' };
 }
