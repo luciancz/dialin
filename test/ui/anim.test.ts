@@ -5,10 +5,12 @@ import {
   beanCount,
   brewPressureBar,
   cremaFraction,
-  gaugeAngle,
   grindRateGps,
   hopperAngle,
   liquidHeightMm,
+  pumpNeedleAngle,
+  steamBarAt,
+  steamNeedleAngle,
   streamRadiusMm,
 } from '../../src/ui/three/anim';
 
@@ -41,9 +43,14 @@ describe('3D animation math', () => {
   });
 
   it('gauges, pressure ramp, grind rate, beans and smoothing', () => {
-    expect(gaugeAngle(0, 16)).toBeCloseTo(-Math.PI / 4, 9);
-    expect(gaugeAngle(16, 16)).toBeCloseTo(-1.75 * Math.PI, 9);
-    expect(gaugeAngle(8, 16)).toBeCloseTo(-Math.PI, 9); // straight up at mid-scale
+    // Dual gauge: both needles rest at nine o'clock; steam goes over the top, pump under.
+    expect(steamNeedleAngle(0)).toBeCloseTo(Math.PI, 9);
+    expect(steamNeedleAngle(1.5)).toBeCloseTo(Math.PI / 2, 9); // straight up
+    expect(steamNeedleAngle(9)).toBeCloseTo(0, 9);
+    expect(pumpNeedleAngle(0)).toBeCloseTo(Math.PI, 9);
+    expect(pumpNeedleAngle(8)).toBeCloseTo(1.5 * Math.PI, 9); // straight down
+    expect(pumpNeedleAngle(16)).toBeCloseTo(2 * Math.PI, 9);
+    expect(steamBarAt(2)).toBeGreaterThan(steamBarAt(0));
     expect(brewPressureBar(10, true)).toBe(9);
     expect(brewPressureBar(10, false)).toBe(0);
     expect(brewPressureBar(2, true)).toBeLessThan(brewPressureBar(6, true));

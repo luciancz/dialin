@@ -14,6 +14,18 @@ export interface Mats {
   /** VS6 powder-coated aluminium (black or white). */
   alu: MeshStandardMaterial;
   aluDark: MeshStandardMaterial;
+  /** VS6 machined rings (index collar, feed ring, cup band): satin silver or dark anodised. */
+  ring: MeshStandardMaterial;
+  /** Brushed stainless (the dosing cup's inside). */
+  stainless: MeshPhysicalMaterial;
+  /** Gloss black glass (display windows). */
+  glossBlack: MeshPhysicalMaterial;
+  /** Polished black resin (Mara X knobs, lever knob, portafilter handle). */
+  resin: MeshPhysicalMaterial;
+  /** Polished wire (grates). */
+  wire: MeshStandardMaterial;
+  /** Unlit darkness (the throat into the burrs). */
+  void: MeshStandardMaterial;
   /** Mara X brushed stainless (anisotropic). */
   steel: MeshPhysicalMaterial;
   chrome: MeshStandardMaterial;
@@ -72,12 +84,47 @@ export function makeMaterials(grinder: 'black' | 'white'): Mats {
         metalness: 0.2,
       }),
     ),
+    ring: keep(
+      new MeshStandardMaterial({
+        color: black ? 0x2a2b2e : 0xd6d8db,
+        roughness: black ? 0.42 : 0.34,
+        metalness: black ? 0.55 : 0.85,
+      }),
+    ),
+    stainless: keep(
+      new MeshPhysicalMaterial({
+        color: 0xbcc0c4,
+        metalness: 1,
+        roughness: 0.3,
+        anisotropy: 0.5,
+      }),
+    ),
+    glossBlack: keep(
+      new MeshPhysicalMaterial({
+        color: 0x050506,
+        roughness: 0.12,
+        metalness: 0,
+        clearcoat: 1,
+        clearcoatRoughness: 0.04,
+      }),
+    ),
+    resin: keep(
+      new MeshPhysicalMaterial({
+        color: 0x0c0c0d,
+        roughness: 0.22,
+        metalness: 0,
+        clearcoat: 1,
+        clearcoatRoughness: 0.08,
+      }),
+    ),
+    wire: keep(new MeshStandardMaterial({ color: 0xe6e8ea, metalness: 1, roughness: 0.16 })),
+    void: keep(new MeshStandardMaterial({ color: 0x050505, roughness: 1, metalness: 0 })),
     steel: keep(
       new MeshPhysicalMaterial({
-        color: 0x9fa4aa,
+        color: 0xa7acb2,
         metalness: 1,
-        roughness: 0.36,
-        anisotropy: 0.65,
+        roughness: 0.3,
+        anisotropy: 0.7,
         anisotropyRotation: Math.PI / 2,
       }),
     ),

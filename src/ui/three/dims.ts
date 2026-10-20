@@ -1,49 +1,89 @@
 /**
- * Real dimensions (mm) the 3D models are built from. Sources (2026-10-19):
- * - Varia VS6: 191.6 × 130.0 × 403.7 mm (L × W × H), 10.7 kg, 58 mm magnetic dosing cup
- *   (holds 35 g), hopper 80 g that turns to set the grind — crema.fi product page,
- *   dailycoffeenews.com (2024-07-25).
- * - Lelit Mara X V1 (PL62X): ≈ 220 × 410 × 350 mm (W × D × H); retailers list the width as
- *   200–270 mm, so the width is the least certain figure. E61-style 58 mm group, twin gauges,
- *   drip tray with grate, cup-warmer rail — espressocoffeeshop.com, wholelattelove.com.
+ * Real dimensions (mm) the 3D models are built from. Published figures first, then estimates
+ * from photos and drawings (marked ≈). Sources (2026-10-20):
+ * - Varia VS6: 191.6 × 130.0 × 403.7 mm (D × W × H), 10.7 kg — variabrewing.com product page,
+ *   Whole Latte Love (W 5.1", D 7.5"). The body leans forward 13.5° (76.5° to the table) —
+ *   kaffeemacher.de. A C-shaped frame of square-section blocks: a level base with the cup
+ *   seat and the RPM knob on its right side, a column at the back, a head over the cup with
+ *   the RPM display on its top face; on top a stepped index collar, the hopper with the scale
+ *   and a feed ring with six screws. The proportions (≈) come from Varia's product photos,
+ *   scaled by the 58 mm cup rim and the head width.
+ * - Lelit Mara X V1 (PL62X): 220–225 × 410 × 350–355 mm (W × D × H), 18.5 kg — lelit.com,
+ *   CoffeeGeek, Seattle Coffee Gear (8.7" × 16.25" × 13.75"); 52 cm deep with the portafilter.
+ *   Layout from Lelit's V1 manual (EN/7800052 REV01, Pic 4): one dual gauge (steam 0–3 bar,
+ *   pump 0–16 bar, MC593, 65 mm) left of the group, six-lobed knobs on valve bodies at the
+ *   top front corners (steam left, hot water right), the brew lever on the right of the group
+ *   (hangs down, lifts towards you), the lit round I/O button and the red LELIT badge under
+ *   the gauge, the 0/I/II rocker in the drip-tray bay, a wire cup grate and the tank lid on
+ *   top. Drip tray ≈ 210 deep (Lelit part 1000201); cup clearance ≈ 114 mm (SCG).
  * - Bookoo Themis Mini: a small square scale, modelled at 100 × 100 × 22 mm.
- * Shapes follow product photos; there is no logo artwork.
  */
 export const VS6 = {
   depth: 191.6,
   width: 130.0,
   height: 403.7,
-  baseH: 16,
-  /** Column (behind the cup bay). */
-  columnDepth: 112,
-  /** Burr housing and hopper on top. */
-  headR: 62,
-  headH: 64,
-  hopperR: 57,
-  hopperH: 26,
-  /** Chute exit height above the table, and its forward offset from the centre. */
-  chuteY: 150,
-  chuteZ: 48,
-  /** 58 mm dosing cup. */
-  cupInnerR: 29,
-  cupOuterR: 31.5,
-  cupH: 52,
+  /** Body (base, column, head) width; the RPM knob makes up the rest of the 130 mm. */
+  bodyW: 116,
+  leanDeg: 13.5,
+  /** Rubber pads under the base, then the level base block. */
+  feetH: 1.5,
+  baseH: 42,
+  baseD: 190,
+  /** Column depth and head depth across the lean; the head's top and bottom along the lean. */
+  columnD: 72,
+  headD: 124,
+  headTopS: 281,
+  headH: 98,
+  /** Stepped index collar, the hopper's scale band and the feed ring on top. */
+  collarR: 48.5,
+  collarH: 12,
+  hopperR: 44,
+  hopperH: 58,
+  feedR: 45.5,
+  feedH: 17,
+  throatR: 21,
+  /** RPM / power knob on the right side of the base. */
+  knobR: 14.5,
+  knobOut: 14,
+  /** Vertical chute tube and the cup under it (z from the base centre). */
+  chuteR: 14,
+  cupZ: 38,
+  /** Dosing cup: 58 mm portafilter rim, magnetic, ≈ 35 g. */
+  cupOuterR: 30,
+  cupLipR: 28.5,
+  cupInnerR: 26.5,
+  cupH: 78,
+  cupFloor: 4,
   cupCapacityG: 35,
+  seatR: 33,
 } as const;
 
 export const MARAX = {
   width: 220,
-  depth: 410,
-  height: 350,
-  feetH: 18,
-  /** Group head centre above the table and forward of the front face. */
-  groupY: 238,
-  groupOut: 62,
-  /** Spout outlets below the portafilter. */
-  spoutY: 150,
+  height: 355,
+  /** Body shell depth; the drip tray adds ≈ 115 mm in front. */
+  shellD: 300,
+  feetH: 11,
+  /** Drip-tray bay: its roof above the table and its back wall behind the front panel. */
+  bayTop: 78,
+  bayDepth: 100,
+  /** Drip tray: top of the grate rods, depth, and how far it reaches past the front panel. */
+  trayTop: 59,
+  trayD: 213,
+  trayOut: 115,
+  /** E61-style group: axis in front of the panel, the gasket plane and the cap top. */
+  groupOut: 70,
+  gasketY: 205,
+  capTopY: 330,
+  collarR: 48,
+  /** Portafilter spout tips: ≈ 100 mm over the grate. */
+  spoutY: 159,
   spoutGap: 22,
-  trayH: 26,
-  trayDepth: 120,
+  /** Dual gauge (65 mm) and the corner valves (knob axes ≈ 15 mm in from the sides). */
+  gaugeR: 32.5,
+  gauge: [-60, 207] as const,
+  valveX: 95,
+  valveY: 300,
 } as const;
 
 export const THEMIS = {

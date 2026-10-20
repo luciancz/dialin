@@ -46,13 +46,23 @@ export function hopperAngle(pos: DialPosition, spec: DialSpec): number {
 }
 
 /**
- * Rotation about the gauge's axis (three.js, counter-clockwise positive) for a needle that
- * points straight down at rest: 0 sits at the lower left (45° clockwise from down) and the
- * scale sweeps 270° clockwise to the lower right, as on the Mara X gauges.
+ * Needle angles on the Mara X dual gauge (three.js, counter-clockwise from +x, the needle
+ * modelled pointing along +x): both scales start at nine o'clock; steam (0–3 bar) sweeps
+ * clockwise over the top to three o'clock, pump (0–16 bar) counter-clockwise under the bottom.
  */
-export function gaugeAngle(value: number, max: number): number {
-  const f = Math.max(0, Math.min(1, value / max));
-  return -(Math.PI / 4 + f * 1.5 * Math.PI);
+export function steamNeedleAngle(bar: number): number {
+  const f = Math.max(0, Math.min(1, bar / 3));
+  return Math.PI - f * Math.PI;
+}
+
+export function pumpNeedleAngle(bar: number): number {
+  const f = Math.max(0, Math.min(1, bar / 16));
+  return Math.PI + f * Math.PI;
+}
+
+/** Heat-exchanger boiler pressure at the temperature switch (0 / I / II ≈ 0.9 / 1.1 / 1.4 bar). */
+export function steamBarAt(tempSwitch: 0 | 1 | 2): number {
+  return tempSwitch === 0 ? 0.9 : tempSwitch === 1 ? 1.1 : 1.4;
 }
 
 /** Brew pressure shown on the gauge t seconds into the pull (E61 pre-infusion, then ≈ 9 bar). */
