@@ -6,6 +6,7 @@ import { signal } from '@preact/signals';
 import { reportStall } from '../../app/calibration';
 import { handsFreeOn } from '../../app/handsFree';
 import { isDemo } from '../../app/mode';
+import { autoSaveAt, countdownTick, touchRating } from '../../app/rateLater';
 import { navigate } from '../../app/router';
 import {
   backToPlan,
@@ -16,8 +17,14 @@ import {
   weighOpenedAt,
 } from '../../app/shotFlow';
 import { app } from '../../app/state';
+import {
+  QUICK_TASTES,
+  type QuickTaste,
+  quickRating,
+  type RatingFields,
+} from '../../core/quickRating';
 import { allowedRpmRange, e006Guidance } from '../../core/rpm/range';
-import type { Chip, Rating, SliderValue, TempSwitch, VsPrevious } from '../../core/types';
+import type { Chip, SliderValue, TempSwitch, VsPrevious } from '../../core/types';
 import { DEFAULT_DIAL_SPEC, formatDial, toLines } from '../../core/units';
 import { realClock } from '../../scale/clock';
 import { doseNote, openWeigh, weighStep } from '../../shot/weigh';
@@ -37,6 +44,8 @@ const thinHeavy = signal<SliderValue | null>(null);
 const chips = signal<Chip[]>([]);
 const overall = signal<number | null>(null);
 const manualYield = signal('');
+/** A save is under way (a second tap must not save the shot twice). */
+const saving = signal(false);
 
 function resetRating(): void {
   vs.value = null;
@@ -670,8 +679,22 @@ function RateSheet() {
     if (has) chips.value = chips.value.filter((x) => x !== c);
     else if (chips.value.length < 2) chips.value = [...chips.value, c];
   };
-  const save = async (withRating: boolean) => {
-    const rating: Omit<Rating, 'id' | 'createdAt' | 'updatedAt' | 'deviceId' | 'shotId'> | null =
+  const sincePullS = () => (realClock.now() - (p.draft.endAtRxMs ?? realClock.now())) / 1000;
+  const finish = async (rating: RatingFields | null) => {
+    if (saving.value) return;
+    saving.value = true;
+    try {
+      await app.saveShot(rating);
+    } finally {
+      saving.value = false;
+    }
+    backToPlan();
+    resetRating();
+    deviation.value = null;
+    navigate(isDemo() ? '/demo' : '/');
+  };
+  const save = (withRating: boolean) =>
+    finish(
       withRating
         ? {
             comparedToShotId: prev?.id ?? null,
@@ -681,20 +704,39 @@ function RateSheet() {
             chips: chips.value,
             drink: 'black',
             ...(overall.value !== null ? { overall1to9: overall.value } : {}),
-            secondsSincePull: Math.round(
-              (realClock.now() - (p.draft.endAtRxMs ?? realClock.now())) / 1000,
-            ),
+            secondsSincePull: Math.round(sincePullS()),
           }
-        : null;
-    await app.saveShot(rating);
-    backToPlan();
-    resetRating();
-    deviation.value = null;
-    navigate(isDemo() ? '/demo' : '/');
-  };
+        : null,
+    );
+  const quick = (taste: QuickTaste) => finish(quickRating(taste, prev?.id ?? null, sincePullS()));
+  // Re-render every second for the countdown.
+  void countdownTick.value;
+  const autoAt = autoSaveAt.value;
+  const leftS = autoAt === null ? null : Math.max(0, Math.ceil((autoAt - realClock.now()) / 1000));
   return (
-    <div>
+    <div onPointerDownCapture={touchRating} onKeyDownCapture={touchRating}>
       <h1>Rate</h1>
+      <HandsFreeStrip />
+      <div class="grid3 quick-taste">
+        {QUICK_TASTES.map((q) => (
+          <button
+            key={q.taste}
+            type="button"
+            class={`taste ${q.taste}`}
+            disabled={saving.value}
+            onClick={() => void quick(q.taste)}
+          >
+            {q.label}
+          </button>
+        ))}
+      </div>
+      <p class="muted small">
+        One tap saves the shot with that taste.
+        {calShot ? ' Calibration shot: rate the body below as well, it teaches the RPM.' : ''}
+        {leftS !== null
+          ? ` Untouched, it is saved unrated in ${Math.floor(leftS / 60)}:${String(leftS % 60).padStart(2, '0')} (rate it later on Home).`
+          : ''}
+      </p>
       <div class="card">
         <div class="row between">
           <div>
@@ -826,10 +868,15 @@ function RateSheet() {
         </label>
       </div>
       <div class="grid2">
-        <button type="button" class="primary" onClick={() => void save(true)}>
+        <button
+          type="button"
+          class="primary"
+          disabled={saving.value}
+          onClick={() => void save(true)}
+        >
           Save with rating
         </button>
-        <button type="button" onClick={() => void save(false)}>
+        <button type="button" disabled={saving.value} onClick={() => void save(false)}>
           Save, skip rating
         </button>
       </div>

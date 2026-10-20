@@ -534,3 +534,32 @@ pre {
   display: block;
   font-size: 1.05rem;
 }
+
+/* One-tap rating (rate sheet and Home → Rate earlier shots) */
+button.taste {
+  min-height: 84px;
+  font-size: 1.15rem;
+  width: 100%;
+  padding: 8px 4px;
+}
+button.taste.sour {
+  border-color: var(--info);
+  color: var(--info);
+}
+button.taste.balanced {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+button.taste.bitter {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+.rate-row + .rate-row {
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+.rate-row button.taste {
+  min-height: var(--tap);
+  font-size: 1rem;
+}

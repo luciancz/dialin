@@ -1,7 +1,10 @@
+import { signal } from '@preact/signals';
 import { isDemo } from '../../app/mode';
+import { rateEarlier } from '../../app/rateLater';
 import { modelSummary, setpointView } from '../../app/recommender';
 import { app } from '../../app/state';
 import { RULES } from '../../core/params';
+import { QUICK_TASTES, RATE_LATER_DAYS, unratedRecent } from '../../core/quickRating';
 import { formatDial } from '../../core/units';
 import { PosteriorBar } from '../charts/PosteriorBar';
 import { ConnectionPill } from '../components/ConnectionPill';
@@ -36,6 +39,68 @@ function SetpointCard() {
           : '—'}{' '}
         · flow model {Math.min(4, m.learnableShots)}/4 shots.
       </p>
+    </div>
+  );
+}
+
+/** The shot whose late rating is being saved. */
+const ratingShot = signal<string | null>(null);
+
+/** Shots saved without a rating (the sheet left untouched, or skipped): one tap each. */
+function RateEarlierCard() {
+  const shots = unratedRecent(
+    app.shotsOfBag.value,
+    app.ratingsOfBag.value,
+    app.qualityOfBag.value,
+    Date.now(),
+  );
+  if (shots.length === 0) return null;
+  const phase = app.recorder.value.phase;
+  // Not while a shot is being made: the new card would replace the settings on screen.
+  const busy =
+    ratingShot.value !== null ||
+    app.pending.value !== null ||
+    !(phase === 'IDLE' || phase === 'SAVED' || phase === 'ABORTED');
+  return (
+    <div class="card">
+      <h3>Rate earlier shots</h3>
+      <p class="muted small">
+        Saved without a rating in the last {RATE_LATER_DAYS} days. One tap each; the card is
+        recomputed with it.
+      </p>
+      {shots.slice(0, 6).map((s) => (
+        <div key={s.id} class="rate-row">
+          <div class="small">
+            {new Date(s.at).toLocaleString([], {
+              weekday: 'short',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}{' '}
+            · {s.features.finalYieldG.toFixed(1)} g in {s.features.totalTimeS.toFixed(0)} s ·{' '}
+            {formatDial(s.settings.grind.dialPos)} · {s.settings.grind.rpm} RPM
+          </div>
+          <div class="grid3" style="margin-top:6px">
+            {QUICK_TASTES.map((q) => (
+              <button
+                key={q.taste}
+                type="button"
+                class={`taste ${q.taste}`}
+                disabled={busy}
+                onClick={() => {
+                  ratingShot.value = s.id;
+                  void rateEarlier(s, q.taste)
+                    .catch((err) => app.toast('error', `Rating not saved: ${String(err)}`))
+                    .finally(() => {
+                      ratingShot.value = null;
+                    });
+                }}
+              >
+                {ratingShot.value === s.id ? '…' : q.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -105,6 +170,7 @@ export function Home() {
           </a>
         </div>
       )}
+      <RateEarlierCard />
       <ThreeView view="setup" height={240} />
       <RecommendationCard rec={app.lastRecommendation.value} />
       <SetpointCard />
