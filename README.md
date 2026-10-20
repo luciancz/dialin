@@ -71,11 +71,17 @@ service worker with the precache list into `dist/`).
    the app moves body at the same flow, uses RPM when the dial is at a limit, and trims
    below one dial line. "Grinder stalled (E006)" on the shot screen raises the bag's RPM
    floor to the stall + 100.
-8. **History**: badges, include / exclude a shot from learning (with a note), delete a shot,
+8. **Channeling and outliers.** Channeling only makes a shot faster, so a slow start (first
+   drip after 15 s, or choked at 15 s) never counts as channeling from the curve alone: the
+   sputtering first drops and the late rise are the tight puck opening up, and the card
+   grinds coarser. A shot far off the model is believed, not repeated, when it ran slow and
+   tasted bitter. On a puck-prep card **No channeling**, and on a repeat-to-confirm card
+   **It was real**, mark the last shot and recompute the card from it, with no shot pulled.
+9. **History**: badges, include / exclude a shot from learning (with a note), delete a shot,
    flow-vs-dial scatter with the fitted line, overlay of two curves. A deleted shot or bean
    is kept as a tombstone, so importing an older backup does not bring it back; the model
    replays without it and the card is recomputed.
-9. **Settings → Backup**: export (share sheet → download → clipboard) and import with a
+10. **Settings → Backup**: export (share sheet → download → clipboard) and import with a
    dry-run merge preview. Export every few shots; the app nags at 5 shots or 7 days.
 
 ### 3D views and weighing
@@ -189,7 +195,8 @@ shot-to-shot noise equal to the model's `σ_y = 0.07` and the taste gate at `σ_
 (see "Taste retune" below). Re-measured on 2026-10-19: the RPM calibration build redraws
 k_r from the research prior and adds RPM truth draws, so every seed's random stream
 changed. Moves of a few points against 2026-10-18 are sampling noise between two sets of
-200 seeds.
+200 seeds. Re-measured on 2026-10-20 on the same seeds after the slow-start and
+believed-outlier rules ("Channeling and outliers" above): no rate moved by more than 2.6 points.
 
 | Scenario | Plan target | Measured |
 |---|---|---|
@@ -197,12 +204,12 @@ changed. Moves of a few points against 2026-10-18 are sampling noise between two
 | (a′) mis-counted dial | ≥ 90 % | 68 % |
 | (b) later bag in band by shot 2 / 3 | ≥ 85 % / 75 % | 89 % / 74.5 % (shot 3 is one seed short; 83 % on the old draw) |
 | (c) taste setpoint found within 9 rated shots at the plan's gate σ_s ≤ 0.06 | ≥ 80 % | 8 % |
-| (c) found at the app's gate σ_s ≤ 0.08, within 9 / 14 rated shots | retune target > 60 % within 14 | 61 % / 92 % |
+| (c) found at the app's gate σ_s ≤ 0.08, within 9 / 14 rated shots | retune target > 60 % within 14 | 61 % / 91.5 % |
 | (d) same with 20 % channeling, plan's gate, within 11 | ≥ 80 % | 4 % |
 | (d) at the app's gate, within 11 / 14 | none | 44 % / 65 % |
 | (e) 30-day drift bias < 0.05 | ≥ 90 % | 93 % |
 | (f) washer epoch re-anchors in one shot | ≥ 90 % | 84 % (the card is recomputed when the epoch opens, so the anchor shot is pulled at the predicted shift) |
-| (g) RPM sign after 3 pairs | ≥ 80 % | 94 %, passes |
+| (g) RPM sign after 3 pairs | ≥ 80 % | 93 %, passes |
 | (h) confidence calibration ±0.10 | all words | worst gap 0.04, passes |
 | (i) 1/x truth in band by shot 5 | ≥ 90 % | 78 % |
 
@@ -289,15 +296,15 @@ the grinder stalls below 750 RPM.
 | Scenario | Plan target | Measured |
 |---|---|---|
 | (k) sd(k_r) ≤ 0.012 after the session | ≥ 95 % | 98.5 %, passes |
-| (k) k̂_r within 2 sd of the truth | ≥ 90 % | 94 %, passes |
-| (k) session done within 10 shots | ≥ 95 % | 93.5 % (channelled slots repeat; 97.5 % of runs complete) |
-| (k) every calibration shot within 0.14 ln of the balanced flow at its RPM | ≥ 90 % | 15 % of sessions, 72 % of shots |
+| (k) k̂_r within 2 sd of the truth | ≥ 90 % | 94.5 %, passes |
+| (k) session done within 10 shots | ≥ 95 % | 92 % (channelled slots repeat; 97 % of runs complete) |
+| (k) every calibration shot within 0.14 ln of the balanced flow at its RPM | ≥ 90 % | 15.5 % of sessions, 72 % of shots |
 | (k) δ within 2 sd of the truth | none | 95.5 % |
-| (l) body-sensitive: final body regret ≤ 0.1 | ≥ 75 % | 92 %, passes (63 % if RPM stays at 1000) |
-| (l) compensated RPM moves hold flow within β | ≥ 80 % | 97.5 % of 202 moves, passes |
+| (l) body-sensitive: final body regret ≤ 0.1 | ≥ 75 % | 93 %, passes (63 % if RPM stays at 1000) |
+| (l) compensated RPM moves hold flow within β | ≥ 80 % | 98.5 % of 202 moves, passes |
 | (l) RPM-insensitive: no body move, back to the usual RPM | ≥ 90 % | 100 %, passes |
 | (l) RPM-insensitive: P(RPM barely matters) ≥ 0.6 | ≥ 70 % | 98 %, passes |
-| (m) backup RPM reaches the band at the dial floor, reachable seeds | ≥ 80 % | 86 %, passes (1 % without RPM) |
+| (m) backup RPM reaches the band at the dial floor, reachable seeds | ≥ 80 % | 85 %, passes (1 % without RPM) |
 | (n) no recommendation below stall + 100 | 100 % | 100 %, passes |
 | (n) session completes after the stall | ≥ 90 % | 100 %, passes |
 

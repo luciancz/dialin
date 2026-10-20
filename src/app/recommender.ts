@@ -206,6 +206,29 @@ export async function recommendAfterRating(): Promise<Recommendation | null> {
   return last ? recommendAfterShot(last) : null;
 }
 
+/** What the user can say about the bag's last shot from the card. */
+export type LastShotMark = 'notChannelled' | 'confirmed';
+
+const MARK_NOTE: Record<LastShotMark, string> = {
+  notChannelled: 'not channelled: said by hand',
+  confirmed: 'real, not an outlier: said by hand',
+};
+
+/**
+ * The user corrects the card about the bag's last shot: it did not channel (the card asked for
+ * puck prep), or it was real (the card asked to repeat it). Mark it, replay and recompute the
+ * card from it, with no new shot.
+ */
+export async function markLastShot(mark: LastShotMark): Promise<Recommendation | null> {
+  const repo = app.repo;
+  const last = app.shotsOfBag.value[app.shotsOfBag.value.length - 1];
+  if (!repo || !last) return null;
+  const q = await repo.getQualityForShot(last.id);
+  if (!q || q.deleted) return null;
+  await repo.putQuality({ ...q, [mark]: true, notes: [...q.notes, MARK_NOTE[mark]] });
+  return recommendAfterShot(last);
+}
+
 /** Refresh the model summary for the current bag (on load / bag change). */
 export async function refreshModelSummary(): Promise<void> {
   const result = await replayAll();

@@ -241,6 +241,7 @@ export function recommend(input: RecommendInput): RecommendOutput {
     y: s.y,
     learn: s.learn,
     channelFlag: s.channelFlag,
+    notChannelled: s.quality?.notChannelled === true,
     predictedY: s.predictedY,
     skipped: s.skipped,
     r: s.r,
