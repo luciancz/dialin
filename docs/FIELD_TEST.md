@@ -66,7 +66,8 @@ connect). Grinder and machine warm.
 
 - Does the connection survive switching apps for 10 s? (`notifyAppStatePresent`, and the
   recorder's "return to Bluefy" gap.)
-- Does the connection survive the screen locking? (Expected: no. Keep the phone in hand.)
+- Does the connection survive the screen locking? (Expected: no. Keep the screen on, also
+  when the phone lies on the counter for a hands-free shot.)
 - Does a Home Screen bookmark open Bluefy or Safari? (Expected: Safari, which has no
   Bluetooth. Bookmark inside Bluefy instead.)
 
@@ -111,3 +112,29 @@ Record from the RPM screen and the export:
 | G5 | Body | thin–heavy differs between 700 and 1300 by ≥ 1 step, or the app reports "RPM barely changes body" | θ̂, P(flat) |
 | G6 | Body move | a later card that changes RPM keeps the flow within 7 % | next shot |
 | G7 | E006 | stalls only at ≤ 600 RPM; note the bean and RPM | stalls list |
+
+## H. Hands-free (Settings → Hands-free on, auto-tare on, beep cues on)
+
+Pull these shots without touching the phone except for the rating. Put the phone where you
+can see it, and count every tap.
+
+1. **Cycle.** Dosing cup on (1 beep, Weigh beans opens) → beans in (2 beeps, Grind opens) →
+   cup off, grind → espresso cup on (1 beep, armed) → lever up **and press the scale's
+   timer** → lever down at 3 beeps → one tap on the rate sheet.
+2. **Second cycle without weighing:** espresso cup straight on from the plan → armed.
+
+| # | Check | Expected | Record |
+|---|---|---|---|
+| H1 | Does the Themis timer button tare? | unknown; either works (the recorder decides from the first frames when the cup was not tared) | yes / no |
+| H2 | Arm after a shot (timer frozen by `05`): does the scale's display read 0.0 s before you press? | yes (`06` sent on arm) | yes / no |
+| H3 | Timer button on a stopped timer: restart from 0 or resume? Second press: stops? | start / stop (the recorder handles restart and resume) | restart / resume; stops |
+| H4 | Start: status `ok`, "started by the scale's timer", first-drip time plausible | t0 within 0.1 s of the press | status, first drip |
+| H5 | Does `02` beep? Is "beep n" n beeps? | n beeps | yes / no, count |
+| H6 | Are the 3 pre-alert beeps audible over the Mara X pump? | yes | yes / no; if not, note it |
+| H7 | Taps per shot (5 shots) | 1 (the rating); 0 when the 2-minute unrated save does it | taps |
+| H8 | Cup recognition: dosing cup empty / with the grounds, espresso cup weights; any false or missed arm | arms only on the espresso cup | weights, misses |
+| H9 | Dose capture: time from the last bean to 2 beeps; any capture while still pouring | ≈ 2.5 s, none early | s |
+| H10 | Forget the timer once: auto-start at the first drops (`auto_start`); press it late once: `late_tap` | as described | status |
+| H11 | Pump-vibration lead: on the forgotten-timer shot, `context.sensors.pumpOnAtMs` in the export vs a stopwatch from lever up to the first drops | within 1 s, or null (no buzz on the tray) | ms |
+| H12 | Press the timer again at lever down once: the shot ends then (`ended by the scale timer button`), tail mass > 0 | yes | tail g |
+| H13 | Leave a rate sheet for 2 minutes: saved unrated; Home → Rate earlier shots rates it | yes | — |
