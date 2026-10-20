@@ -17,6 +17,7 @@
  * the actions it returns.
  */
 import { REC } from '../core/params';
+import type { ShotSettings } from '../core/types';
 import type { Phase } from './machine';
 import type { RingBuffer } from './ringBuffer';
 import { steadyDose } from './weigh';
@@ -46,6 +47,8 @@ export interface HfInput {
   plannedDoseG: number;
   /** Learned weight of the dosing cup (Settings), null until the first weighing. */
   dosingCupG: number | null;
+  /** The pre-shot step on screen (the manual buttons move it too). */
+  preStep: 'plan' | 'weigh' | 'grind';
 }
 
 export type HfCue = 'weigh' | 'dose' | 'armed' | 'rate';
@@ -98,21 +101,34 @@ export function handsFreeStep(st: HfState, inp: HfInput): { state: HfState; acti
     actions.push({ type: 'toPlan' });
     return { state: go(st, 'ready', now, { cupCandidateG: null, doseG: null }), actions };
   }
+  // Armed by hand (the Arm button): follow the recorder.
+  if (inp.phase === 'ARMED' && st.step !== 'armed') return { state: go(st, 'armed', now), actions };
+  // The manual buttons moved the pre-shot step: weighed and taken by hand, back to the plan,
+  // or back to weighing.
+  if (st.step === 'weigh' && inp.preStep !== 'weigh') {
+    const next =
+      inp.preStep === 'grind'
+        ? go(st, 'grind', now)
+        : go(st, 'ready', now, { cupCandidateG: null, doseG: null });
+    return { state: next, actions };
+  }
+  if (st.step === 'grind' && inp.preStep === 'weigh')
+    return { state: go(st, 'weigh', now), actions };
   if (!inp.connected) return { state: st, actions };
   const last = inp.ring.last()?.grams ?? 0;
-  // The dosing cup: the learned weight, or (before it is learned) this cycle's own weighing;
-  // empty, or carrying the grounds.
-  const cupG = inp.dosingCupG ?? st.cupCandidateG;
+  // The dosing cup: the learned weight, or the cup of this cycle's own weighing; empty, or
+  // carrying the grounds (this cycle's dose, else the planned one).
+  const cups = [inp.dosingCupG, st.cupCandidateG].filter((c): c is number => c !== null);
+  const doseG = st.doseG ?? inp.plannedDoseG;
   const isDosingCup = (g: number) =>
-    cupG !== null &&
-    (Math.abs(g - cupG) <= HF.cupMatchG ||
-      (st.doseG !== null && Math.abs(g - cupG - st.doseG) <= HF.cupMatchG));
+    cups.some((c) => Math.abs(g - c) <= HF.cupMatchG || Math.abs(g - c - doseG) <= HF.cupMatchG);
 
   switch (st.step) {
     case 'ready': {
       if (!inp.tare) break;
-      // A cup that is not the (learned) dosing cup: no weighing this time, arm straight away.
-      if (inp.dosingCupG !== null && !isDosingCup(inp.tare.placedG)) {
+      // A cup that is not the (learned) dosing cup: no weighing this time, arm straight away
+      // (unless the weigh step was opened by hand: then it is the dosing cup).
+      if (inp.dosingCupG !== null && !isDosingCup(inp.tare.placedG) && inp.preStep !== 'weigh') {
         actions.push({ type: 'arm' }, { type: 'cue', cue: 'armed' });
         return { state: go(st, 'armed', now), actions };
       }
@@ -120,6 +136,8 @@ export function handsFreeStep(st: HfState, inp: HfInput): { state: HfState; acti
       return { state: go(st, 'weigh', now, { cupCandidateG: inp.tare.placedG }), actions };
     }
     case 'weigh': {
+      // The tare is still being applied: the reading is the cup.
+      if (now - st.sinceMs < REC.tareApplyMs) break;
       // Cup taken off before a dose was taken: start over.
       if (last <= -REC.autoTareRemovedG) {
         actions.push({ type: 'toPlan' });
@@ -163,4 +181,28 @@ export function handsFreeStep(st: HfState, inp: HfInput): { state: HfState; acti
       break;
   }
   return { state: st, actions };
+}
+
+/**
+ * The deviation from the card when arming hands-free: 'followed' when the next settings are
+ * the recommendation's (a dose weighed on the scale counts as the card's), else 'partly'.
+ */
+export function deviationFromCard(
+  next: ShotSettings,
+  card: ShotSettings,
+  weighedDoseG: number | null,
+): 'followed' | 'partly' {
+  const a = next.grind.dialPos;
+  const b = card.grind.dialPos;
+  const dose =
+    Math.abs(next.doseG - card.doseG) < 0.05 ||
+    (weighedDoseG !== null && Math.abs(weighedDoseG - next.doseG) < 0.05);
+  const same =
+    a.rev === b.rev &&
+    a.number === b.number &&
+    a.line === b.line &&
+    next.grind.rpm === card.grind.rpm &&
+    next.targetYieldG === card.targetYieldG &&
+    next.tempSwitch === card.tempSwitch;
+  return same && dose ? 'followed' : 'partly';
 }

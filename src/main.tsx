@@ -1,6 +1,7 @@
 import { render } from 'preact';
 import { ensureDemoWorld } from './app/demo';
 import { isDemo } from './app/mode';
+import './app/handsFree';
 import './app/recommender';
 import { app } from './app/state';
 import { swState } from './app/sw';

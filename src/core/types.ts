@@ -353,8 +353,17 @@ export interface Settings {
   transport?: 'webbt' | 'fake' | 'replay';
   /** Tare automatically when a cup or the dosing cup is put on the scale (default on). */
   autoTare?: boolean;
+  /**
+   * Hands-free (default on): the scale moves the shot on. The dosing cup opens the weighing,
+   * a steady dose goes to the grind, the espresso cup arms, the scale's timer button starts.
+   */
+  handsFree?: boolean;
   /** The scale beeps the cues of a shot: cup tared, dose taken, armed, pre-alert (default on). */
   beepCues?: boolean;
+  /** Armed hands-free, start by itself at the first drops if the timer was not pressed (on). */
+  autoStartFallback?: boolean;
+  /** Empty dosing cup, learned at the first hands-free weighing (null = forget it). */
+  dosingCupG?: number | null;
   /** Show the 3D grinder, machine and scale views (default on). */
   show3d?: boolean;
   /** Grinder colour in the 3D views. */

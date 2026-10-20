@@ -302,7 +302,7 @@ function PreShot() {
             type: 'arm',
             now: realClock.now(),
             targetYieldG: ns.targetYieldG,
-            tailEstimateG: tailEstimate(),
+            tailEstimateG: app.tailEstimate(),
           })
         }
       >
@@ -442,13 +442,6 @@ function Grind() {
       ) : null}
     </div>
   );
-}
-
-function tailEstimate(): number {
-  const shots = app.shotsOfBag.value.slice(-5);
-  const tails = shots.map((s) => s.features.tailMassG).filter((t) => t > 0 && t < 5);
-  if (tails.length === 0) return 1.0;
-  return tails.reduce((a, b) => a + b, 0) / tails.length;
 }
 
 function Armed() {

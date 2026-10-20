@@ -12,8 +12,9 @@ export const weighOpenedAt = signal(0);
 /** When the grind animation started (null = not grinding). */
 export const grindStartedAt = signal<number | null>(null);
 
-export function openWeighStep(): void {
-  weighOpenedAt.value = realClock.now();
+/** `atMs`: the frame that opened it, so the tare that frame triggers counts. */
+export function openWeighStep(atMs = realClock.now()): void {
+  weighOpenedAt.value = atMs;
   grindStartedAt.value = null;
   preStep.value = 'weigh';
 }
