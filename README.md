@@ -22,6 +22,7 @@ is the checklist for the first sessions at the machine.
 | M4 onboarding, beans/bags, hardware epochs, history, backup nags | done |
 | RPM calibration (8-shot session, compensated RPM levers, E006 handling) | done; see "RPM calibration" |
 | Bean weighing, auto-tare, 3D VS6 / Mara X / Themis Mini views | done; see "3D views and weighing" |
+| Hands-free shot: the scale moves the steps, timer-button start, beep cues, one-tap rating | done in code; see "Hands-free"; needs the field test |
 | M5 field hardening | **open**, needs the scale and the machine (list below) |
 
 ## Setup
@@ -50,13 +51,15 @@ service worker with the precache list into `dist/`).
    check the Timer-mode test, keep-awake and the capability table. Everything measured is
    stored in `settings.bleCaps` and included in exports.
 3. **Beans → Add bean**: roaster, name, roast level, process, roast date, dose, starting RPM.
-4. **Shot**: Plan → **Weigh beans** → Grind → Arm → pour.
+4. **Shot**: Plan → **Weigh beans** → Grind → Arm → pour. Hands-free (the default, see
+   below) moves through these steps from the scale; every step also has its button.
    - **Weigh beans:** put the empty dosing cup on the scale and it tares itself. Pour in the
      beans; the steady reading becomes the exact dose, and the planned yield stays.
    - **Grind:** shows the VS6 at the card's dial and RPM.
-   - **Arm:** put the cup on the scale and it tares itself. **Tap START as you lift the
-     lever** → STOP at the target, or let it auto-end → rate: better / same / worse,
-     sour–bitter, thin–heavy, chips.
+   - **Arm:** put the cup on the scale and it tares itself. **Press the scale's timer (or
+     tap START) as you lift the lever** → STOP at the target, or let it auto-end → rate:
+     one tap sour / balanced / bitter, or the detailed form (better / same / worse,
+     sour–bitter, thin–heavy, chips).
 5. **Home** shows the next-shot card: one lever, absolute dial, RPM, yield, a sentence, a
    confidence word and the predicted flow band; "why not the other levers" expands the model
    numbers. The taste-setpoint card shows the posterior over plateau flow.
@@ -82,8 +85,8 @@ dimensions in `src/ui/three/dims.ts`. three.js is a lazily loaded chunk of about
   streams thicken with the live flow. The cup fills to the live weight, and the scale shows the
   reading.
 - **Where.** Home, the weigh and grind steps, Armed and the live shot, and the demo's
-  "Watch a shot". "Watch a shot" runs the whole weigh → grind → pour flow through the
-  simulated scale and the real recorder.
+  "Watch a shot". "Watch a shot" scripts only the simulated scale (cups, beans, the lever,
+  its timer button) and lets the hands-free flow and the real recorder do the rest.
 - **Settings → Grinder & machine.** 3D views can be turned off; nothing renders without
   WebGL. You can also pick the grinder colour and turn auto-tare off.
 
@@ -93,12 +96,53 @@ After a tare it waits until something is taken off, so beans poured into a tared
 never tared away. Putting a cup down while armed no longer raises "Shot running?", and a
 START right after putting the cup down is no longer read as a late tap.
 
+### Hands-free
+
+The scale moves the shot on, so the phone can stay on the counter: the only tap is the
+rating. The controller is `src/shot/handsFree.ts` (pure, tested), wired in
+`src/app/handsFree.ts`; Settings → Hands-free turns it off. It needs auto-tare.
+
+| You do | The app does | Scale beeps |
+|---|---|---|
+| Put the empty dosing cup on the scale | tares it, opens Weigh beans on the Shot screen | 1 |
+| Pour in the beans | takes the reading once it holds still for 1 s as the dose, learns the cup's weight, opens Grind | 2 |
+| Tip the beans into the VS6 and grind; put the espresso cup on the scale | tares it, arms | 1 |
+| Lift the lever and press the scale's timer | starts the shot from the scale's timer | |
+| Lever down at the pre-alert | pre-alert at the target minus the drip tail | 3 |
+| Wait | ends 3 s after the flow stops, drip window, rate sheet | |
+| Taste, one tap: Sour / Balanced / Bitter | saves the shot | |
+
+- **Cups.** Once the dosing cup's weight is learned (Settings shows it, with Forget), any
+  other cup put down arms straight away: a shot without weighing needs no taps either. The
+  dosing cup put back after grinding, empty or with the grounds, is ignored. Coffee arriving
+  while the weighing is open means the cup went under the spout: it arms, and the recorder
+  starts at the first drops.
+- **Start.** Arming sends `06`, so a timer frozen by the last shot's `05` reads 0. A timer
+  that starts rising while armed is the scale's own button: the shot starts at t0 = receive
+  time − timer, status `ok`, first drip known, and nothing is sent. Pressed after the first
+  drops, it is spliced like a late tap. Not pressed at all: with Settings → "Start by itself
+  at the first drops" (default on) the shot starts at the first drops (`auto_start`, spliced
+  back to the onset, learned), else the "Shot running?" prompt asks. A START tapped within
+  2 s of a shot that started by itself is ignored (the button had just become STOP).
+- **End.** The flow stopping ends the shot after 3 s. Pressing the scale's timer again at
+  lever down ends it at that moment, which gives an exact end and drip tail.
+- **Cues** are scale beeps only (`02` "beep n"): speech and vibration are unreliable in
+  Bluefy. Settings → Beep cues turns them off.
+- **Rating.** The rate sheet opens with three big buttons: sour–bitter −2, 0 (with the
+  `balanced` chip) or +2, saved at once; the detailed form stays below. Left untouched for
+  2 minutes, the shot is saved unrated. Home → "Rate earlier shots" lists the bag's unrated
+  shots of the last 3 days with the same buttons, and recomputes the card after each.
+- **Manual buttons.** Every automatic step keeps its button (Weigh beans, Use, Ground, Arm,
+  START, STOP), and the controller follows them. The Shot screen's strip names the next thing
+  to do with your hands.
+
 ### iPhone (Bluefy)
 
 No iOS browser has Web Bluetooth except third-party WKWebView browsers. Install **Bluefy**
 (free), open the Pages URL **inside Bluefy** and bookmark it there. A Home Screen icon opens
-Safari, which has no Bluetooth. Keep the phone in hand during the shot (the link drops when
-the screen locks); try the keep-awake options on the Probe screen and record which works.
+Safari, which has no Bluetooth. Keep the screen on during the shot, phone in hand or on the
+counter (the link drops when the screen locks); try the keep-awake options on the Probe
+screen and record which works.
 Service workers are not expected to register in Bluefy; the app never depends on them.
 
 ### Windows (Chrome / Edge)
@@ -281,3 +325,7 @@ Run `docs/FIELD_TEST.md` on Windows Chrome, then on the iPhone in Bluefy. Open i
 - RPM calibration on the real grinder (`docs/FIELD_TEST.md` §RPM): the sign and size of k_r
   against the prior N(−0.015, 0.035²); whether the 12 slider steps per ln flow assumed by δ
   is plausible from matched-flow tastings; whether compensated moves hold flow within 7 %.
+- Hands-free (`docs/FIELD_TEST.md` §H): what the Themis timer button does (tare? restart or
+  resume? a second press stops?), whether `06` on arm zeroes a frozen timer, whether the
+  scale beeps on `02` and is heard over the pump, taps per shot, cup recognition, and the
+  pump-vibration lead before the first drops.
