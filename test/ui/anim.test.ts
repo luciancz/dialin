@@ -21,7 +21,9 @@ describe('3D animation math', () => {
     expect(streamRadiusMm(2)).toBeCloseTo(1.6, 6);
     expect(streamRadiusMm(4) / streamRadiusMm(1)).toBeCloseTo(2, 6);
     expect(streamRadiusMm(0.05)).toBeGreaterThanOrEqual(0.35);
-    expect(streamRadiusMm(50)).toBe(3.2);
+    expect(streamRadiusMm(50)).toBe(3.6);
+    // One stream from a bottomless basket carries the whole flow: √2 wider than each of two.
+    expect(streamRadiusMm(2, 1) / streamRadiusMm(2, 2)).toBeCloseTo(Math.SQRT2, 6);
   });
 
   it('the cup fills by volume and never overflows the model', () => {

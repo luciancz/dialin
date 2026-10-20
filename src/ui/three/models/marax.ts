@@ -2,8 +2,8 @@
  * Lelit Mara X V1 (PL62X, ≈ 220 × 410 × 355 mm), after Lelit's V1 manual (Pic 4): a brushed
  * steel box on four feet with a wire cup grate and the tank lid on top. On the front: the
  * chrome E61-style group with its cap, side fins and bayonet collar, the brew lever on the
- * group's right (hangs down at rest, lifts towards you), the 58 mm portafilter with a black
- * handle and a short double spout, six-lobed black knobs on valve bodies at the top corners
+ * group's right (hangs down at rest, lifts towards you), the owner's Normcore 58 mm
+ * all-stainless bottomless portafilter, six-lobed black knobs at the top corners
  * (steam left, hot water right) with their wands, the dual steam/pump gauge, two pilot
  * lights, the lit I/O button and the red LELIT badge. The 0/I/II rocker sits in the drip-tray
  * bay behind the tray with its rod grate.
@@ -32,6 +32,7 @@ import {
   contactShadow,
   cylinder,
   disc,
+  extrudeAcross,
   extrudeForward,
   filletShape,
   lathe,
@@ -41,12 +42,12 @@ import {
   roundedBox,
   tube,
 } from '../parts';
-import { dualGaugeFace, lelitBadge, maraxPanelPrint } from '../textures';
+import { basketHoles, dualGaugeFace, lelitBadge, maraxPanelPrint } from '../textures';
 
 export interface MaraxHandle {
   group: Group;
-  /** Spout outlets (two streams), machine coordinates. */
-  spouts: Vector3[];
+  /** Where the coffee leaves the portafilter (the bottomless basket's centre), machine coordinates. */
+  outlets: Vector3[];
   /** Drip tray grate height and the centre under the group (where the scale goes). */
   trayTop: number;
   underGroup: Vector3;
@@ -368,79 +369,91 @@ export function buildMarax(m: Mats): MaraxHandle {
   );
   g.add(lever);
 
-  // ---- Portafilter: ring and basket, ears, short double spout, black handle ----
+  // ---- Portafilter: the Normcore 58 mm all-stainless bottomless ("unibody", lay-flat):
+  // a 30 mm ring with a flat top lip and the E61 ears, open underneath on the recessed
+  // perforated basket; a thin neck plate at the base that steps up into a straight,
+  // squarish polished bar, its underside level with the ring's base ----
   const pf = new Group();
   pf.position.set(0, gy0, gz);
+  const rr = MARAX.pfRingR;
+  const ph = MARAX.pfH;
+  const bb = MARAX.basketBottomY - gy0;
+  // Profiles run bottom → top on the outside (as every lathe here) so the faces point out.
   pf.add(
     lathe(
       [
-        [0.01, -31],
-        [24, -30.5],
-        [31, -28],
-        [35, -22],
-        [36.5, -9],
-        [38, -6.5],
-        [41.5, -5.5],
-        [41.5, -1.2],
-        [41, 0],
-        [0.01, 0],
+        [30.2, bb],
+        [30.2, -ph + 0.8],
+        [31, -ph],
+        [rr - 2.2, -ph],
+        [rr - 1.4, -ph + 0.8],
+        [rr - 1.4, -6.5],
+        [rr, -5.2],
+        [rr, -0.8],
+        [rr - 0.8, 0],
+        [29.5, 0],
       ],
       m.chrome,
       0,
       0,
       0,
-      72,
+      96,
     ),
   );
-  for (const sx of [-1, 1]) pf.add(roundedBox(9, 4.5, 14, 1.5, m.chrome, sx * 43, -5, 0));
+  // A fine groove under the lip.
+  pf.add(mesh(new TorusGeometry(rr - 1.2, 0.5, 8, 96), m.void, 0, -5.8, 0).rotateX(Math.PI / 2));
+  const holesTex = keep(basketHoles());
+  const holesMat = keep(new MeshStandardMaterial({ map: holesTex, metalness: 1, roughness: 0.35 }));
+  const bottom = mesh(new CircleGeometry(30.2, 64), holesMat, 0, bb, 0);
+  bottom.rotation.x = Math.PI / 2;
+  pf.add(bottom);
+  // The ears: tabs at the top of the ring, left and right of the handle.
+  for (const sx of [-1, 1]) pf.add(roundedBox(9, 4.2, 17, 1.4, m.chrome, sx * (rr + 2.6), -5.4, 0));
+  // Handle in profile (z forward, y up, from the ring's base): the neck plate, the ramp, the bar.
+  const base = -ph;
+  const neck = extrudeAcross(
+    filletShape([
+      [rr - 8, base, 0],
+      [rr + 38, base, 1.5],
+      [rr + 38, base + 7.5, 1.5],
+      [rr - 8, base + 7.5, 0],
+    ]),
+    16,
+    m.chrome,
+    2,
+  );
+  pf.add(neck);
+  // The ramp from the neck up to the bar, then the bar: a soft rounded square, end cut flat.
   pf.add(
-    lathe(
-      [
-        [0.01, -43],
-        [10, -42],
-        [14, -36],
-        [15, -29],
-      ],
+    extrudeAcross(
+      filletShape([
+        [rr + 26, base, 1],
+        [rr + 50, base, 0],
+        [rr + 50, base + 20, 0],
+        [rr + 44, base + 19.6, 3],
+        [rr + 32, base + 7.5, 3],
+      ]),
+      19,
       m.chrome,
-      0,
-      0,
-      0,
-      40,
+      2,
     ),
   );
-  const spoutTipY = MARAX.spoutY - gy0;
-  const spouts: Vector3[] = [];
-  for (const sx of [-1, 1]) {
-    const o = mesh(new CylinderGeometry(3.4, 2.6, 8, 20), m.chrome, sx * 9.5, spoutTipY + 4, 0);
-    o.rotation.z = sx * 0.28;
-    pf.add(o);
-    spouts.push(new Vector3((sx * MARAX.spoutGap) / 2, MARAX.spoutY, gz));
-  }
-  const handle = new Group();
-  handle.position.set(0, -14, 40);
-  handle.rotation.x = 0.17;
-  handle.add(rodZ(8.5, 0, 24, 0, 0, m.chrome, 28, 10));
-  const grip = lathe(
-    [
-      [10.5, 0],
-      [11.5, 30],
-      [13.2, 78],
-      [12.8, 98],
-      [10, 108],
-      [5, 112],
-      [0.01, 113],
-    ],
-    m.resin,
-    0,
-    0,
-    0,
-    40,
+  const bar = extrudeForward(
+    filletShape([
+      [-10.5, 0, 7.5],
+      [10.5, 0, 7.5],
+      [10.5, 21, 7.5],
+      [-10.5, 21, 7.5],
+    ]),
+    rr + 46,
+    rr + 152,
+    m.chrome,
+    2.2,
   );
-  grip.rotation.x = Math.PI / 2;
-  grip.position.z = 22;
-  handle.add(grip);
-  pf.add(handle);
+  bar.position.y = base;
+  pf.add(bar);
   g.add(pf);
+  const outlets = [new Vector3(0, MARAX.basketBottomY, gz)];
 
   // ---- Dual gauge (steam over pump), left of the group ----
   const [gx, gyc] = MARAX.gauge;
@@ -535,7 +548,7 @@ export function buildMarax(m: Mats): MaraxHandle {
 
   return {
     group: g,
-    spouts,
+    outlets,
     trayTop: tTop,
     underGroup: new Vector3(0, tTop, gz),
     setLever(f) {

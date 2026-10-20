@@ -16,6 +16,11 @@
  *   (hangs down, lifts towards you), the lit round I/O button and the red LELIT badge under
  *   the gauge, the 0/I/II rocker in the drip-tray bay, a wire cup grate and the tank lid on
  *   top. Drip tray ≈ 210 deep (Lelit part 1000201); cup clearance ≈ 114 mm (SCG).
+ * - Portafilter: the owner's Normcore 58 mm All Stainless Steel Bottomless (unibody handle,
+ *   180° lay-flat base; ≈ 225 × 80 × 30 mm — Normcore's listing and product photos). The
+ *   handle is a straight polished bar, ≈ 21 mm square with rounded edges, its underside level
+ *   with the ring's base; a thin neck plate joins it to the ring. No spout: the coffee leaves
+ *   the basket's perforated bottom as one stream.
  * - Bookoo Themis Mini: a small square scale, modelled at 100 × 100 × 22 mm.
  */
 export const VS6 = {
@@ -76,9 +81,10 @@ export const MARAX = {
   gasketY: 205,
   capTopY: 330,
   collarR: 48,
-  /** Portafilter spout tips: ≈ 100 mm over the grate. */
-  spoutY: 159,
-  spoutGap: 22,
+  /** Normcore bottomless: the ring's radius and height, and where the basket bottom sits. */
+  pfRingR: 36.5,
+  pfH: 30,
+  basketBottomY: 178,
   /** Dual gauge (65 mm) and the corner valves (knob axes ≈ 15 mm in from the sides). */
   gaugeR: 32.5,
   gauge: [-60, 207] as const,

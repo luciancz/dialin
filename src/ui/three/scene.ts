@@ -158,7 +158,7 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
     scene.add(beans.mesh);
     disposers.push(beans.dispose);
   }
-  const streams = marax ? buildStreams(mats.stream) : null;
+  const streams = marax ? buildStreams(mats.stream, marax.outlets.length) : null;
   if (streams) {
     for (const m of streams.meshes) scene.add(m);
     disposers.push(streams.dispose);
@@ -255,7 +255,7 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
   let lastT = performance.now();
   let raf = 0;
   let disposed = false;
-  const spoutWorld = (marax?.spouts ?? []).map((p) => p.clone().add(maraxRoot.position));
+  const outletWorld = (marax?.outlets ?? []).map((p) => p.clone().add(maraxRoot.position));
   const chuteWorld = vs6 ? vs6.chuteExit.clone().add(vs6Root.position) : new Vector3();
   let lastScaleText = '';
 
@@ -295,7 +295,7 @@ export function mountScene(canvas: HTMLCanvasElement, o: SceneOptions): SceneHan
       cup.setGrams(s.cupG);
       const surface = cup.group.position.y + cup.surfaceY();
       const flow = o.reducedMotion ? 0 : s.running ? s.flowGps : 0;
-      if (streams.update(dtS, flow, spoutWorld, surface, tS)) active = true;
+      if (streams.update(dtS, flow, outletWorld, surface, tS)) active = true;
     }
     if (beans) beans.set(Math.max(0, s.scaleG ?? 0));
     if (vs6 && view === 'grind') {
