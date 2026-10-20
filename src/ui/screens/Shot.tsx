@@ -4,6 +4,7 @@
  */
 import { signal } from '@preact/signals';
 import { reportStall } from '../../app/calibration';
+import { handsFreeOn } from '../../app/handsFree';
 import { isDemo } from '../../app/mode';
 import { navigate } from '../../app/router';
 import {
@@ -23,6 +24,7 @@ import { doseNote, openWeigh, weighStep } from '../../shot/weigh';
 import { CurveChart } from '../charts/CurveChart';
 import { ConnectionPill } from '../components/ConnectionPill';
 import { DialPicker } from '../components/DialPicker';
+import { HandsFreeStrip } from '../components/HandsFreeStrip';
 import { ThreeView } from '../components/ThreeView';
 
 const rpmConfirmedThisSession = signal(false);
@@ -93,6 +95,7 @@ function PreShot() {
         <h1>Pre-shot</h1>
         <ConnectionPill />
       </div>
+      <HandsFreeStrip />
       {lastRec ? (
         <div class="card">
           <div class="small muted">Last recommendation: {lastRec.sentence}</div>
@@ -350,6 +353,7 @@ function WeighBeans() {
         <h1>Weigh beans</h1>
         <ConnectionPill />
       </div>
+      <HandsFreeStrip />
       <ThreeView view="weigh" height={250} />
       <div class={`card ${st.phase === 'captured' ? 'accent' : ''}`} style="text-align:center">
         <div class="big-number">{grams === null ? '—' : `${grams.toFixed(1)} g`}</div>
@@ -393,6 +397,7 @@ function Grind() {
         <h1>Grind</h1>
         <ConnectionPill />
       </div>
+      <HandsFreeStrip />
       <ThreeView view="grind" height={290} />
       <div class="card accent">
         <p>
@@ -454,6 +459,7 @@ function Armed() {
         <h1>Armed</h1>
         <ConnectionPill />
       </div>
+      <HandsFreeStrip />
       <ThreeView view="marax" height={280} />
       <div class="card accent" style="text-align:center">
         <div class="big-number">{w ? w.grams.toFixed(1) : '—'} g</div>
@@ -494,6 +500,11 @@ function Armed() {
       >
         START (lift the lever)
       </button>
+      {handsFreeOn() ? (
+        <p class="muted small">
+          The scale's timer button starts the shot as well; tap START only if you did not press it.
+        </p>
+      ) : null}
       <div class="row" style="margin-top:8px">
         <button type="button" onClick={() => app.dispatch({ type: 'disarm', now })}>
           Disarm
@@ -520,6 +531,7 @@ function Live() {
   if (d?.status === 'late_tap') status.push('late tap recovered');
   if (d?.status === 'no_tap_recovered') status.push('start estimated');
   if (d?.status === 'auto_start') status.push('started by itself at the first drops');
+  if (d?.startCmd === 'button' && d.status === 'ok') status.push("started by the scale's timer");
   if (d?.modeHint === 'auto') status.push('scale not in Timer mode');
   if (app.clientState.value === 'reconnecting') status.push('scale link lost');
   if (phase === 'SETTLING' || phase === 'ENDING') status.push('drip window…');
@@ -534,6 +546,7 @@ function Live() {
         </h1>
         <ConnectionPill />
       </div>
+      <HandsFreeStrip />
       <div class="card accent">
         <div class="row between">
           <div class="big-number">{g.toFixed(1)} g</div>

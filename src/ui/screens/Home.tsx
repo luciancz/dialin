@@ -116,7 +116,10 @@ export function Home() {
         New shot
       </a>
       <p class="muted small" style="margin-top:12px">
-        Scale in Timer mode, BOOKOO N closed. Tap START as you lift the lever.
+        Scale in Timer mode, BOOKOO N closed.{' '}
+        {s?.handsFree === false || s?.autoTare === false
+          ? 'Tap START as you lift the lever.'
+          : "Hands-free: put the dosing cup on the scale to begin, and press the scale's timer as you lift the lever."}
       </p>
       {isDemo() ? null : (
         <div class="card">
