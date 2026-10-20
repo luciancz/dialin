@@ -74,6 +74,7 @@ export async function rateEarlier(shot: Shot, taste: QuickTaste): Promise<void> 
   if (!repo || !settings) return;
   const at = nowIso();
   const prev = previousShot(app.shotsOfBag.value, shot);
+  // Seconds since the shot was saved (the pull itself was a little earlier).
   const row: Rating = {
     ...newMeta(settings.deviceId, newId(), at),
     shotId: shot.id,

@@ -139,8 +139,12 @@ export function Demo() {
             disabled={busy !== ''}
             onClick={() => void watchDemoShot()}
           >
-            Watch a shot: weigh, grind and pour in 3D
+            Watch a hands-free shot: weigh, grind and pour in 3D
           </button>
+          <p class="muted small">
+            Only the simulated scale is scripted (cups, beans, lever, its timer button); the app
+            moves itself on, as it would on the bench.
+          </p>
           <button
             type="button"
             disabled={busy !== ''}

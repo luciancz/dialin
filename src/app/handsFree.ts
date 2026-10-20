@@ -84,6 +84,8 @@ function run(a: HfAction, tRxMs: number): void {
         tailEstimateG: app.tailEstimate(),
         autoStart: s?.autoStartFallback !== false,
       });
+      // The pre-shot steps are done: after the shot the screen opens on the plan.
+      backToPlan();
       toShotScreen();
       return;
     }
