@@ -3,7 +3,8 @@
  * hardware tests describe (07 tares and starts, 04 starts from zero, 05 freezes, 06 zeroes
  * only when stopped, 08 smoothing, 03 auto-off), emits 20-byte frames at 100.7 ± 30 ms with
  * the timer 0.7 % slow, and takes scripted faults: disconnect at t = 12 s into a shot,
- * auto-off, and an Auto-mode persona that ignores 04/07 and emits 03 0D on FF12.
+ * auto-off, and an Auto-mode persona that ignores 04/07 and emits 03 0D on FF12. The timer
+ * button on the scale is pressTimerButton().
  */
 
 import { mulberry32, type Rng, uniform } from '../core/math/rng';
@@ -95,8 +96,9 @@ export class FakeTransport implements Transport {
   private lastWeightG = 0;
   private lastWeightAt = 0;
 
-  // Shot playback.
+  // Shot playback; `pouring` from startShot until stopShot (the lever is up).
   private playback: Playback | null = null;
+  private pouring = false;
   private playbackStartAt = 0;
   private playbackBaseG = 0;
   private autoModeStarted = false;
@@ -204,6 +206,7 @@ export class FakeTransport implements Transport {
   /** Begin delivering a shot curve into the cup, starting now. */
   startShot(playback: Playback): void {
     this.playback = playback;
+    this.pouring = true;
     this.playbackStartAt = this.clock.now();
     this.playbackBaseG = this.cupWeightG;
     this.autoModeStarted = false;
@@ -216,6 +219,7 @@ export class FakeTransport implements Transport {
     const w = this.currentPlaybackWeight();
     this.cupWeightG = w;
     this.playback = null;
+    this.pouring = false;
     if (tail && tail.g > 0) {
       const tau = Math.max(0.2, tail.s / 4);
       const t: number[] = [];
@@ -229,6 +233,31 @@ export class FakeTransport implements Transport {
       this.playbackStartAt = this.clock.now();
       this.playbackBaseG = w;
     }
+  }
+
+  /** A pour is running: started and neither stopped nor played to its end. */
+  get isPouring(): boolean {
+    const pb = this.playback;
+    if (!this.pouring || !pb) return false;
+    return (this.clock.now() - this.playbackStartAt) / 1000 < (pb.t[pb.t.length - 1] ?? 0);
+  }
+
+  /**
+   * The timer button on the scale (Timer mode): stops a running timer, else starts it from
+   * zero. No tare. Both are guesses until the field test (docs/FIELD_TEST.md).
+   */
+  pressTimerButton(): void {
+    if (this.persona.mode !== 'timer' || !this.connected) return;
+    const now = this.clock.now();
+    this.lastActivityAt = now;
+    if (this.timerRunning) {
+      this.timerFrozenMs = this.timerMs(now);
+      this.timerRunning = false;
+      return;
+    }
+    this.timerFrozenMs = 0;
+    this.timerRunning = true;
+    this.timerStartedAt = now;
   }
 
   forceDisconnect(reason = 'forced'): void {

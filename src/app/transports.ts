@@ -47,6 +47,30 @@ export interface MadeTransport {
 // Starts at a random value so the first simulated shot after a reload is not always the same one.
 let simShotCounter = Math.floor(Math.random() * 1_000_000);
 
+/** Lever up on the simulated machine: a random shot at the simulated flow pours into the cup. */
+export function startSimPour(fake: FakeTransport, sim: SimOptions): void {
+  simShotCounter += 1;
+  const rng = mulberry32(sim.seed * 1000 + simShotCounter);
+  const channel = rng() < sim.channelProbability;
+  const spec = randomSpec(
+    rng,
+    (sim.plateauGpsFn?.() ?? sim.plateauGps) * Math.exp(uniform(rng, -0.05, 0.05)),
+    sim.stopAtG + 15,
+    { channel },
+  );
+  const curve = synthCurve(spec, rng, 100, 8);
+  fake.startShot({ t: curve.t, g: curve.g });
+  diag.log(
+    'info',
+    `[sim] shot ${simShotCounter}: plateau ${spec.plateauGps.toFixed(2)} g/s${channel ? ', channeling' : ''}`,
+  );
+}
+
+/** Lever down: the pour stops and the last drops follow. */
+export function stopSimPour(fake: FakeTransport): void {
+  fake.stopShot({ g: 1.0 + 0.6 * Math.random(), s: 4.5 });
+}
+
 export function makeTransport(
   kind: TransportKind,
   opts: { sim?: SimOptions; replayRows?: RawFrameRow[]; replaySpeed?: number } = {},
@@ -64,32 +88,16 @@ export function makeTransport(
     const fake = new FakeTransport({ clock: realClock, seed: sim.seed, persona });
     // The simulated scale starts empty, so putting a cup on it is a visible placement (auto-tare).
     fake.setCupWeight(0);
-    // Self-driving: a start command "lifts the lever" and the simulated shot begins to pour.
+    // Self-driving: a start command "lifts the lever" and the simulated shot begins to pour;
+    // the stop command is also the lever coming down (pour ends, drips follow). A pour that
+    // is already running (lever up, the scale's timer pressed) is left alone.
     fake.onCommand((bytes) => {
       const cmd = bytes[2];
       if (cmd === Cmd.stop) {
-        // In the simulator the stop tap is also the lever coming down: pour ends, drips follow.
-        fake.stopShot({ g: 1.0 + 0.6 * Math.random(), s: 4.5 });
+        if (fake.isPouring) stopSimPour(fake);
         return;
       }
-      if (cmd !== Cmd.tareStart && cmd !== Cmd.start) return;
-      simShotCounter += 1;
-      const rng = mulberry32(sim.seed * 1000 + simShotCounter);
-      const channel = rng() < sim.channelProbability;
-      const spec = randomSpec(
-        rng,
-        (sim.plateauGpsFn?.() ?? sim.plateauGps) * Math.exp(uniform(rng, -0.05, 0.05)),
-        sim.stopAtG + 15,
-        {
-          channel,
-        },
-      );
-      const curve = synthCurve(spec, rng, 100, 8);
-      fake.startShot({ t: curve.t, g: curve.g });
-      diag.log(
-        'info',
-        `[sim] shot ${simShotCounter}: plateau ${spec.plateauGps.toFixed(2)} g/s${channel ? ', channeling' : ''}`,
-      );
+      if ((cmd === Cmd.tareStart || cmd === Cmd.start) && !fake.isPouring) startSimPour(fake, sim);
     });
     const recorder = new RecorderTransport(fake, { now: () => realClock.now() });
     return { transport: recorder, recorder, fake };

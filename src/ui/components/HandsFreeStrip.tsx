@@ -58,13 +58,13 @@ function nextAction(step: StripStep): { title: string; detail: string } {
       const at = d ? Math.max(0, d.targetYieldG - d.tailEstimateG) : ns.targetYieldG;
       return {
         title: `Lever down at 3 beeps (${at.toFixed(1)} g).`,
-        detail: 'The shot ends by itself when the flow stops.',
+        detail: "It ends by itself when the flow stops (the scale's timer ends it exactly).",
       };
     }
     case 'rate':
       return {
         title: 'Taste it, then one tap: sour, balanced or bitter.',
-        detail: 'Untouched for 2 minutes it is saved unrated, to rate later on Home.',
+        detail: 'The detailed form is below the curve.',
       };
     default:
       return { title: '', detail: '' };
