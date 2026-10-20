@@ -5,6 +5,8 @@
  *   ν = y − H m;  S = H P Hᵀ + σ_y²/w0;  r = ν/√S
  *   (r1, r2) = (2, 4) for ν < 0, (1.5, 3) for ν > 0   — channeling only makes shots faster
  *   w = w0 · {1 | r1/|r| | 0 → skip}
+ * A believed shot keeps w = w0, never down-weighted or skipped: the user confirmed it, or it ran
+ * slow and tasted bitter, so the palate agrees with the scale and a repeat would only waste coffee.
  *   R = σ_y²/w;  K = P Hᵀ/(H P Hᵀ + R);  m += Kν;  P = (I−KH)P(I−KH)ᵀ + K R Kᵀ
  */
 import { add, identity, matMul, outer, scale, sub, symmetrize, transpose } from '../math/linalg';
@@ -26,6 +28,10 @@ export interface Observation {
   w0: number;
   at: string;
   storageEvents?: StorageEventKind[];
+  /** The user said the shot was real: never skipped as an outlier. */
+  confirmed?: boolean;
+  /** Rated bitter: a slow outlier is believed. */
+  tastedBitter?: boolean;
 }
 
 export interface UpdateResult {
@@ -99,7 +105,8 @@ export function update(s: FlowModelState, obs: Observation): UpdateResult {
   if (!anchorShot) {
     const [r1, r2] = nu < 0 ? MODEL.huberNeg : MODEL.huberPos;
     const ar = Math.abs(r);
-    if (ar > r2) {
+    const believed = obs.confirmed === true || (nu < 0 && obs.tastedBitter === true);
+    if (ar > r2 && !believed) {
       b.consecutiveSkips += 1;
       s.lastOutlier = { bagId: obs.bagId, r, shotId: obs.shotId };
       if (b.consecutiveSkips >= MODEL.reanchorSkips) {
@@ -114,7 +121,7 @@ export function update(s: FlowModelState, obs: Observation): UpdateResult {
       }
       return { accepted: false, r, w: 0, innovation: nu, reanchored, anchorShot: false };
     }
-    if (ar > r1) w = w0 * (r1 / ar);
+    if (ar > r1 && !believed) w = w0 * (r1 / ar);
   }
   const R = sigma2 / w;
   const denom = hPh + R;

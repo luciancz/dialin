@@ -1,5 +1,7 @@
 import { declineOffer, startRun } from '../../app/calibration';
+import { type LastShotMark, markLastShot } from '../../app/recommender';
 import { navigate } from '../../app/router';
+import { app } from '../../app/state';
 import type { Recommendation } from '../../core/types';
 import { formatDial } from '../../core/units';
 
@@ -32,6 +34,52 @@ function combinedMove(rec: Recommendation): string | null {
         ? ' (RPM covers the flow change)'
         : '';
   return `RPM ${from} → ${to} · ${dial}${why}`;
+}
+
+/**
+ * What the card lets the user correct about the bag's last shot: channeling it blamed (puck
+ * prep, or the prep line a calibration card adds) or an outlier it wants repeated. The texts
+ * come from src/core/rules/explain.ts.
+ */
+function correction(
+  rec: Recommendation,
+): { mark: LastShotMark; label: string; hint: string } | null {
+  const last = app.shotsOfBag.value[app.shotsOfBag.value.length - 1];
+  if (!last || rec.afterShotId !== last.id) return null;
+  if (rec.lever === 'prep' || rec.sentence.includes('looked channelled'))
+    return {
+      mark: 'notChannelled',
+      label: 'No channeling',
+      hint: 'Only too slow or too fast? The card is recomputed from the shot as it ran.',
+    };
+  if (rec.lever === 'none' && rec.sentence.includes('off the model'))
+    return {
+      mark: 'confirmed',
+      label: 'It was real',
+      hint: 'Nothing odd about that shot? The card is recomputed from it, no repeat.',
+    };
+  return null;
+}
+
+function CorrectionRow({ rec }: { rec: Recommendation }) {
+  const c = correction(rec);
+  if (!c) return null;
+  return (
+    <div class="row" style="align-items:center;gap:8px;margin-bottom:8px">
+      <button
+        type="button"
+        class="small"
+        onClick={() =>
+          void markLastShot(c.mark).then((r) => {
+            if (r) app.toast('info', 'Noted; the card was recomputed.');
+          })
+        }
+      >
+        {c.label}
+      </button>
+      <span class="muted small">{c.hint}</span>
+    </div>
+  );
 }
 
 export function RecommendationCard({ rec }: { rec: Recommendation | null }) {
@@ -75,6 +123,7 @@ export function RecommendationCard({ rec }: { rec: Recommendation | null }) {
       </div>
       {move ? <p class="small">{move}</p> : null}
       <p>{rec.sentence}</p>
+      <CorrectionRow rec={rec} />
       {rec.guidance && rec.guidance.length > 0 ? (
         <ul class="small warn">
           {rec.guidance.map((g) => (

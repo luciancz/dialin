@@ -91,10 +91,28 @@ export interface ReplayResult {
   prefByBean: Map<Id, RpmPreference>;
 }
 
-export function channelFlagOf(f: Features, r: Rating | null): boolean {
+/**
+ * The curve alone says channeling (score at or above `min`). Channeling only makes a puck run
+ * faster: on a slow start (first drip after 15 s, or choked at 15 s) the jumpy flow of the
+ * first drops, the dips and the late rise are the tight puck opening up, so they do not count
+ * and the grind moves first.
+ */
+export function curveChannelled(f: Features, min = 0.5): boolean {
+  return (
+    f.curveChannelScore >= min && !f.flags.includes('late_drip') && !f.flags.includes('choked')
+  );
+}
+
+/** Channeling signs on a shot: the curve or the chips, unless the user said it did not channel. */
+export function channelFlagOf(
+  f: Features,
+  r: Rating | null,
+  q: ShotQuality | null = null,
+): boolean {
+  if (q?.notChannelled) return false;
   const chips = r?.chips ?? [];
   return (
-    f.curveChannelScore >= 0.5 ||
+    curveChannelled(f) ||
     chips.includes('channelled') ||
     (chips.includes('astringent') && chips.includes('harsh'))
   );
@@ -185,7 +203,7 @@ export function replay(input: ReplayInput): ReplayResult {
       const lines = toLines(shot.settings.grind.dialPos, epoch.dialSpec);
       const y = f.plateauFlow !== null && f.plateauFlow > 0 ? Math.log(f.plateauFlow) : null;
       const learn = (quality ? quality.learn : f.valid) && y !== null;
-      const channelFlag = channelFlagOf(f, rating);
+      const channelFlag = channelFlagOf(f, rating, quality);
       const prevCount = learnableCountByBag.get(bag.id) ?? 0;
       const age = Math.max(0, (Date.parse(shot.at) - Date.parse(bag.roastDate)) / 86_400_000);
       let entry = bagsOut.get(bag.id);
@@ -221,7 +239,9 @@ export function replay(input: ReplayInput): ReplayResult {
           freshnessGate: age < freshnessGateDays(bean.roastLevel),
           lowInfo: f.flags.includes('low_info'),
           earlyChannel:
-            f.curveChannelScore >= MODEL.earlyChannelScore && prevCount < MODEL.earlyChannelShots,
+            curveChannelled(f, MODEL.earlyChannelScore) &&
+            !quality?.notChannelled &&
+            prevCount < MODEL.earlyChannelShots,
         });
         const events = bag.storage
           .filter(
@@ -241,6 +261,8 @@ export function replay(input: ReplayInput): ReplayResult {
           w0,
           at: shot.at,
           storageEvents: events,
+          confirmed: quality?.confirmed === true,
+          tastedBitter: (rating?.sourBitter ?? 0) >= 1,
         });
         r = res.r;
         w = res.accepted ? res.w : 0;

@@ -25,6 +25,8 @@ export interface RuleShot {
   y: number | null;
   learn: boolean;
   channelFlag: boolean;
+  /** The user said this shot did not channel (overrides the chips too). */
+  notChannelled?: boolean;
   predictedY: number | null;
   skipped: boolean;
   r: number | null;
@@ -104,6 +106,7 @@ export function evaluateRules(f: RuleFacts): { decision: RuleDecision; whyNot: s
   // 1. Channeling on the last shot.
   const channelled =
     last !== null &&
+    !last.notChannelled &&
     (last.channelFlag ||
       chips.includes('channelled') ||
       (chips.includes('astringent') && chips.includes('harsh')));

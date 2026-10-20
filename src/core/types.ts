@@ -228,6 +228,10 @@ export interface ShotQuality extends Meta {
   status: ShotStatus;
   learn: boolean;
   userOverride?: boolean;
+  /** The user said the shot did not channel: its channeling signs are ignored. */
+  notChannelled?: true;
+  /** The user said the shot was real, far off the model or not: it is never skipped. */
+  confirmed?: true;
   notes: string[];
 }
 
