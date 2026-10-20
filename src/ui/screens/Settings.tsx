@@ -363,6 +363,18 @@ export function Settings() {
       </div>
 
       <div class="card">
+        <h3>Hands-free</h3>
+        <label class="row" style="align-items:center;gap:8px">
+          <input
+            type="checkbox"
+            checked={s?.beepCues !== false}
+            onChange={(e) => void app.saveSettings({ beepCues: e.currentTarget.checked })}
+          />
+          Beep cues on the scale: 1 cup tared, 2 dose taken, 1 armed, 3 at the pre-alert
+        </label>
+      </div>
+
+      <div class="card">
         <h3>Grinder & machine</h3>
         <RpmRangeSettings />
         <label class="row" style="align-items:center;gap:8px">

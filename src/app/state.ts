@@ -46,6 +46,7 @@ import {
   timerDriftPct,
 } from '../shot/machine';
 import { RingBuffer } from '../shot/ringBuffer';
+import { type Cue, playCue } from './cues';
 import { DEMO_DB_NAME, isDemo } from './mode';
 import {
   defaultSimOptions,
@@ -393,6 +394,11 @@ class AppState {
       .catch((err) => diag.log('warn', `auto-tare failed: ${String(err)}`));
   }
 
+  /** Beep a cue on the scale (Settings → beep cues). */
+  cue(c: Cue): void {
+    if (this.client) playCue(c, this.settings.value, (bytes) => this.sendCommand(bytes));
+  }
+
   /** Tare now (the weighing step's button, or when auto-tare is off). */
   async tareNow(): Promise<void> {
     if (!this.client) return;
@@ -428,13 +434,7 @@ class AppState {
       case 'prompt':
         return; // the Shot screen renders the prompt from recorder.prompt
       case 'pre_alert':
-        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-          try {
-            navigator.vibrate?.(80);
-          } catch {
-            /* ignore */
-          }
-        }
+        this.cue('pre_alert');
         return;
       case 'shot_running':
         this.client?.setShotRunning(e.running);

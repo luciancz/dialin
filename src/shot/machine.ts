@@ -709,8 +709,8 @@ function onFrame(
         }
         if (!d.alertFired && g >= d.targetYieldG - d.tailEstimateG) {
           d.alertFired = true;
+          // The app beeps the scale for it (src/app/cues.ts).
           effects.push({ type: 'pre_alert' });
-          effects.push({ type: 'send', cmd: 'beep', n: 1 });
         }
         let end = false;
         if (g >= d.targetYieldG + REC.autoEndOvershootG) end = true;
