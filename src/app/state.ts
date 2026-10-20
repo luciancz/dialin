@@ -543,6 +543,10 @@ class AppState {
         appVersion: APP_VERSION,
         ...(settings.scaleFirmware ? { scaleFirmware: settings.scaleFirmware } : {}),
         ...(weighed ? { doseWeighed: weighed } : {}),
+        // Hands-free start: when the pump vibration showed up on the scale, relative to t0.
+        ...(pending.draft.pumpLeadMs !== null
+          ? { sensors: { pumpOnAtMs: -pending.draft.pumpLeadMs } }
+          : {}),
       },
       features: pending.features,
       endedBy: pending.draft.endedBy ?? 'tap',

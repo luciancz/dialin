@@ -526,6 +526,7 @@ function Live() {
   if (phase === 'RECOVERING') status.push('reconnecting… recording blind');
   if (d?.status === 'late_tap') status.push('late tap recovered');
   if (d?.status === 'no_tap_recovered') status.push('start estimated');
+  if (d?.status === 'auto_start') status.push('started by itself at the first drops');
   if (d?.modeHint === 'auto') status.push('scale not in Timer mode');
   if (app.clientState.value === 'reconnecting') status.push('scale link lost');
   if (phase === 'SETTLING' || phase === 'ENDING') status.push('drip window…');

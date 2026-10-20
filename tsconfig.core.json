@@ -11,6 +11,7 @@
     "src/shot/machine.ts",
     "src/shot/ringBuffer.ts",
     "src/shot/autoTare.ts",
-    "src/shot/weigh.ts"
+    "src/shot/weigh.ts",
+    "src/shot/handsFree.ts"
   ]
 }
