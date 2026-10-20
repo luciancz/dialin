@@ -278,7 +278,7 @@ function startShot(
     d.modeHint = 'timer';
     d.anchorOffsetS = -button.baseMs / 1000;
     const med = ring.medianBetween(from, startMs);
-    d.preTapMedianG = Number.isNaN(med) ? 0 : med;
+    d.preTapMedianG = Number.isNaN(med) ? (ring.last()?.grams ?? 0) : med;
     d.tareDecided = Math.abs(d.preTapMedianG) <= REC.tareSettleG;
     d.notes.push('started by the scale timer button');
   } else if (!late) {

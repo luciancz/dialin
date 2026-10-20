@@ -363,6 +363,8 @@ export async function watchDemoShot(): Promise<void> {
     // An empty scale and a fresh cycle.
     demoBusy.value = 'clearing the scale…';
     fake.setCupWeight(0);
+    if (app.recorder.value.phase === 'ARMED')
+      app.dispatch({ type: 'disarm', now: realClock.now() });
     backToPlan();
     handsFree.value = initHandsFree(realClock.now());
     await sleep(1500);
