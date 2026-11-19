@@ -1,0 +1,157 @@
+[
+ {
+  "id": "20527558",
+  "scores": {
+   "appliances": 3,
+   "fixtures": 4,
+   "furnishings": 4,
+   "condition": 4,
+   "light_layout": 6,
+   "space": 3,
+   "outdoor_level": 3,
+   "epc_street": 7
+  },
+  "note": "Dated pine kitchen with old white oven, coil hob and no dishwasher; tired carpets and magnolia decor; tight 789 sq ft, EPC C.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "8135404",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 7,
+   "furnishings": 5,
+   "condition": 7,
+   "light_layout": 6,
+   "space": 3,
+   "outdoor_level": 7,
+   "epc_street": 5
+  },
+  "note": "Marble-tiled bathrooms and private patio onto communal gardens, but dated cream kitchen, garden-level flat, tight 859 sq ft; EPC C.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "19383395",
+  "scores": {
+   "appliances": 8,
+   "fixtures": 8,
+   "furnishings": null,
+   "condition": 8,
+   "light_layout": 7,
+   "space": 5,
+   "outdoor_level": 5,
+   "epc_street": 5
+  },
+  "note": "Fresh refurb: range cooker, American fridge, wine fridge, marble bathrooms, crittall en-suite, oak floors; 1098 sq ft, communal garden.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": null
+ },
+ {
+  "id": "20381215",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 6,
+   "furnishings": null,
+   "condition": 5,
+   "light_layout": 6,
+   "space": 5,
+   "outdoor_level": 6,
+   "epc_street": 7
+  },
+  "note": "Handleless white kitchen, mosaic bathrooms, but worn seagrass flooring and 1970s block; private brick balcony, EPC C, quiet street.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": null
+ },
+ {
+  "id": "20694304",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 5,
+   "furnishings": 5,
+   "condition": 6,
+   "light_layout": 6,
+   "space": 5,
+   "outdoor_level": 6,
+   "epc_street": 4
+  },
+  "note": "Dated oak shaker kitchen with stainless oven and gas hob, plain white-tiled bathrooms, laminate floors; balcony, modern block on Warwick Rd.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "20752748",
+  "scores": {
+   "appliances": 3,
+   "fixtures": 4,
+   "furnishings": 3,
+   "condition": 4,
+   "light_layout": 4,
+   "space": 4,
+   "outdoor_level": 4,
+   "epc_street": 3
+  },
+  "note": "Freestanding fridge and washer, no dishwasher, busy wallpaper, cheap divan beds, small rooms; EPC D on busy Edgware Road.",
+  "flags": [],
+  "furnished": null,
+  "sqft": null
+ },
+ {
+  "id": "20697099",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 6,
+   "furnishings": 6,
+   "condition": 7,
+   "light_layout": 6,
+   "space": 8,
+   "outdoor_level": 5,
+   "epc_street": 7
+  },
+  "note": "Gloss white kitchen with integrated Samsung oven and induction hob, modern tiled bathrooms, wood floors; 1463 sq ft stated, lift, EPC C.",
+  "flags": [
+   "Few photos"
+  ],
+  "furnished": "Furnished or unfurnished",
+  "sqft": null
+ },
+ {
+  "id": "20738073",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 5,
+   "furnishings": null,
+   "condition": 6,
+   "light_layout": 7,
+   "space": 6,
+   "outdoor_level": 4,
+   "epc_street": 6
+  },
+  "note": "Freshly painted and carpeted, wide windows and 22 ft reception, but plain white kitchen and basic beige bathrooms; 3rd floor portered block.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": null
+ },
+ {
+  "id": "19832423",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 4,
+   "furnishings": null,
+   "condition": 5,
+   "light_layout": 7,
+   "space": 6,
+   "outdoor_level": 3,
+   "epc_street": 5
+  },
+  "note": "Dated beech kitchen with freestanding white dishwasher and washer, basic bathrooms, grey carpet; bright with shutters, upper maisonette.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": null
+ }
+]

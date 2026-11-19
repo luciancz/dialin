@@ -1,0 +1,19 @@
+{
+  "origin": {"name": "Imperial College London, South Kensington", "lat": 51.4988, "lon": -0.1749},
+  "max_walk_min": 40,
+  "prefilter_km": 3.4,
+  "beds": 3,
+  "min_baths": 2,
+  "target_pcm": 4000,
+  "band": [3700, 4300],
+  "outer_band": [3400, 4600],
+  "areas": ["sw7","sw3","sw5","sw10","sw1","w8","w14","w2","w11","sw6","sw11","w6","w10","w9","w1","w12","sw8"],
+  "discount": {
+    "large_agent": 0.015, "independent_agent": 0.03, "direct_landlord": 0.05,
+    "stale_over_14_days": 0.01, "reduced": 0.015, "offers_invited": 0.01, "fresh_under_7_days": -0.01,
+    "cap": 0.08
+  },
+  "large_agents": ["foxtons","savills","knight frank","hamptons","chestertons","dexters","kinleigh","kfh","winkworth","marsh & parsons","marsh and parsons","jll","strutt","carter jonas","douglas & gordon","john d wood","berkshire hathaway","harrods","cbre","greystar","get living","quintain","native","essential living"],
+  "niceness_weights": {"appliances": 15, "fixtures": 15, "furnishings": 10, "condition": 15, "light_layout": 15, "space": 15, "outdoor_level": 10, "epc_street": 5},
+  "overall_weights": {"niceness": 0.5, "value": 0.5}
+}

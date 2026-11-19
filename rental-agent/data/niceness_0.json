@@ -1,0 +1,165 @@
+[
+ {
+  "id": "20676133",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 7,
+   "furnishings": null,
+   "condition": 8,
+   "light_layout": 6,
+   "space": 3,
+   "outdoor_level": 5,
+   "epc_street": 5
+  },
+  "note": "Brand-new refurb: grey gloss kitchen with integrated ovens, new tiled bathrooms, oak-effect floors; only 844 sq ft on Fulham Road.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": 844
+ },
+ {
+  "id": "16712090",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 5,
+   "furnishings": 6,
+   "condition": 6,
+   "light_layout": 5,
+   "space": 2,
+   "outdoor_level": 6,
+   "epc_street": 6
+  },
+  "note": "Tidy furnished maisonette with private patio and EPC C, but older wood kitchen, freestanding washer and tiny 703 sq ft rooms.",
+  "flags": [
+   "Bathrooms not shown"
+  ],
+  "furnished": "Furnished",
+  "sqft": 703
+ },
+ {
+  "id": "20676238",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 5,
+   "furnishings": 3,
+   "condition": 5,
+   "light_layout": 6,
+   "space": 4,
+   "outdoor_level": 5,
+   "epc_street": 4
+  },
+  "note": "Dated beech kitchen with freestanding white goods, sparse basic furniture, one new marble shower room; above shops on Kings Road.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "3061176",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 4,
+   "furnishings": 4,
+   "condition": 5,
+   "light_layout": 6,
+   "space": 5,
+   "outdoor_level": 5,
+   "epc_street": 6
+  },
+  "note": "Dated 2000s oak kitchen and beige tiled bathrooms, tired furniture; 5th floor with lift and porter, EPC B, busy main road.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": 1023
+ },
+ {
+  "id": "20322268",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 6,
+   "furnishings": 5,
+   "condition": 6,
+   "light_layout": 6,
+   "space": 6,
+   "outdoor_level": 4,
+   "epc_street": 4
+  },
+  "note": "Cream gloss integrated kitchen and plain modern bathrooms, top-floor dormer rooms; AI-staged photos, no outdoor, busy road.",
+  "flags": [
+   "CGI or staged photos",
+   "Few photos"
+  ],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "19788374",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 6,
+   "furnishings": null,
+   "condition": 7,
+   "light_layout": 8,
+   "space": 7,
+   "outdoor_level": 7,
+   "epc_street": 5
+  },
+  "note": "Bay-windowed reception with roof terrace and balcony, 1237 sq ft, newly decorated; narrow galley kitchen, dark tiled baths, EPC D.",
+  "flags": [
+   "CGI or staged photos"
+  ],
+  "furnished": "Unfurnished",
+  "sqft": 1237
+ },
+ {
+  "id": "20745785",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 5,
+   "furnishings": 4,
+   "condition": 5,
+   "light_layout": 6,
+   "space": 6,
+   "outdoor_level": 5,
+   "epc_street": 6
+  },
+  "note": "White gloss kitchen with freestanding fridge, washer and dishwasher, plain tiled bathrooms, cluttered tenant furniture; EPC C, lift.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "20491665",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 4,
+   "furnishings": 4,
+   "condition": 4,
+   "light_layout": 8,
+   "space": 6,
+   "outdoor_level": 8,
+   "epc_street": 3
+  },
+  "note": "Grand high-ceilinged reception with arched windows and large terrace, but dated orange-wood kitchen, tired furniture and EPC E.",
+  "flags": [
+   "Bathrooms not shown",
+   "Few photos"
+  ],
+  "furnished": "Part furnished",
+  "sqft": 1125
+ },
+ {
+  "id": "20474559",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 3,
+   "furnishings": 3,
+   "condition": 4,
+   "light_layout": 6,
+   "space": 7,
+   "outdoor_level": 3,
+   "epc_street": 5
+  },
+  "note": "Dated white kitchen with freestanding oven, old marble-tiled bathroom, pink carpet and bare divans; 1291 sq ft third-floor walk-up.",
+  "flags": [],
+  "furnished": "Part furnished",
+  "sqft": null
+ }
+]

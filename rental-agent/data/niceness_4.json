@@ -1,0 +1,160 @@
+[
+ {
+  "id": "17711101",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 6,
+   "furnishings": 6,
+   "condition": 7,
+   "light_layout": 5,
+   "space": 3,
+   "outdoor_level": 4,
+   "epc_street": 5
+  },
+  "note": "Recently refurbished lower-ground flat with gloss grey kitchen, island hob and skylit reception, but only 796 sq ft and a tiny third bedroom.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": 796
+ },
+ {
+  "id": "20679155",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 4,
+   "furnishings": 3,
+   "condition": 6,
+   "light_layout": 6,
+   "space": 5,
+   "outdoor_level": 4,
+   "epc_street": 4
+  },
+  "note": "Freshly painted mansion flat with new carpet and bay window, but basic kitchen with freestanding white goods, dated bathroom tiling, on busy Fulham Road.",
+  "flags": [],
+  "furnished": "Part furnished",
+  "sqft": null
+ },
+ {
+  "id": "20528734",
+  "scores": {
+   "appliances": 3,
+   "fixtures": 3,
+   "furnishings": 4,
+   "condition": 4,
+   "light_layout": 5,
+   "space": 5,
+   "outdoor_level": 6,
+   "epc_street": 5
+  },
+  "note": "Dated oak-effect kitchen with freestanding washer and magnolia walls; fifth floor with lift and porter, EPC B, but on busy Vauxhall Bridge Road.",
+  "flags": [
+   "Bathrooms not shown",
+   "Few photos"
+  ],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "20293962",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 7,
+   "furnishings": null,
+   "condition": 8,
+   "light_layout": 7,
+   "space": 4,
+   "outdoor_level": 6,
+   "epc_street": 5
+  },
+  "note": "Crisp all-white maisonette with integrated kitchen, tiled floors, wall-hung vanity and small terrace; 946 sq ft over three floors on a busy road, EPC C.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": 946
+ },
+ {
+  "id": "20524641",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 7,
+   "furnishings": 5,
+   "condition": 6,
+   "light_layout": 6,
+   "space": 5,
+   "outdoor_level": 4,
+   "epc_street": 6
+  },
+  "note": "Shaker kitchen with granite worktops and built-in ovens, travertine bathroom with double vanity; cluttered tenant furnishings, no outdoor space shown.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "20745757",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 5,
+   "furnishings": 4,
+   "condition": 6,
+   "light_layout": 6,
+   "space": 2,
+   "outdoor_level": 5,
+   "epc_street": 5
+  },
+  "note": "Tidy white gloss kitchen with gas hob and wood floors, plain modern bathrooms, but only 721 sq ft for three bedrooms; lift and porter, EPC C.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "20624737",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 5,
+   "furnishings": 5,
+   "condition": 5,
+   "light_layout": 7,
+   "space": 5,
+   "outdoor_level": 8,
+   "epc_street": 7
+  },
+  "note": "Bright sixth-floor flat with long balcony, concierge and built-in steel oven, but early-2000s beech doors, dated bathrooms and a narrow galley kitchen.",
+  "flags": [
+   "Text describes a 2-bed"
+  ],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "11695728",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 6,
+   "furnishings": null,
+   "condition": 7,
+   "light_layout": 7,
+   "space": 6,
+   "outdoor_level": 6,
+   "epc_street": 7
+  },
+  "note": "Characterful period maisonette with shutters, roll-top bath, painted shaker kitchen and decked roof terrace; top floor without lift, EPC C.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": null
+ },
+ {
+  "id": "20636302",
+  "scores": {
+   "appliances": 3,
+   "fixtures": 4,
+   "furnishings": 5,
+   "condition": 5,
+   "light_layout": 6,
+   "space": 5,
+   "outdoor_level": 4,
+   "epc_street": 5
+  },
+  "note": "Ex-local-authority style block with budget gloss kitchen, freestanding fridge and washer, marble-effect tiled bathrooms and staged short-let furniture.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ }
+]

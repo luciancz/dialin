@@ -1,0 +1,225 @@
+<title>Imperial Flat Hunt</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: map and ranked list side by side on wide screens (map sticky), stacked on phones. */
+:root {
+  --bg: #f5f6fa; --surface: #ffffff; --ink: #141a2e; --muted: #5d6680; --line: #dfe3ee;
+  --accent: #2743c9; --accent-soft: #e6eaff; --good: #0f7a4d; --warn: #a45a00;
+  --s0: #c9d2f7; --s1: #8fa0ee; --s2: #5a70e0; --s3: #2743c9; --s4: #14238a;
+  --map-filter: none;
+  --display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1220; --surface: #181c2e; --ink: #e9ecf8; --muted: #9aa3bf; --line: #2a3050;
+  --accent: #8ea0ff; --accent-soft: #232a52; --good: #5fd3a0; --warn: #f0b060;
+  --map-filter: invert(1) hue-rotate(180deg) brightness(.9) contrast(.9); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1220; --surface: #181c2e; --ink: #e9ecf8; --muted: #9aa3bf; --line: #2a3050;
+  --accent: #8ea0ff; --accent-soft: #232a52; --good: #5fd3a0; --warn: #f0b060;
+  --map-filter: invert(1) hue-rotate(180deg) brightness(.9) contrast(.9); color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 18px; }
+h1 { font-family: var(--display); font-size: 26px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
+h2 { font-family: var(--display); font-size: 17px; font-weight: 600; margin: 0; }
+.sub { color: var(--muted); margin: 4px 0 0; max-width: 70ch; }
+.funnel { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.funnel b { color: var(--ink); font-weight: 600; }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.mapcol { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 900px) { .mapcol { position: static; } }
+.map { position: relative; aspect-ratio: 1; max-width: 100%; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); touch-action: none; cursor: grab; }
+.map.drag { cursor: grabbing; }
+.world { position: absolute; inset: 0; transform-origin: 0 0; }
+.world img { width: 100%; height: 100%; display: block; filter: var(--map-filter); user-select: none; -webkit-user-drag: none; }
+.world svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ring { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 8 6; opacity: .55; vector-effect: non-scaling-stroke; }
+.pin { position: absolute; transform: translate(-50%, -50%) scale(var(--inv, 1)); width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ffffff; color: #fff; font: 600 11px/20px var(--body); text-align: center; padding: 0; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.45); }
+.pin.out { background: #ffffff !important; color: #141a2e; border: 2px dashed #141a2e; }
+.pin.sel { outline: 3px solid var(--ink); outline-offset: 2px; z-index: 5; }
+.pin:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.campus { position: absolute; transform: translate(-50%, -50%) scale(var(--inv, 1)); background: var(--ink); color: var(--bg); font: 600 11px/1 var(--body); padding: 5px 7px; border-radius: 3px; white-space: nowrap; pointer-events: none; }
+.zoom { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.zoom button { width: 32px; height: 32px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 4px; font-size: 18px; cursor: pointer; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; color: var(--muted); font-size: 12px; }
+.legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -2px; margin-right: 4px; }
+.legend .hollow { background: #ffffff; border: 2px dashed #141a2e; box-sizing: border-box; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.controls label { color: var(--muted); font-size: 12px; display: flex; gap: 8px; align-items: center; }
+select, input[type=range] { font: inherit; color: var(--ink); accent-color: var(--accent); }
+select { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; }
+.list { display: flex; flex-direction: column; }
+.card { display: grid; grid-template-columns: 30px 108px minmax(0, 1fr); gap: 12px; padding: 14px 6px; border-bottom: 1px solid var(--line); scroll-margin-top: 80px; }
+.card.sel { background: var(--accent-soft); }
+.rank { font: 600 15px var(--display); color: var(--muted); padding-top: 2px; text-align: right; font-variant-numeric: tabular-nums; }
+.card img { width: 108px; height: 72px; object-fit: cover; border-radius: 4px; background: var(--line); }
+.body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.addr { font-weight: 600; font-size: 14px; color: var(--ink); text-decoration: none; }
+.addr:hover { text-decoration: underline; }
+.facts { display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.facts b { color: var(--ink); font-weight: 600; }
+.scores { display: flex; flex-wrap: wrap; gap: 6px 14px; font-variant-numeric: tabular-nums; font-size: 13px; }
+.sc { display: flex; align-items: center; gap: 6px; }
+.sc i { display: block; width: 54px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.sc i u { display: block; height: 100%; background: var(--accent); }
+.sc.ov b { font: 600 15px var(--display); }
+.badges { display: flex; flex-wrap: wrap; gap: 5px; }
+.badge { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); }
+.badge.neg { color: var(--warn); border-color: var(--warn); }
+.badge.new { color: var(--good); border-color: var(--good); }
+.note { margin: 0; color: var(--ink); font-size: 13px; }
+details.more summary { cursor: pointer; color: var(--accent); font-size: 12px; }
+.crit { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px 16px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.crit .sc { justify-content: space-between; }
+details.outside > summary { cursor: pointer; padding: 14px 0; font: 600 17px var(--display); }
+details.outside > summary span { font: 400 13px var(--body); color: var(--muted); margin-left: 8px; }
+.method { color: var(--muted); font-size: 13px; max-width: 75ch; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 16px; }
+.method p { margin: 0; }
+@media (max-width: 480px) { .card { grid-template-columns: 22px 84px minmax(0, 1fr); gap: 9px; } .card img { width: 84px; height: 56px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Imperial Flat Hunt</h1>
+    <p class="sub" id="sub"></p>
+  </header>
+  <div class="funnel" id="funnel"></div>
+  <div class="cols">
+    <div class="mapcol">
+      <div class="map" id="map">
+        <div class="world" id="world">
+          <img src="basemap.jpg" alt="Street map of west and central London around Imperial College" draggable="false">
+          <svg id="ringsvg" aria-hidden="true"></svg>
+          <div id="pins"></div>
+        </div>
+        <div class="zoom"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">&minus;</button></div>
+      </div>
+      <div class="legend">
+        <span>Overall score:</span>
+        <span><span class="sw" style="background:var(--s0)"></span>under 40</span>
+        <span><span class="sw" style="background:var(--s1)"></span>40s</span>
+        <span><span class="sw" style="background:var(--s2)"></span>50s</span>
+        <span><span class="sw" style="background:var(--s3)"></span>60s</span>
+        <span><span class="sw" style="background:var(--s4)"></span>70+</span>
+        <span><span class="sw hollow"></span>just outside budget</span>
+        <span>Dashed ring: 3.2 km, the furthest a 40 min walk can reach. Pin numbers are ranks.</span>
+      </div>
+      <div class="legend">Map data &copy; OpenStreetMap contributors</div>
+    </div>
+    <div>
+      <div class="controls">
+        <h2>In budget</h2>
+        <label for="sort">Sort by
+          <select id="sort">
+            <option value="overall">Overall</option><option value="niceness">Niceness</option><option value="value">Value</option>
+            <option value="expected">Expected rent</option><option value="walk_min">Walking time</option>
+          </select>
+        </label>
+        <label for="mix">Niceness <input type="range" id="mix" min="0" max="100" step="10" value="50"> Value <span id="mixv"></span></label>
+      </div>
+      <div class="list" id="main"></div>
+      <details class="outside" id="outwrap"><summary>Just outside budget <span id="outcount"></span></summary><div class="list" id="outside"></div></details>
+    </div>
+  </div>
+  <div class="method">
+    <h2>How the numbers are worked out</h2>
+    <p><b>Source.</b> OnTheMarket only for this run. OpenRent showed a human-verification puzzle to the automated browser, so no OpenRent listings are included. Rightmove and Zoopla were not searched.</p>
+    <p><b>Walking time.</b> Routed on-foot distance to the South Kensington campus at 4.8 km/h. Listing pins are placed where the agent placed them, which can be the street, not the door.</p>
+    <p><b>Expected rent.</b> Asking rent less an assumed negotiation discount: 1.5% for large agents, 3% for independents, plus 1% if listed over two weeks, 1.5% if already reduced, 1% if offers are invited, minus 1% if new this week, capped at 8%. These are assumptions, not measured outcomes.</p>
+    <p><b>Niceness.</b> A model reviewed each listing's photos and description against eight weighted criteria: appliances 15, fixtures and fittings 15, furnishings 10, condition 15, light and layout 15, space 15, outdoor space and floor level 10, EPC and street 5. Furnishings is left out for unfurnished flats. Photos were reviewed at thumbnail size, so appliance brands are often not legible.</p>
+    <p><b>Value.</b> <span id="valmethod"></span> 50 means priced as expected, higher means cheaper than expected.</p>
+  </div>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+const BM = /*BASEMAP*/null;
+const L = DATA.listings, O = DATA.config.origin;
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const gbp = n => '£' + Number(n).toLocaleString('en-GB');
+const CRIT = {appliances:'Appliances', fixtures:'Fixtures and fittings', furnishings:'Furnishings', condition:'Condition', light_layout:'Light and layout', space:'Space', outdoor_level:'Outdoor and floor level', epc_street:'EPC and street'};
+function proj(lat, lon) {
+  const n = 2 ** BM.z, x = (lon + 180) / 360 * n, y = (1 - Math.asinh(Math.tan(lat * Math.PI / 180)) / Math.PI) / 2 * n;
+  return [(x - BM.x0) * 256 / BM.w * 100, (y - BM.y0) * 256 / BM.h * 100];
+}
+function shade(s) { return 'var(--s' + (s >= 70 ? 4 : s >= 60 ? 3 : s >= 50 ? 2 : s >= 40 ? 1 : 0) + ')'; }
+let mix = 50, sortKey = 'overall', selected = null;
+function overall(c) { return Math.round((mix * c.value + (100 - mix) * c.niceness) / 100); }
+function bar(label, v, cls) { return `<span class="sc ${cls || ''}">${label} <i><u style="width:${v}%"></u></i> <b>${v}</b></span>`; }
+function card(c, rank) {
+  const badges = [];
+  if (c.negotiable_only) badges.push('<span class="badge neg">In budget only if negotiated</span>');
+  if (/today|yesterday|< 7 days/i.test(c.added || '')) badges.push('<span class="badge new">New this week</span>');
+  if (/reduced/i.test(c.added || '')) badges.push('<span class="badge">Price reduced</span>');
+  if (c.furnished) badges.push(`<span class="badge">${esc(c.furnished)}</span>`);
+  (c.flags || []).forEach(f => badges.push(`<span class="badge">${esc(f)}</span>`));
+  const crit = Object.keys(CRIT).map(k => { const v = c.scores[k]; return `<span class="sc"><span>${CRIT[k]}</span><b>${v == null ? 'n/a' : v + '/10'}</b></span>`; }).join('');
+  const area = c.sqft ? `<span><b>${c.sqft.toLocaleString('en-GB')}</b> sq ft${c.sqft_est ? ' (est.)' : ''} · £${c.ppsf}/sq ft/yr</span>` : '<span>size not stated</span>';
+  return `<article class="card${selected === c.id ? ' sel' : ''}" id="c${c.id}" data-id="${c.id}">
+    <div class="rank">${rank}</div>
+    <img src="thumbs/${c.id}.jpg" alt="" loading="lazy">
+    <div class="body">
+      <a class="addr" href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.address)}</a>
+      <div class="facts"><span><b>${gbp(c.price)}</b> asking</span><span><b>${gbp(c.expected)}</b> expected (−${(c.discount * 100).toFixed(1)}%)</span><span><b>${Math.round(c.walk_min)}</b> min walk</span><span>3 bed · ${c.baths} bath</span>${area}</div>
+      <div class="scores">${bar('Overall', overall(c), 'ov')}${bar('Niceness', c.niceness)}${bar('Value', c.value)}</div>
+      ${badges.length ? `<div class="badges">${badges.join('')}</div>` : ''}
+      <p class="note">${esc(c.note)}</p>
+      <details class="more"><summary>Score breakdown</summary><div class="crit">${crit}</div>
+        <div class="crit"><span>${esc(c.agent)} · ${esc(c.added || '')}</span><span>Discount basis: ${esc((c.discount_why || []).join(', '))}</span><span>Model-expected rent for this flat: ${gbp(c.predicted)}</span></div></details>
+    </div></article>`;
+}
+function render() {
+  const key = c => sortKey === 'overall' ? -overall(c) : (sortKey === 'expected' || sortKey === 'walk_min') ? c[sortKey] : -c[sortKey];
+  const sorted = [...L].sort((a, b) => key(a) - key(b));
+  const main = sorted.filter(c => c.tier === 'main'), out = sorted.filter(c => c.tier !== 'main');
+  const ranks = {}; main.forEach((c, i) => ranks[c.id] = i + 1); out.forEach((c, i) => ranks[c.id] = String.fromCharCode(97 + i % 26) + (i >= 26 ? Math.floor(i / 26) : ''));
+  $('main').innerHTML = main.map(c => card(c, ranks[c.id])).join('') || '<p class="sub">No listings in budget today.</p>';
+  $('outside').innerHTML = out.map(c => card(c, ranks[c.id])).join('');
+  $('outcount').textContent = out.length + ' listings asking £3,400–£3,700 or £4,300–£4,600';
+  $('mixv').textContent = (100 - mix) + ' / ' + mix;
+  $('pins').innerHTML = `<div class="campus" style="left:${proj(O.lat, O.lon)[0]}%;top:${proj(O.lat, O.lon)[1]}%">Imperial</div>` +
+    [...out, ...main].reverse().reverse().map(c => { const [x, y] = proj(c.lat, c.lon);
+      return `<button type="button" class="pin${c.tier === 'main' ? '' : ' out'}${selected === c.id ? ' sel' : ''}" data-id="${c.id}" style="left:${x}%;top:${y}%;background:${shade(overall(c))};${c.tier === 'main' && overall(c) < 50 ? 'color:#141a2e' : ''}" aria-label="${esc(c.address)}, overall ${overall(c)}">${ranks[c.id]}</button>`; }).join('');
+}
+function select(id, scroll) {
+  selected = id; const c = L.find(x => x.id === id);
+  if (c && c.tier !== 'main') $('outwrap').open = true;
+  render();
+  if (scroll) { const el = $('c' + id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+}
+$('pins').addEventListener('click', e => { const b = e.target.closest('.pin'); if (b && !moved) select(b.dataset.id, true); });
+document.addEventListener('click', e => { const a = e.target.closest('.card'); if (a && !e.target.closest('a,summary')) { select(a.dataset.id, false); focusPin(a.dataset.id); } });
+$('sort').addEventListener('change', e => { sortKey = e.target.value; render(); });
+$('mix').addEventListener('input', e => { mix = +e.target.value; render(); });
+
+// pan and zoom
+let k = 1, tx = 0, ty = 0, moved = false; const map = $('map'), world = $('world');
+function apply() { const s = map.clientWidth; tx = Math.min(0, Math.max(s - s * k, tx)); ty = Math.min(0, Math.max(s - s * k, ty)); world.style.transform = `translate(${tx}px,${ty}px) scale(${k})`; world.style.setProperty('--inv', 1 / k); }
+function zoomAt(f, cx, cy) { const nk = Math.min(6, Math.max(1, k * f)); tx = cx - (cx - tx) * nk / k; ty = cy - (cy - ty) * nk / k; k = nk; apply(); }
+function focusPin(id) { const c = L.find(x => x.id === id), [x, y] = proj(c.lat, c.lon), s = map.clientWidth; if (k < 2) k = 2; tx = s / 2 - x / 100 * s * k; ty = s / 2 - y / 100 * s * k; apply(); }
+$('zin').onclick = () => zoomAt(1.5, map.clientWidth / 2, map.clientWidth / 2);
+$('zout').onclick = () => zoomAt(1 / 1.5, map.clientWidth / 2, map.clientWidth / 2);
+map.addEventListener('wheel', e => { e.preventDefault(); const r = map.getBoundingClientRect(); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+const pts = new Map(); let pinch = 0;
+map.addEventListener('pointerdown', e => { if (e.target.closest('.zoom')) return; pts.set(e.pointerId, e); moved = false; map.classList.add('drag'); });
+window.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return; const p = pts.get(e.pointerId);
+  if (pts.size === 1) { const dx = e.clientX - p.clientX, dy = e.clientY - p.clientY; if (Math.abs(dx) + Math.abs(dy) > 3) moved = true; tx += dx; ty += dy; apply(); }
+  pts.set(e.pointerId, e);
+  if (pts.size === 2) { const [a, b] = [...pts.values()], d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), r = map.getBoundingClientRect(); if (pinch) zoomAt(d / pinch, (a.clientX + b.clientX) / 2 - r.left, (a.clientY + b.clientY) / 2 - r.top); pinch = d; moved = true; } });
+const up = e => { pts.delete(e.pointerId); pinch = 0; map.classList.remove('drag'); setTimeout(() => moved = false, 0); };
+window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up); window.addEventListener('resize', apply);
+
+// header, funnel, ring
+const st = DATA.stats, nMain = L.filter(c => c.tier === 'main').length;
+$('sub').textContent = `Three-bed, two-bath-or-more long lets within a 40 minute walk of Imperial College, South Kensington, around £4,000 a month. Run of ${new Date(DATA.run_date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.`;
+$('funnel').innerHTML = `<span><b>${st.crawled.toLocaleString('en-GB')}</b> three-beds seen</span><span><b>${st.in_price}</b> asking £3,400–£4,600</span><span><b>${st.baths_ok}</b> with 2+ baths</span><span><b>${st.walk_ok}</b> within 40 min walk</span><span><b>${L.length}</b> scored after removing short lets and duplicates</span><span><b>${nMain}</b> in budget</span>`;
+$('valmethod').textContent = DATA.value_method === 'model'
+  ? `A regression across these ${L.length} listings predicts rent from walking time, niceness, bathrooms and floor area (median size assumed where not stated). The score compares expected rent with that prediction.`
+  : `Too few listings for a model, so the score compares expected rent with the median of these ${L.length} listings.`;
+(function () { const [cx, cy] = proj(O.lat, O.lon), [ , y2] = proj(O.lat + 3.2 / 111.2, O.lon), r = Math.abs(cy - y2);
+  $('ringsvg').setAttribute('viewBox', '0 0 100 100'); $('ringsvg').innerHTML = `<circle class="ring" cx="${cx}" cy="${cy}" r="${r}"/>`; })();
+render(); apply();
+</script>
