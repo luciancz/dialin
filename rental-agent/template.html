@@ -125,7 +125,7 @@ details.outside > summary span { font: 400 13px var(--body); color: var(--muted)
   </div>
   <div class="method">
     <h2>How the numbers are worked out</h2>
-    <p><b>Source.</b> OnTheMarket only for this run. OpenRent showed a human-verification puzzle to the automated browser, so no OpenRent listings are included. Rightmove and Zoopla were not searched.</p>
+    <p><b>Sources.</b> OnTheMarket and Rightmove. The same flat on both sites is shown once. OpenRent and Zoopla both block automated visits, so their listings are not included.</p>
     <p><b>Walking time.</b> Routed on-foot distance to the South Kensington campus at 4.8 km/h. Listing pins are placed where the agent placed them, which can be the street, not the door.</p>
     <p><b>Expected rent.</b> Asking rent less an assumed negotiation discount: 1.5% for large agents, 3% for independents, plus 1% if listed over two weeks, 1.5% if already reduced, 1% if offers are invited, minus 1% if new this week, capped at 8%. These are assumptions, not measured outcomes.</p>
     <p><b>Niceness.</b> A model reviewed each listing's photos and description against eight weighted criteria: appliances 15, fixtures and fittings 15, furnishings 10, condition 15, light and layout 15, space 15, outdoor space and floor level 10, EPC and street 5. Furnishings is left out for unfurnished flats. Photos were reviewed at thumbnail size, so appliance brands are often not legible.</p>
@@ -168,7 +168,7 @@ function card(c, rank) {
       ${badges.length ? `<div class="badges">${badges.join('')}</div>` : ''}
       <p class="note">${esc(c.note)}</p>
       <details class="more"><summary>Score breakdown</summary><div class="crit">${crit}</div>
-        <div class="crit"><span>${esc(c.agent)} · ${esc(c.added || '')}</span><span>Discount basis: ${esc((c.discount_why || []).join(', '))}</span><span>Model-expected rent for this flat: ${gbp(c.predicted)}</span></div></details>
+        <div class="crit"><span>${esc(c.source)} · ${esc(c.agent)} · ${esc(c.added || '')}</span><span>Discount basis: ${esc((c.discount_why || []).join(', '))}</span><span>Model-expected rent for this flat: ${gbp(c.predicted)}</span></div></details>
     </div></article>`;
 }
 function render() {
@@ -215,7 +215,7 @@ window.addEventListener('pointerup', up); window.addEventListener('pointercancel
 // header, funnel, ring
 const st = DATA.stats, nMain = L.filter(c => c.tier === 'main').length;
 $('sub').textContent = `Three-bed, two-bath-or-more long lets within a 40 minute walk of Imperial College, South Kensington, around £4,000 a month. Run of ${new Date(DATA.run_date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.`;
-$('funnel').innerHTML = `<span><b>${st.crawled.toLocaleString('en-GB')}</b> three-beds seen</span><span><b>${st.in_price}</b> asking £3,400–£4,600</span><span><b>${st.baths_ok}</b> with 2+ baths</span><span><b>${st.walk_ok}</b> within 40 min walk</span><span><b>${L.length}</b> scored after removing short lets and duplicates</span><span><b>${nMain}</b> in budget</span>`;
+$('funnel').innerHTML = `<span><b>${st.crawled.toLocaleString('en-GB')}</b> three-beds seen on OnTheMarket</span><span><b>${st.walk_ok}</b> passed price, bath and walk filters</span><span><b>${st.rightmove.crawled}</b> more checked on Rightmove</span><span><b>${st.rightmove.dup_other_portal}</b> of those already found</span><span><b>${L.filter(c => c.source === 'Rightmove').length}</b> new from Rightmove</span><span><b>${L.length}</b> scored after removing short lets and duplicates</span><span><b>${nMain}</b> in budget</span>`;
 $('valmethod').textContent = DATA.value_method === 'model'
   ? `A regression across these ${L.length} listings predicts rent from walking time, niceness, bathrooms and floor area (median size assumed where not stated). The score compares expected rent with that prediction.`
   : `Too few listings for a model, so the score compares expected rent with the median of these ${L.length} listings.`;

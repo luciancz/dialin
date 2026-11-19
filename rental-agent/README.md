@@ -6,6 +6,7 @@ Finds 3-bed, 2+ bath long lets within a 40 minute walk of Imperial College (Sout
 
 ```
 python3 crawl.py        # crawl OnTheMarket, filter, route walking distance, fetch details -> data/candidates.json
+python3 crawl_rm.py     # add Rightmove listings (deduplicated against the above)
 python3 sheets.py       # download photos -> data/sheets/<id>.jpg contact sheets, site/thumbs/
 #  niceness review: a model reads each contact sheet + data/review/<id>.txt and writes data/niceness_*.json
 python3 score.py        # expected rent, value model, ranking -> data/listings.json
@@ -17,7 +18,7 @@ Criteria, price bands, negotiation discounts and niceness weights live in `confi
 
 ## Notes
 
-- Network hosts needed: www.onthemarket.com, media.onthemarket.com, routing.openstreetmap.de, tile.openstreetmap.org.
+- Network hosts needed: www.onthemarket.com, media.onthemarket.com, www.rightmove.co.uk, media.rightmove.co.uk, routing.openstreetmap.de, tile.openstreetmap.org.
 - OnTheMarket's robots.txt disallows filter parameters, so the crawler pages through postcode-district URLs and filters locally, at about one request a second.
-- OpenRent is not included: it serves a CAPTCHA to automated browsers.
+- OpenRent and Zoopla are not included: both serve bot challenges to automated clients.
 - Walking time is routed distance at 4.8 km/h.

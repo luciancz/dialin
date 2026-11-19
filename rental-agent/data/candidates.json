@@ -70,7 +70,8 @@
    "South Kensington Underground",
    "Gloucester Road Underground"
   ],
-  "postcode": "SW3 6SH"
+  "postcode": "SW3 6SH",
+  "source": "OnTheMarket"
  },
  {
   "id": "13736704",
@@ -132,7 +133,14 @@
    "Gloucester Road Underground",
    "High Street Kensington Underground"
   ],
-  "postcode": "SW7 4BE"
+  "postcode": "SW7 4BE",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Russell Simpson, Chelsea - Lettings",
+    "url": "https://www.rightmove.co.uk/properties/94394436"
+   }
+  ]
  },
  {
   "id": "3172165",
@@ -188,7 +196,14 @@
    "Gloucester Road Underground",
    "High Street Kensington Underground"
   ],
-  "postcode": "SW7 4HS"
+  "postcode": "SW7 4HS",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Winkworth, South Kensington - Lettings",
+    "url": "https://www.rightmove.co.uk/properties/95340666"
+   }
+  ]
  },
  {
   "id": "20527558",
@@ -252,7 +267,14 @@
    "Gloucester Road Underground",
    "High Street Kensington Underground"
   ],
-  "postcode": "SW7 4HJ"
+  "postcode": "SW7 4HJ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Foxtons, South Kensington",
+    "url": "https://www.rightmove.co.uk/properties/94214079"
+   }
+  ]
  },
  {
   "id": "17711101",
@@ -316,7 +338,14 @@
    "Gloucester Road Underground",
    "South Kensington Underground"
   ],
-  "postcode": "SW7 5JP"
+  "postcode": "SW7 5JP",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Draker KFH, Sloane Square",
+    "url": "https://www.rightmove.co.uk/properties/166010483"
+   }
+  ]
  },
  {
   "id": "16712090",
@@ -383,7 +412,14 @@
    "South Kensington Underground",
    "Sloane Square Underground"
   ],
-  "postcode": "SW3 5SA"
+  "postcode": "SW3 5SA",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "eXp UK, London",
+    "url": "https://www.rightmove.co.uk/properties/95490675"
+   }
+  ]
  },
  {
   "id": "20734060",
@@ -439,7 +475,14 @@
    "Earl's Court Underground",
    "West Brompton"
   ],
-  "postcode": "SW5 9HN"
+  "postcode": "SW5 9HN",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Marsh & Parsons, Earls Court",
+    "url": "https://www.rightmove.co.uk/properties/95340777"
+   }
+  ]
  },
  {
   "id": "20727954",
@@ -495,7 +538,14 @@
    "Earl's Court Underground",
    "Gloucester Road Underground"
   ],
-  "postcode": "SW5 0SE"
+  "postcode": "SW5 0SE",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Dexters, Earls Court",
+    "url": "https://www.rightmove.co.uk/properties/95313267"
+   }
+  ]
  },
  {
   "id": "8135404",
@@ -554,7 +604,14 @@
    "Earl's Court Underground",
    "West Kensington Underground"
   ],
-  "postcode": "SW5 9EZ"
+  "postcode": "SW5 9EZ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "tlc Estate Agents, Chelsea",
+    "url": "https://www.rightmove.co.uk/properties/93406929"
+   }
+  ]
  },
  {
   "id": "20679155",
@@ -612,7 +669,14 @@
    "Fulham Broadway Underground",
    "Imperial Wharf"
   ],
-  "postcode": "SW10 9UY"
+  "postcode": "SW10 9UY",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Emoov, Chelmsford",
+    "url": "https://www.rightmove.co.uk/properties/95045295"
+   }
+  ]
  },
  {
   "id": "20676238",
@@ -682,7 +746,14 @@
    "Imperial Wharf",
    "Fulham Broadway Underground"
   ],
-  "postcode": "SW10 0BN"
+  "postcode": "SW10 0BN",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Foxtons, Sloane Square",
+    "url": "https://www.rightmove.co.uk/properties/95030166"
+   }
+  ]
  },
  {
   "id": "20584504",
@@ -746,7 +817,18 @@
    "Imperial Wharf",
    "Fulham Broadway Underground"
   ],
-  "postcode": "SW10 0LB"
+  "postcode": "SW10 0LB",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Chestertons, Chelsea",
+    "url": "https://www.rightmove.co.uk/properties/94482042"
+   },
+   {
+    "agent": "Martin & Co, Chelsea Riverside",
+    "url": "https://www.rightmove.co.uk/properties/93924414"
+   }
+  ]
  },
  {
   "id": "8267652",
@@ -813,7 +895,14 @@
    "Imperial Wharf",
    "Fulham Broadway Underground"
   ],
-  "postcode": "SW10 0TP"
+  "postcode": "SW10 0TP",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "gLocalAgents.co.uk, Covering Nationwide",
+    "url": "https://www.rightmove.co.uk/properties/91044408"
+   }
+  ]
  },
  {
   "id": "19383395",
@@ -875,7 +964,8 @@
    "Imperial Wharf",
    "Fulham Broadway Underground"
   ],
-  "postcode": "SW10 0PB"
+  "postcode": "SW10 0PB",
+  "source": "OnTheMarket"
  },
  {
   "id": "20528734",
@@ -933,7 +1023,18 @@
    "Victoria Underground",
    "London Victoria"
   ],
-  "postcode": "SW1V 1AA"
+  "postcode": "SW1V 1AA",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Marsh & Parsons, Pimlico & Westminster",
+    "url": "https://www.rightmove.co.uk/properties/94224765"
+   },
+   {
+    "agent": "Chestertons, Westminster & Pimlico",
+    "url": "https://www.rightmove.co.uk/properties/93421803"
+   }
+  ]
  },
  {
   "id": "3061176",
@@ -995,7 +1096,8 @@
    "Victoria Underground",
    "London Victoria"
   ],
-  "postcode": "SW1V 1AA"
+  "postcode": "SW1V 1AA",
+  "source": "OnTheMarket"
  },
  {
   "id": "20775836",
@@ -1067,7 +1169,14 @@
    "High Street Kensington Underground",
    "Earl's Court Underground"
   ],
-  "postcode": "W8 6AB"
+  "postcode": "W8 6AB",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "OpenRent, London",
+    "url": "https://www.rightmove.co.uk/properties/95587881"
+   }
+  ]
  },
  {
   "id": "16373021",
@@ -1126,7 +1235,14 @@
    "High Street Kensington Underground",
    "Earl's Court Underground"
   ],
-  "postcode": "W8 6UJ"
+  "postcode": "W8 6UJ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Tate Residential Ltd, London",
+    "url": "https://www.rightmove.co.uk/properties/94248156"
+   }
+  ]
  },
  {
   "id": "20381215",
@@ -1190,7 +1306,14 @@
    "Notting Hill Gate Underground",
    "Holland Park Underground"
   ],
-  "postcode": "W8 7PW"
+  "postcode": "W8 7PW",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Foxtons, Notting Hill",
+    "url": "https://www.rightmove.co.uk/properties/93397950"
+   }
+  ]
  },
  {
   "id": "20293962",
@@ -1249,7 +1372,14 @@
    "Notting Hill Gate Underground",
    "Holland Park Underground"
   ],
-  "postcode": "W11 3LB"
+  "postcode": "W11 3LB",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Dexters, Notting Hill",
+    "url": "https://www.rightmove.co.uk/properties/92909142"
+   }
+  ]
  },
  {
   "id": "20322268",
@@ -1310,7 +1440,14 @@
    "Kensington (Olympia)",
    "Kensington (Olympia) Underground"
   ],
-  "postcode": "W14 8UZ"
+  "postcode": "W14 8UZ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Willmotts, London",
+    "url": "https://www.rightmove.co.uk/properties/93060894"
+   }
+  ]
  },
  {
   "id": "20744595",
@@ -1379,7 +1516,14 @@
    "Kensington (Olympia)",
    "Kensington (Olympia) Underground"
   ],
-  "postcode": "W14 8QN"
+  "postcode": "W14 8QN",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Broadway & West, London",
+    "url": "https://www.rightmove.co.uk/properties/95402865"
+   }
+  ]
  },
  {
   "id": "20711036",
@@ -1430,7 +1574,8 @@
    "Barons Court Underground",
    "West Kensington Underground"
   ],
-  "postcode": "W14 9AX"
+  "postcode": "W14 9AX",
+  "source": "OnTheMarket"
  },
  {
   "id": "20694304",
@@ -1490,7 +1635,14 @@
    "West Kensington Underground",
    "Kensington (Olympia)"
   ],
-  "postcode": "W14 8TW"
+  "postcode": "W14 8TW",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Foxtons, Earls Court",
+    "url": "https://www.rightmove.co.uk/properties/95412021"
+   }
+  ]
  },
  {
   "id": "20524641",
@@ -1539,7 +1691,8 @@
    "Barons Court Underground",
    "West Kensington Underground"
   ],
-  "postcode": "W14 0ST"
+  "postcode": "W14 0ST",
+  "source": "OnTheMarket"
  },
  {
   "id": "19788374",
@@ -1609,7 +1762,14 @@
    "West Kensington Underground",
    "Barons Court Underground"
   ],
-  "postcode": "W14 8UJ"
+  "postcode": "W14 8UJ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Hamptons, Kensington",
+    "url": "https://www.rightmove.co.uk/properties/93113592"
+   }
+  ]
  },
  {
   "id": "20190646",
@@ -1666,7 +1826,14 @@
    "Kensington (Olympia) Underground",
    "Kensington (Olympia)"
   ],
-  "postcode": "W14 0PR"
+  "postcode": "W14 0PR",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Marsh & Parsons, Brook Green",
+    "url": "https://www.rightmove.co.uk/properties/92295204"
+   }
+  ]
  },
  {
   "id": "17562870",
@@ -1717,7 +1884,8 @@
    "Kensington (Olympia)",
    "West Kensington Underground"
   ],
-  "postcode": "W14 8XW"
+  "postcode": "W14 8XW",
+  "source": "OnTheMarket"
  },
  {
   "id": "20752748",
@@ -1770,7 +1938,8 @@
    "Edgware Road (Circle Line) Underground",
    "Marble Arch Underground"
   ],
-  "postcode": "W2 2QX"
+  "postcode": "W2 2QX",
+  "source": "OnTheMarket"
  },
  {
   "id": "20745757",
@@ -1831,7 +2000,14 @@
    "Edgware Road (Circle Line) Underground",
    "Edgware Road (Bakerloo) Underground"
   ],
-  "postcode": "W2 1EU"
+  "postcode": "W2 1EU",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Newington estates, London",
+    "url": "https://www.rightmove.co.uk/properties/95408889"
+   }
+  ]
  },
  {
   "id": "20745785",
@@ -1893,7 +2069,18 @@
    "Marble Arch Underground",
    "Edgware Road (Circle Line) Underground"
   ],
-  "postcode": "W2 2BW"
+  "postcode": "W2 2BW",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Newington estates, London",
+    "url": "https://www.rightmove.co.uk/properties/95151453"
+   },
+   {
+    "agent": "Newington estates, London",
+    "url": "https://www.rightmove.co.uk/properties/95409054"
+   }
+  ]
  },
  {
   "id": "20385861",
@@ -1953,7 +2140,14 @@
    "Edgware Road (Circle Line) Underground",
    "Marble Arch Underground"
   ],
-  "postcode": "W2 2RB"
+  "postcode": "W2 2RB",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Dexters, Hyde Park & Bayswater",
+    "url": "https://www.rightmove.co.uk/properties/93428025"
+   }
+  ]
  },
  {
   "id": "20640392",
@@ -1999,7 +2193,14 @@
    "Queensway Underground",
    "Bayswater Underground"
   ],
-  "postcode": "W2 4RQ"
+  "postcode": "W2 4RQ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Druce, Notting Hill",
+    "url": "https://www.rightmove.co.uk/properties/94821567"
+   }
+  ]
  },
  {
   "id": "20697099",
@@ -2060,7 +2261,8 @@
    "Marble Arch Underground",
    "Edgware Road (Circle Line) Underground"
   ],
-  "postcode": "W2 2BZ"
+  "postcode": "W2 2BZ",
+  "source": "OnTheMarket"
  },
  {
   "id": "20624737",
@@ -2124,7 +2326,14 @@
    "Paddington (H&C Line)-Underground",
    "London Paddington"
   ],
-  "postcode": "W2 6DQ"
+  "postcode": "W2 6DQ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Foxtons, Marylebone",
+    "url": "https://www.rightmove.co.uk/properties/94722159"
+   }
+  ]
  },
  {
   "id": "20491665",
@@ -2182,7 +2391,14 @@
    "Paddington Underground",
    "Paddington"
   ],
-  "postcode": "W2 3UN"
+  "postcode": "W2 3UN",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Dexters, Hyde Park & Bayswater",
+    "url": "https://www.rightmove.co.uk/properties/94015998"
+   }
+  ]
  },
  {
   "id": "20383816",
@@ -2241,7 +2457,14 @@
    "Edgware Road (Circle Line) Underground",
    "Marble Arch Underground"
   ],
-  "postcode": "W2 2RB"
+  "postcode": "W2 2RB",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Foxtons, Marylebone",
+    "url": "https://www.rightmove.co.uk/properties/93415368"
+   }
+  ]
  },
  {
   "id": "20114008",
@@ -2307,7 +2530,14 @@
    "Bayswater Underground",
    "Queensway Underground"
   ],
-  "postcode": "W2 4NP"
+  "postcode": "W2 4NP",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Hamptons, Notting Hill",
+    "url": "https://www.rightmove.co.uk/properties/91873341"
+   }
+  ]
  },
  {
   "id": "20738073",
@@ -2368,7 +2598,14 @@
    "Bayswater Underground",
    "Queensway Underground"
   ],
-  "postcode": "W2 4JZ"
+  "postcode": "W2 4JZ",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Wilfords London, Kensington",
+    "url": "https://www.rightmove.co.uk/properties/95366865"
+   }
+  ]
  },
  {
   "id": "11695728",
@@ -2432,7 +2669,14 @@
    "Bayswater Underground",
    "Royal Oak Underground"
   ],
-  "postcode": "W2 4PH"
+  "postcode": "W2 4PH",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Mountgrange Heritage, Notting Hill",
+    "url": "https://www.rightmove.co.uk/properties/94315197"
+   }
+  ]
  },
  {
   "id": "20474559",
@@ -2486,7 +2730,14 @@
    "Lancaster Gate Underground",
    "Paddington Underground"
   ],
-  "postcode": "W2 2NH"
+  "postcode": "W2 2NH",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Jeremy Jacob Letting Specialists, Kensington",
+    "url": "https://www.rightmove.co.uk/properties/93916656"
+   }
+  ]
  },
  {
   "id": "20395717",
@@ -2553,7 +2804,8 @@
    "Bayswater Underground",
    "Queensway Underground"
   ],
-  "postcode": "W2 4SN"
+  "postcode": "W2 4SN",
+  "source": "OnTheMarket"
  },
  {
   "id": "17716862",
@@ -2608,7 +2860,14 @@
    "West Brompton",
    "West Brompton Underground"
   ],
-  "postcode": "SW6 1RL"
+  "postcode": "SW6 1RL",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Winkworth, Fulham",
+    "url": "https://www.rightmove.co.uk/properties/166051094"
+   }
+  ]
  },
  {
   "id": "19832423",
@@ -2680,7 +2939,14 @@
    "Imperial Wharf",
    "Battersea Park"
   ],
-  "postcode": "SW11 4NU"
+  "postcode": "SW11 4NU",
+  "source": "OnTheMarket",
+  "also": [
+   {
+    "agent": "Radstock Property, Central & South West London",
+    "url": "https://www.rightmove.co.uk/properties/90331014"
+   }
+  ]
  },
  {
   "id": "20636302",
@@ -2734,6 +3000,362 @@
    "Edgware Road (Circle Line) Underground",
    "Edgware Road (Bakerloo) Underground"
   ],
-  "postcode": "W1H 5HB"
+  "postcode": "W1H 5HB",
+  "source": "OnTheMarket"
+ },
+ {
+  "id": "rm148712042",
+  "source": "Rightmove",
+  "price": 3500,
+  "lat": 51.49354,
+  "lon": -0.19577,
+  "crow_km": 1.56,
+  "address": "Longridge Road, London, SW5",
+  "baths": 2,
+  "type": "Flat",
+  "agent": "Tower Quay Limited, London",
+  "added": "Reduced today",
+  "url": "https://www.rightmove.co.uk/properties/148712042",
+  "thumbs": [],
+  "walk_m": 1936,
+  "walk_min": 24.2,
+  "description": "Amazing flat coming on the market, set in this Period Townhouse is located in one of the most sought after area of Earls Court with fantastic access to central London and all amenities of High Street Kensington within walking distance. New refurbished 3 double bedrooms, kitchen separated from living room with an open arcade, 2 bathroom. Early viewings recommended! Furnished/Unfurnished. Available Now.",
+  "features": [
+   "Lovely three bedrooms",
+   "Private Garden",
+   "Fully fitted kitchen",
+   "Lower Ground",
+   "Two bathrooms",
+   "Furnished/Unfurnished",
+   "Moments from Earls Court Station"
+  ],
+  "letting": [
+   "letAvailableDate: Now",
+   "deposit: 4038",
+   "letType: Long term",
+   "furnishType: Furnished or unfurnished, landlord is flexible"
+  ],
+  "let_type": "Long term",
+  "key_info": {},
+  "sqft": null,
+  "photos": [
+   "https://media.rightmove.co.uk/dir/property-photo/7241f3ea7/148712042/7241f3ea7feab63ac5602b28eea473fa_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/fe8d40159/148712042/fe8d40159bf3d461bfa7958059eacf76_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/34c9ffda4/148712042/34c9ffda457197bb3556096a60699e61_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/9d1d0f5f0/148712042/9d1d0f5f07ad6cb251429c69baea018f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/edcdfbb96/148712042/edcdfbb96ec39591c6c5f180e95b7f82_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/0e8497b4d/148712042/0e8497b4d5344a54436c69d0ea512782_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/e3f3fa5ad/148712042/e3f3fa5ad0dbaf460e8689fa76a9f088_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/07ce6d4ef/148712042/07ce6d4ef1b1c64942c95ac100007e60_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/ba705a906/148712042/ba705a90627b3fc3a901db076bf17a84_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/32097183d/148712042/32097183de6081d249d8912aa4e1da98_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/df7787027/148712042/df7787027f53d65a4729247b00df116e_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/5f446b743/148712042/5f446b7435a2776361887ef1586cab72_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/e6386ef99/148712042/e6386ef9979dbe15f7d23d2ced60cada_max_656x437.jpeg"
+  ],
+  "floorplans": [
+   "https://media.rightmove.co.uk/property-floorplan/da32cf2f9/148712042/da32cf2f9f7629be37fa06a2ff2f4784.png"
+  ],
+  "stations": [
+   "Earls Court Station",
+   "West Brompton Station"
+  ],
+  "postcode": "SW5 9SB"
+ },
+ {
+  "id": "rm94622952",
+  "source": "Rightmove",
+  "price": 3800,
+  "lat": 51.515749,
+  "lon": -0.164975,
+  "crow_km": 2.01,
+  "address": "Park West, Edgware Rd, London, W2",
+  "baths": 2,
+  "type": "Flat",
+  "agent": "Relo Redac Strattons, Central London Office",
+  "added": "Reduced < 7 days",
+  "url": "https://www.rightmove.co.uk/properties/94622952",
+  "thumbs": [],
+  "walk_m": 2470,
+  "walk_min": 30.9,
+  "description": "Situated on Edgware Road, Marble Arch, this spacious three-bedroom, two-bathroom apartment offers the perfect blend of convenience and charm. The property benefits from generously sized rooms, a bright and airy living space, and an excellent central London location with easy access to local amenities, transport links, shops, and restaurants. Available furnished or part-furnished, this attractive apartment is ideal for professionals, families, or sharers seeking comfortable living in a vibrant neighbourhood.",
+  "features": [
+   "Communal hot water",
+   "Communal heating",
+   "Lift",
+   "Porter/Concierge - 24 hours",
+   "Residential parking",
+   "Wooden flooring - throughout",
+   "Dishwasher",
+   "Electric hob",
+   "Washing machine"
+  ],
+  "letting": [
+   "letAvailableDate: Now",
+   "deposit: 4615",
+   "letType: Long term",
+   "furnishType: Part furnished"
+  ],
+  "let_type": "Long term",
+  "key_info": {},
+  "sqft": 926,
+  "photos": [
+   "https://media.rightmove.co.uk/dir/property-photo/fba37e4de/94622952/fba37e4deb817125d3d7fc842c60f4ea_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/bd3664e76/94622952/bd3664e76a1e9daee506cb4f02c27959_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/92d02c4d0/94622952/92d02c4d0e220196115f682ba8f4fd23_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/91982a378/94622952/91982a378086b91f6fe6a6fc6ba74a66_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/0255c76ce/94622952/0255c76cef4753901e86696b4ffa8afb_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/9a45ae448/94622952/9a45ae4486049c91d8cf900c0302bf17_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/7843463d5/94622952/7843463d545c250bfb5ad338de242daa_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/c69b71cd5/94622952/c69b71cd513d7e1f130d5f2b47ac47a4_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/c2f86991f/94622952/c2f86991f16921d1d947149941dc08fe_max_656x437.jpeg"
+  ],
+  "floorplans": [],
+  "stations": [
+   "Edgware Road (Circle, District, Hammersmith & City) Station",
+   "Marble Arch Station"
+  ],
+  "postcode": "W2 2QJ"
+ },
+ {
+  "id": "rm89724579",
+  "source": "Rightmove",
+  "price": 4500,
+  "lat": 51.47971,
+  "lon": -0.17947,
+  "crow_km": 2.15,
+  "address": "Lots Road, Chelsea",
+  "baths": 2,
+  "type": "Apartment",
+  "agent": "Martin & Co, Chelsea Riverside",
+  "added": "Reduced > 14 days",
+  "url": "https://www.rightmove.co.uk/properties/89724579",
+  "thumbs": [],
+  "walk_m": 2884,
+  "walk_min": 36.0,
+  "description": "Modern high quality finish, three bedroom apartment available to let in SW10. The property comprises three double bedrooms, two bathrooms (one en-suite), large open plan kitchen living room and a private patio garden area. Wood flooring runs throughout and quality furniture has been provided.",
+  "features": [
+   "Duplex Apartment",
+   "Three Double Bedrooms",
+   "Two Bathrooms (One En-suite)",
+   "Open Plan Kitchen Living",
+   "Finished to a High Standard",
+   "Nest Heating System",
+   "Gas Central Heating",
+   "Wood Flooring Throughout",
+   "Ample Storage",
+   "Managed by Martin &amp; Co"
+  ],
+  "letting": [
+   "letAvailableDate: Ask agent",
+   "deposit: 6231",
+   "letType: Long term",
+   "furnishType: Furnished"
+  ],
+  "let_type": "Long term",
+  "key_info": {},
+  "sqft": 1252,
+  "photos": [
+   "https://media.rightmove.co.uk/dir/property-photo/b13253e6a/89724579/b13253e6a1c6478d76daef145e0d79dc_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/1e471df38/89724579/1e471df386fce8cde2893d7ad8a4b26f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/a21a13fce/89724579/a21a13fce8ed76cebd1fe4ee62196c2f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/cf93f0a38/89724579/cf93f0a386711f4349cf2348031e5a23_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/6cb2de3c1/89724579/6cb2de3c11a851be392c2aaadfe1cabc_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/e51c4a59e/89724579/e51c4a59eb8e9dbd7730271b11a0f6ac_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/b46d7e13d/89724579/b46d7e13d000cc335e5fbbd18204846d_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/6f8ce187f/89724579/6f8ce187f98d5292c55c4470317e4472_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/ab829d5f2/89724579/ab829d5f222ae57472ac991af7f53bf5_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/9fb18abb1/89724579/9fb18abb15cba43c633d591f6d53e1ec_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/e3956ea38/89724579/e3956ea3816c178079c1f17f6ee83a0e_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/6739fb4ec/89724579/6739fb4ec50960c2e8d3bb003ec94117_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/987556010/89724579/9875560108fecd996248cf11c455d53d_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/721a53f53/89724579/721a53f530d0035326949d72eadddac0_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/2fd4d8ea5/89724579/2fd4d8ea51bee4cbb1466dae4ca8e550_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/e2241fb42/89724579/e2241fb42cea413bcb1035836163bff7_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/ef64f4da8/89724579/ef64f4da81651a6c4ac3351993ff798a_max_656x437.jpeg"
+  ],
+  "floorplans": [
+   "https://media.rightmove.co.uk/property-floorplan/b877f0aba/89724579/b877f0abaa24d65366085aa278322fab.png"
+  ],
+  "stations": [
+   "Imperial Wharf Station",
+   "Fulham Broadway Station"
+  ],
+  "postcode": "SW10 0QF"
+ },
+ {
+  "id": "rm94568112",
+  "source": "Rightmove",
+  "price": 3467,
+  "lat": 51.493752,
+  "lon": -0.19215,
+  "crow_km": 1.32,
+  "address": "Kenway Road, London, SW5",
+  "baths": 2,
+  "type": "Apartment",
+  "agent": "Panda & Partners, London",
+  "added": "Reduced > 14 days",
+  "url": "https://www.rightmove.co.uk/properties/94568112",
+  "thumbs": [],
+  "walk_m": 1732,
+  "walk_min": 21.6,
+  "description": "The Building: The interior of this red brick building is completely renovated to a spectacular standard and fully managed by Panda and Partners. It offers residents safe and quiet enjoyment of the property and a comfortable living space. The Services: All properties in the building come with 24-hour support from the management company. Residents can also book weekly cleaning and change of linens upon request.",
+  "features": [
+   "3B2B (Converted living room to 3rd bedroom)",
+   "A/C throughout",
+   "Open plan living",
+   "Designer furnishings"
+  ],
+  "letting": [
+   "letAvailableDate: 29/11/2026",
+   "letType: Long term"
+  ],
+  "let_type": "Long term",
+  "key_info": {},
+  "sqft": null,
+  "photos": [
+   "https://media.rightmove.co.uk/dir/property-photo/bac9ec3c1/94568112/bac9ec3c106ddae1705d49d32bcc25a5_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/616759d96/94568112/616759d96a28769dd4acf012f6936e4c_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/e9ff0ff73/94568112/e9ff0ff734ad829460ecdf3a8062fb70_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/f2652e6a2/94568112/f2652e6a2a77d179b5e641a288646d8c_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/006bc2477/94568112/006bc2477b19ba9c270f42288cdc6815_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/60ae04872/94568112/60ae04872726c71fa82ceab26850b602_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/e12664585/94568112/e12664585c469c86e742009393827a0f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/54e966efa/94568112/54e966efaf9da6933c9115fbf324e59f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/3eab53bc9/94568112/3eab53bc9b170b53c1b2a9d89746eb51_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/7ff57a310/94568112/7ff57a310f4e895077edbd026732888f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/fd8e35e3f/94568112/fd8e35e3f322639e4e0d4c583fca0e2d_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/286ded2a8/94568112/286ded2a814889b17a76dcaf7bb9a603_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/39306ae55/94568112/39306ae552aa5af1242e7a9bfb144450_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/7d142e18e/94568112/7d142e18edf779e0fd7c22219b24b6ee_max_656x437.jpeg"
+  ],
+  "floorplans": [
+   "https://media.rightmove.co.uk/property-floorplan/8183a300e/94568112/8183a300e49280beafc409f68a2bb861.png"
+  ],
+  "stations": [
+   "Earls Court Station",
+   "Gloucester Road Station"
+  ],
+  "postcode": "SW5 0RA",
+  "also": [
+   {
+    "agent": "Panda & Partners, London",
+    "url": "https://www.rightmove.co.uk/properties/94566630"
+   }
+  ]
+ },
+ {
+  "id": "rm94851948",
+  "source": "Rightmove",
+  "price": 3625,
+  "lat": 51.519765,
+  "lon": -0.166531,
+  "crow_km": 2.4,
+  "address": "Chapel Street, Marylebone, London, NW1",
+  "baths": 2,
+  "type": "Flat",
+  "agent": "Kinleigh Folkard & Hayward - Lettings, Marylebone",
+  "added": "Added > 14 days",
+  "url": "https://www.rightmove.co.uk/properties/94851948",
+  "thumbs": [],
+  "walk_m": 2963,
+  "walk_min": 37.0,
+  "description": "SHARERS WELCOME A bright and spacious three bedroom, two bathroom flat available to rent set on the second floor within a purpose-built block located close to Edgware Road Underground station. The property comprises a reception room, separate fully fitted kitchen, three double bedrooms, and two bathrooms. Further benefits include wooden floors throughout and lift access. Well located for access to Edgware Road Underground station whilst the many amenities and transport links of Baker Street and Marylebone High Street are also close by. Holding Deposit: \u00a3836.53 (1 week)* Tenancy Deposit: \u00a34,182.69 (5 weeks)* Council Tax Band: E *The deposit amounts are approximate and will vary depending on the final rent agreed. *If Chinese is your preferred language. Please get in touch via WeChat ID: KFH1977",
+  "features": [
+   "Three double bedrooms",
+   "Two bathrooms",
+   "Reception room",
+   "Separate kitchen",
+   "Second floor with lift access",
+   "Suitable for sharers"
+  ],
+  "letting": [
+   "letAvailableDate: 12/12/2026",
+   "deposit: 4182",
+   "letType: Long term",
+   "furnishType: Furnished"
+  ],
+  "let_type": "Long term",
+  "key_info": {},
+  "sqft": 800,
+  "photos": [
+   "https://media.rightmove.co.uk/dir/property-photo/3c2b4b05c/94851948/3c2b4b05cfdc1e4646793776123f5eb2_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/37f5993d4/94851948/37f5993d44550ea37bc5e61b4cd9471c_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/8d0bcb84f/94851948/8d0bcb84fa0fc75e5cd73b2edef2615f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/c1faeece5/94851948/c1faeece549427ade6695f0ae23b29c6_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/bec7c3b12/94851948/bec7c3b12827626ebfc9e74a40d8ce47_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/f84ed01aa/94851948/f84ed01aac5fa0a6653e18aeddd207c0_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/5c4f61ddb/94851948/5c4f61ddbd62fcd9332bbe0acc0a4830_max_656x437.jpeg"
+  ],
+  "floorplans": [
+   "https://media.rightmove.co.uk/property-floorplan/804b9c1df/94851948/804b9c1dfc24fda9e510bbf59cf5784d.jpeg"
+  ],
+  "stations": [
+   "Edgware Road (Circle, District, Hammersmith & City) Station",
+   "Edgware Road (Bakerloo) Station"
+  ],
+  "postcode": "NW1 5DP",
+  "also": [
+   {
+    "agent": "OpenRent, London",
+    "url": "https://www.rightmove.co.uk/properties/95244483"
+   }
+  ]
+ },
+ {
+  "id": "rm94775700",
+  "source": "Rightmove",
+  "price": 4000,
+  "lat": 51.492486,
+  "lon": -0.196387,
+  "crow_km": 1.64,
+  "address": "Nevern Square, \nEarls Court, SW5",
+  "baths": 2,
+  "type": "Flat",
+  "agent": "Chestertons, South Kensington",
+  "added": "Added > 14 days",
+  "url": "https://www.rightmove.co.uk/properties/94775700",
+  "thumbs": [],
+  "walk_m": 2101,
+  "walk_min": 26.3,
+  "description": "A beautifully proportioned three-bedroom apartment situated on the highly sought-after Nevern Square, in the heart of Earls Court. The property comprises three spacious double bedrooms, two bathrooms including an en-suite to the principal bedroom, and a separate fully fitted kitchen. The principal bedroom further benefits from direct access to a private balcony, creating a charming outdoor space and allowing an abundance of natural light into the room. Ideally located for the excellent selection of shops, restaurants and amenities in Earls Court, the property also enjoys the attractive open surroundings of Nevern Square. An excellent opportunity for professional sharers or a family seeking a spacious three-bedroom home in a prime West London location. Our China Desk is here for you, if Chinese is your preferred language, please get in touch via WeChat ( ChestertonsLettings )",
+  "features": [],
+  "letting": [
+   "letAvailableDate: Now",
+   "deposit: 4615",
+   "minimumTermInMonths: 12",
+   "letType: Long term",
+   "furnishType: Unfurnished"
+  ],
+  "let_type": "Long term",
+  "key_info": {},
+  "sqft": null,
+  "photos": [
+   "https://media.rightmove.co.uk/dir/property-photo/89cbc7a20/94775700/89cbc7a20d1c573ebf20ff689c977030_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/a28edb82a/94775700/a28edb82a3856851226810c88abdd298_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/f3c08f92b/94775700/f3c08f92bdd2f18d0fec7f7f4f636794_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/89cb67e5d/94775700/89cb67e5d4358fa4c155f95ce5ec4e40_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/65c886f50/94775700/65c886f50b7df52a20ea480d4849523d_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/20f4185af/94775700/20f4185af84695fafda4e20eb8af7862_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/138fe1f1c/94775700/138fe1f1cd9935a079322a8a45ae37dd_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/82005b826/94775700/82005b8267933d2c63d0a1865de1d4c9_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/702842275/94775700/702842275f46d594a80fc4ceab2002b5_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/a125b095d/94775700/a125b095d7c66aa5d77b91990e5a84f6_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/b3a48a236/94775700/b3a48a236fbac15fe161ba347856673d_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/da7465fcf/94775700/da7465fcffa2ff07804660eb2a6ce3e6_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/7fd256aa5/94775700/7fd256aa5e106fe095a4a2c58d292ed1_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/db95b41a0/94775700/db95b41a0aa8179124649fecd873dd34_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/08a3ae789/94775700/08a3ae789a6c6924e61fe88f79294be7_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/fca75206e/94775700/fca75206e3b949b8e530cafcbfed6a7f_max_656x437.jpeg",
+   "https://media.rightmove.co.uk/dir/property-photo/898fbbd3d/94775700/898fbbd3d5c7eeeeb79ecd0f40b21ccf_max_656x437.jpeg"
+  ],
+  "floorplans": [
+   "https://media.rightmove.co.uk/property-floorplan/e3df93abd/94775700/e3df93abde423152c3bb80cc836b03de.png"
+  ],
+  "stations": [
+   "Earls Court Station",
+   "West Brompton Station"
+  ],
+  "postcode": "SW5 9NN"
  }
 ]

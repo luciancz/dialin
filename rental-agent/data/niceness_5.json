@@ -1,0 +1,109 @@
+[
+ {
+  "id": "rm148712042",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 5,
+   "furnishings": 4,
+   "condition": 6,
+   "light_layout": 4,
+   "space": 3,
+   "outdoor_level": 5,
+   "epc_street": 6
+  },
+  "note": "Lower-ground 773 sq ft flat, recently refurbished but basic: freestanding fridge, budget kitchen, black leather sofas, small bedrooms, private garden.",
+  "flags": [],
+  "furnished": "Furnished or unfurnished",
+  "sqft": 773
+ },
+ {
+  "id": "rm94568112",
+  "scores": {
+   "appliances": 6,
+   "fixtures": 8,
+   "furnishings": 8,
+   "condition": 9,
+   "light_layout": 5,
+   "space": 3,
+   "outdoor_level": 4,
+   "epc_street": 6
+  },
+  "note": "High-spec staged refurb: herringbone floor, A/C, terrazzo showers, fitted wardrobes; but tiny kitchen and the living room becomes the third bedroom.",
+  "flags": [
+   "CGI or staged photos",
+   "Converted 2-bed"
+  ],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "rm94622952",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 4,
+   "furnishings": 3,
+   "condition": 4,
+   "light_layout": 5,
+   "space": 4,
+   "outdoor_level": 5,
+   "epc_street": 4
+  },
+  "note": "Mansion block on busy Edgware Road with lift and porter; dated black gloss kitchen, freestanding washer, mismatched beds, scuffed laminate.",
+  "flags": [],
+  "furnished": "Part furnished",
+  "sqft": null
+ },
+ {
+  "id": "rm94851948",
+  "scores": {
+   "appliances": 5,
+   "fixtures": 4,
+   "furnishings": 4,
+   "condition": 5,
+   "light_layout": 6,
+   "space": 3,
+   "outdoor_level": 5,
+   "epc_street": 5
+  },
+  "note": "Plain 800 sq ft ex-local-authority style block flat, 2nd floor with lift; white gloss kitchen, pine furniture, basic bathroom, bright reception.",
+  "flags": [
+   "Few photos"
+  ],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "rm89724579",
+  "scores": {
+   "appliances": 8,
+   "fixtures": 8,
+   "furnishings": 7,
+   "condition": 9,
+   "light_layout": 5,
+   "space": 7,
+   "outdoor_level": 5,
+   "epc_street": 5
+  },
+  "note": "1,252 sq ft duplex finished to high spec: handleless kitchen with island and double ovens, marble bathrooms, fitted wardrobes; sunken patio, deep plan.",
+  "flags": [],
+  "furnished": "Furnished",
+  "sqft": null
+ },
+ {
+  "id": "rm94775700",
+  "scores": {
+   "appliances": 4,
+   "fixtures": 4,
+   "furnishings": null,
+   "condition": 5,
+   "light_layout": 7,
+   "space": 5,
+   "outdoor_level": 5,
+   "epc_street": 7
+  },
+  "note": "Bright period flat on Nevern Square with large sashes, big reception and balcony; dated maple kitchen and plain white-tiled bathrooms, one narrow bedroom.",
+  "flags": [],
+  "furnished": "Unfurnished",
+  "sqft": 1011
+ }
+]

@@ -4,5 +4,13 @@
  "baths_ok": 115,
  "near": 81,
  "walk_ok": 46,
- "final": 45
+ "final": 45,
+ "rightmove": {
+  "crawled": 375,
+  "in_price": 232,
+  "near": 93,
+  "dup_other_portal": 38,
+  "walk_ok": 8,
+  "new": 7
+ }
 }

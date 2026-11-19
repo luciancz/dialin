@@ -3,7 +3,7 @@ import json, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 d = json.load(open(os.path.join(HERE, "data", "listings.json")))
 keep = ["id","price","expected","discount","discount_why","lat","lon","address","baths","agent","added","url","walk_min","sqft","sqft_est","ppsf",
-        "niceness","value","overall","predicted","scores","note","flags","furnished","tier","negotiable_only"]
+        "niceness","value","overall","predicted","scores","note","flags","furnished","tier","negotiable_only","source"]
 d["listings"] = [{k: c.get(k) for k in keep} for c in d["listings"]]
 d["config"] = {"origin": d["config"]["origin"]}
 bm = json.load(open(os.path.join(HERE, "data", "basemap.json")))

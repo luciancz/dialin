@@ -7,7 +7,15 @@
   "baths_ok": 115,
   "near": 81,
   "walk_ok": 46,
-  "final": 45
+  "final": 45,
+  "rightmove": {
+   "crawled": 375,
+   "in_price": 232,
+   "near": 93,
+   "dup_other_portal": 38,
+   "walk_ok": 8,
+   "new": 7
+  }
  },
  "config": {
   "origin": {
@@ -100,6 +108,97 @@
  },
  "listings": [
   {
+   "id": "rm94568112",
+   "source": "Rightmove",
+   "price": 3467,
+   "lat": 51.493752,
+   "lon": -0.19215,
+   "crow_km": 1.32,
+   "address": "Kenway Road, London, SW5",
+   "baths": 2,
+   "type": "Apartment",
+   "agent": "Panda & Partners, London",
+   "added": "Reduced > 14 days",
+   "url": "https://www.rightmove.co.uk/properties/94568112",
+   "thumbs": [],
+   "walk_m": 1732,
+   "walk_min": 21.6,
+   "description": "The Building: The interior of this red brick building is completely renovated to a spectacular standard and fully managed by Panda and Partners. It offers residents safe and quiet enjoyment of the property and a comfortable living space. The Services: All properties in the building come with 24-hour support from the management company. Residents can also book weekly cleaning and change of linens upon request.",
+   "features": [
+    "3B2B (Converted living room to 3rd bedroom)",
+    "A/C throughout",
+    "Open plan living",
+    "Designer furnishings"
+   ],
+   "letting": [
+    "letAvailableDate: 29/11/2026",
+    "letType: Long term"
+   ],
+   "let_type": "Long term",
+   "key_info": {},
+   "sqft": null,
+   "photos": [
+    "https://media.rightmove.co.uk/dir/property-photo/bac9ec3c1/94568112/bac9ec3c106ddae1705d49d32bcc25a5_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/616759d96/94568112/616759d96a28769dd4acf012f6936e4c_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/e9ff0ff73/94568112/e9ff0ff734ad829460ecdf3a8062fb70_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/f2652e6a2/94568112/f2652e6a2a77d179b5e641a288646d8c_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/006bc2477/94568112/006bc2477b19ba9c270f42288cdc6815_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/60ae04872/94568112/60ae04872726c71fa82ceab26850b602_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/e12664585/94568112/e12664585c469c86e742009393827a0f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/54e966efa/94568112/54e966efaf9da6933c9115fbf324e59f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/3eab53bc9/94568112/3eab53bc9b170b53c1b2a9d89746eb51_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/7ff57a310/94568112/7ff57a310f4e895077edbd026732888f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/fd8e35e3f/94568112/fd8e35e3f322639e4e0d4c583fca0e2d_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/286ded2a8/94568112/286ded2a814889b17a76dcaf7bb9a603_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/39306ae55/94568112/39306ae552aa5af1242e7a9bfb144450_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/7d142e18e/94568112/7d142e18edf779e0fd7c22219b24b6ee_max_656x437.jpeg"
+   ],
+   "floorplans": [
+    "https://media.rightmove.co.uk/property-floorplan/8183a300e/94568112/8183a300e49280beafc409f68a2bb861.png"
+   ],
+   "stations": [
+    "Earls Court Station",
+    "Gloucester Road Station"
+   ],
+   "postcode": "SW5 0RA",
+   "also": [
+    {
+     "agent": "Panda & Partners, London",
+     "url": "https://www.rightmove.co.uk/properties/94566630"
+    }
+   ],
+   "discount": 0.055,
+   "discount_why": [
+    "independent agent",
+    "already reduced",
+    "listed over 2 weeks"
+   ],
+   "expected": 3275,
+   "niceness": 62,
+   "scores": {
+    "appliances": 6,
+    "fixtures": 8,
+    "furnishings": 8,
+    "condition": 9,
+    "light_layout": 5,
+    "space": 3,
+    "outdoor_level": 4,
+    "epc_street": 6
+   },
+   "note": "High-spec staged refurb: herringbone floor, A/C, terrazzo showers, fitted wardrobes; but tiny kitchen and the living room becomes the third bedroom.",
+   "flags": [
+    "CGI or staged photos",
+    "Converted 2-bed"
+   ],
+   "furnished": "Furnished",
+   "predicted": 4030,
+   "value": 97,
+   "ppsf": null,
+   "overall": 80,
+   "tier": "outside",
+   "negotiable_only": false
+  },
+  {
    "id": "20293962",
    "price": 3500,
    "lat": 51.508526,
@@ -157,6 +256,13 @@
     "Holland Park Underground"
    ],
    "postcode": "W11 3LB",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Dexters, Notting Hill",
+     "url": "https://www.rightmove.co.uk/properties/92909142"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -178,8 +284,8 @@
    "flags": [],
    "sqft_est": true,
    "furnished": "Unfurnished",
-   "predicted": 3915,
-   "value": 82,
+   "predicted": 3895,
+   "value": 81,
    "ppsf": 43.3,
    "overall": 72,
    "tier": "outside",
@@ -245,6 +351,13 @@
     "Kensington (Olympia) Underground"
    ],
    "postcode": "W14 8UZ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Willmotts, London",
+     "url": "https://www.rightmove.co.uk/properties/93060894"
+    }
+   ],
    "discount": 0.035,
    "discount_why": [
     "independent agent",
@@ -269,7 +382,7 @@
     "Few photos"
    ],
    "furnished": "Furnished",
-   "predicted": 3920,
+   "predicted": 3925,
    "value": 88,
    "ppsf": 33.5,
    "overall": 72,
@@ -330,6 +443,13 @@
     "West Brompton Underground"
    ],
    "postcode": "SW6 1RL",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Winkworth, Fulham",
+     "url": "https://www.rightmove.co.uk/properties/166051094"
+    }
+   ],
    "discount": 0.015,
    "discount_why": [
     "large agent"
@@ -349,10 +469,10 @@
    "note": "Brand new renovation: handleless integrated kitchen, marble-effect bathrooms, oak floors, air con, bifold doors to a private terrace; only 770 sq ft.",
    "flags": [],
    "furnished": "Furnished or unfurnished",
-   "predicted": 3905,
-   "value": 73,
+   "predicted": 3875,
+   "value": 71,
    "ppsf": 55.2,
-   "overall": 72,
+   "overall": 71,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -416,6 +536,7 @@
     "Edgware Road (Circle Line) Underground"
    ],
    "postcode": "W2 2BZ",
+   "source": "OnTheMarket",
    "discount": 0.04,
    "discount_why": [
     "independent agent",
@@ -438,7 +559,7 @@
     "Few photos"
    ],
    "furnished": "Furnished or unfurnished",
-   "predicted": 4180,
+   "predicted": 4185,
    "value": 77,
    "ppsf": 30.6,
    "overall": 70,
@@ -446,83 +567,102 @@
    "negotiable_only": false
   },
   {
-   "id": "3172165",
-   "price": 3497,
-   "lat": 51.495821,
-   "lon": -0.18625,
-   "crow_km": 0.85,
-   "address": "Emperors Gate, South Kensington, London, SW7",
+   "id": "8267652",
+   "price": 3400,
+   "lat": 51.481745,
+   "lon": -0.182195,
+   "crow_km": 1.96,
+   "address": "Kings Road, London, Chelsea, SW10",
    "baths": 2,
-   "type": "Apartment",
-   "agent": "Winkworth - South Kensington",
-   "added": "Added < 14 days",
-   "url": "https://www.onthemarket.com/details/3172165/",
+   "type": "Flat",
+   "agent": "99home - Wallington",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/8267652/",
    "thumbs": [
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-4-480x320.jpg"
+    "https://media.onthemarket.com/properties/8267652/1658179304/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1653297411/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-4-480x320.jpg"
    ],
-   "walk_m": 1075,
-   "walk_min": 13.4,
-   "description": "PLEASE BE AWARE, THIS FLAT IS NOT SUITABLE FOR 3 SHARERS. The property benefits from an open-plan kitchen/reception room, two double bedrooms (one with en-suite bathroom), a further single bedroom, a separate shower room and a separate guest WC. The property is available now on a furnished basis. Please note: the photos were taken from a previous tenancy when the property was newly furnished",
+   "walk_m": 2646,
+   "walk_min": 33.1,
+   "description": "Property Ref: 4529 Amazing CHELSEA! Stunning Chelsea World Famous Kings Road!! Very Large 4 Room Apartment in Chelsea, SW10 Large Rooms Eat in Kitchen Modern, clean, respectful... Amazing location in one of the best areas in London. 3 Bedrooms, 1 Living Room, Eat in Kitchen Fully Furnished rooms, Double Bed, Massive Wardrobes, Private own Balcony. A bus is 5 secs away. 5 min on a bus from Earls Court Tube and Sloane Square Tube... Large Supermarket 30 Sec away......... For viewing arrangement, please get in touch with 99home. If calling, please quote reference: 4529 Disclaimer: 99home does not charge administration fees. GDPR : Applying for the above property means you are giving us permission to pass your details to the vendor or landlord for further communication related to viewing arrangement or more property-related information. If you disagree, please write us in the message so we do not forward your details to the vendor or landlord or their managing company. *Disclaimer for virtual viewings: Some or all information pertaining to this property may have been provided solely by the vendor, and although we always make every effort to verify the information provided to us, we strongly advise you to make further enquiries before continuing. *If you book a viewing or make an offer on a property that has had its valuation conducted virtually, you are doing so under the knowledge that this information may have been provided solely by the vendor, and that we may not have been able to access the premises to confirm the information or test any equipment. We therefore strongly advise you to make further enquiries before completing your purchase of the property to ensure you are happy with all the information provided. *Will make no warranty for the accuracy or completeness of the advertisement or any linked or associated information, and 99home has no control over the content. This property advertisement does not constitute property particulars, the property may offer to tenants in the same condition as they have seen on time of the viewing. Fraud warning : We have had reports of fraudulent activities in our industry. DO NOT make any payment directly to the landlord or the seller. Be cautious of emails or messages asking you to transfer funds to any account, please contact us by telephone immediately to verify the authenticity of the communication and under NO circumstances action the request. If you paid any deposit or rent to 99home, we will release the fund to the landlord once you have moved in. Your safety is our top priority. Additional Information Council Tax band: C",
    "features": [
-    "3 Bedrooms",
-    "1 Reception Room",
-    "2 Bathrooms",
-    "Fourth and Fifth Floor with lift",
+    "Chelsea",
+    "Modern",
+    "Amazing Chelsea",
     "Furnished"
    ],
    "letting": [
     "Available now",
-    "Part furnished"
+    "Furnished",
+    "Deposit: \u00a33600",
+    "Long term let"
    ],
    "key_info": {
-    "Council tax": "Ask agent",
+    "Council tax": "Band C",
     "Broadband": "Ultra-fast 1000Mbps *"
    },
-   "sqft": 771,
+   "sqft": 764,
    "photos": [
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/3172165/1657786994/epc-graph-0-480x320.png"
+    "https://media.onthemarket.com/properties/8267652/1658179304/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1653297411/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-7-480x320.png",
+    "https://media.onthemarket.com/properties/8267652/1659547684/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1644881154/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1644881154/image-10-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1644881154/image-11-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1644881154/image-12-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1644881154/image-13-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1644881154/image-14-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1644881154/image-15-480x320.jpg",
+    "https://media.onthemarket.com/properties/8267652/1630155622/epc-0-480x320.png"
    ],
    "floorplans": [
-    "https://media.onthemarket.com/properties/3172165/1657786994/floor-plan-0-1024x1024.jpg"
+    "https://media.onthemarket.com/properties/8267652/1630155622/floor-plan-0-1024x1024.jpg"
    ],
    "stations": [
-    "Gloucester Road Underground",
-    "High Street Kensington Underground"
+    "Imperial Wharf",
+    "Fulham Broadway Underground"
    ],
-   "postcode": "SW7 4HS",
-   "discount": 0.015,
+   "postcode": "SW10 0TP",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "gLocalAgents.co.uk, Covering Nationwide",
+     "url": "https://www.rightmove.co.uk/properties/91044408"
+    }
+   ],
+   "discount": 0.04,
    "discount_why": [
-    "large agent"
+    "independent agent",
+    "listed over 2 weeks"
    ],
-   "expected": 3445,
-   "niceness": 48,
+   "expected": 3265,
+   "niceness": 50,
    "scores": {
-    "appliances": 5,
-    "fixtures": 5,
+    "appliances": 7,
+    "fixtures": 6,
     "furnishings": 4,
     "condition": 5,
-    "light_layout": 6,
+    "light_layout": 4,
     "space": 3,
-    "outdoor_level": 5,
-    "epc_street": 6
+    "outdoor_level": 6,
+    "epc_street": 4
    },
-   "note": "Dated cherry-wood kitchen with integrated oven and microwave, beige tiled bath, sparse basic furniture, bright top-floor reception, only 771 sq ft, EPC D.",
+   "note": "White gloss kitchen with built-in oven, microwave and coffee machine and marble tiling, but dated bedroom furniture, sofa in a bedroom, 764 sq ft, balcony.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 4020,
-   "value": 86,
-   "ppsf": 53.6,
-   "overall": 67,
+   "predicted": 3730,
+   "value": 81,
+   "ppsf": 51.3,
+   "overall": 66,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -597,6 +737,13 @@
     "Battersea Park"
    ],
    "postcode": "SW11 4NU",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Radstock Property, Central & South West London",
+     "url": "https://www.rightmove.co.uk/properties/90331014"
+    }
+   ],
    "discount": 0.04,
    "discount_why": [
     "independent agent",
@@ -617,103 +764,98 @@
    "note": "Dated beech kitchen with freestanding white dishwasher and washer, basic bathrooms, grey carpet; bright with shutters, upper maisonette.",
    "flags": [],
    "furnished": "Unfurnished",
-   "predicted": 3905,
-   "value": 85,
+   "predicted": 3895,
+   "value": 84,
    "ppsf": 35.5,
-   "overall": 67,
+   "overall": 66,
    "tier": "outside",
    "negotiable_only": false
   },
   {
-   "id": "8267652",
-   "price": 3400,
-   "lat": 51.481745,
-   "lon": -0.182195,
-   "crow_km": 1.96,
-   "address": "Kings Road, London, Chelsea, SW10",
+   "id": "3172165",
+   "price": 3497,
+   "lat": 51.495821,
+   "lon": -0.18625,
+   "crow_km": 0.85,
+   "address": "Emperors Gate, South Kensington, London, SW7",
    "baths": 2,
-   "type": "Flat",
-   "agent": "99home - Wallington",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/8267652/",
+   "type": "Apartment",
+   "agent": "Winkworth - South Kensington",
+   "added": "Added < 14 days",
+   "url": "https://www.onthemarket.com/details/3172165/",
    "thumbs": [
-    "https://media.onthemarket.com/properties/8267652/1658179304/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1653297411/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-4-480x320.jpg"
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-4-480x320.jpg"
    ],
-   "walk_m": 2646,
-   "walk_min": 33.1,
-   "description": "Property Ref: 4529 Amazing CHELSEA! Stunning Chelsea World Famous Kings Road!! Very Large 4 Room Apartment in Chelsea, SW10 Large Rooms Eat in Kitchen Modern, clean, respectful... Amazing location in one of the best areas in London. 3 Bedrooms, 1 Living Room, Eat in Kitchen Fully Furnished rooms, Double Bed, Massive Wardrobes, Private own Balcony. A bus is 5 secs away. 5 min on a bus from Earls Court Tube and Sloane Square Tube... Large Supermarket 30 Sec away......... For viewing arrangement, please get in touch with 99home. If calling, please quote reference: 4529 Disclaimer: 99home does not charge administration fees. GDPR : Applying for the above property means you are giving us permission to pass your details to the vendor or landlord for further communication related to viewing arrangement or more property-related information. If you disagree, please write us in the message so we do not forward your details to the vendor or landlord or their managing company. *Disclaimer for virtual viewings: Some or all information pertaining to this property may have been provided solely by the vendor, and although we always make every effort to verify the information provided to us, we strongly advise you to make further enquiries before continuing. *If you book a viewing or make an offer on a property that has had its valuation conducted virtually, you are doing so under the knowledge that this information may have been provided solely by the vendor, and that we may not have been able to access the premises to confirm the information or test any equipment. We therefore strongly advise you to make further enquiries before completing your purchase of the property to ensure you are happy with all the information provided. *Will make no warranty for the accuracy or completeness of the advertisement or any linked or associated information, and 99home has no control over the content. This property advertisement does not constitute property particulars, the property may offer to tenants in the same condition as they have seen on time of the viewing. Fraud warning : We have had reports of fraudulent activities in our industry. DO NOT make any payment directly to the landlord or the seller. Be cautious of emails or messages asking you to transfer funds to any account, please contact us by telephone immediately to verify the authenticity of the communication and under NO circumstances action the request. If you paid any deposit or rent to 99home, we will release the fund to the landlord once you have moved in. Your safety is our top priority. Additional Information Council Tax band: C",
+   "walk_m": 1075,
+   "walk_min": 13.4,
+   "description": "PLEASE BE AWARE, THIS FLAT IS NOT SUITABLE FOR 3 SHARERS. The property benefits from an open-plan kitchen/reception room, two double bedrooms (one with en-suite bathroom), a further single bedroom, a separate shower room and a separate guest WC. The property is available now on a furnished basis. Please note: the photos were taken from a previous tenancy when the property was newly furnished",
    "features": [
-    "Chelsea",
-    "Modern",
-    "Amazing Chelsea",
+    "3 Bedrooms",
+    "1 Reception Room",
+    "2 Bathrooms",
+    "Fourth and Fifth Floor with lift",
     "Furnished"
    ],
    "letting": [
     "Available now",
-    "Furnished",
-    "Deposit: \u00a33600",
-    "Long term let"
+    "Part furnished"
    ],
    "key_info": {
-    "Council tax": "Band C",
+    "Council tax": "Ask agent",
     "Broadband": "Ultra-fast 1000Mbps *"
    },
-   "sqft": 764,
+   "sqft": 771,
    "photos": [
-    "https://media.onthemarket.com/properties/8267652/1658179304/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1653297411/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-7-480x320.png",
-    "https://media.onthemarket.com/properties/8267652/1659547684/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1644881154/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1644881154/image-10-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1644881154/image-11-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1644881154/image-12-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1644881154/image-13-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1644881154/image-14-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1644881154/image-15-480x320.jpg",
-    "https://media.onthemarket.com/properties/8267652/1630155622/epc-0-480x320.png"
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/3172165/1657786994/epc-graph-0-480x320.png"
    ],
    "floorplans": [
-    "https://media.onthemarket.com/properties/8267652/1630155622/floor-plan-0-1024x1024.jpg"
+    "https://media.onthemarket.com/properties/3172165/1657786994/floor-plan-0-1024x1024.jpg"
    ],
    "stations": [
-    "Imperial Wharf",
-    "Fulham Broadway Underground"
+    "Gloucester Road Underground",
+    "High Street Kensington Underground"
    ],
-   "postcode": "SW10 0TP",
-   "discount": 0.04,
+   "postcode": "SW7 4HS",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Winkworth, South Kensington - Lettings",
+     "url": "https://www.rightmove.co.uk/properties/95340666"
+    }
+   ],
+   "discount": 0.015,
    "discount_why": [
-    "independent agent",
-    "listed over 2 weeks"
+    "large agent"
    ],
-   "expected": 3265,
-   "niceness": 50,
+   "expected": 3445,
+   "niceness": 48,
    "scores": {
-    "appliances": 7,
-    "fixtures": 6,
+    "appliances": 5,
+    "fixtures": 5,
     "furnishings": 4,
     "condition": 5,
-    "light_layout": 4,
+    "light_layout": 6,
     "space": 3,
-    "outdoor_level": 6,
-    "epc_street": 4
+    "outdoor_level": 5,
+    "epc_street": 6
    },
-   "note": "White gloss kitchen with built-in oven, microwave and coffee machine and marble tiling, but dated bedroom furniture, sofa in a bedroom, 764 sq ft, balcony.",
+   "note": "Dated cherry-wood kitchen with integrated oven and microwave, beige tiled bath, sparse basic furniture, bright top-floor reception, only 771 sq ft, EPC D.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3760,
-   "value": 83,
-   "ppsf": 51.3,
-   "overall": 66,
+   "predicted": 3935,
+   "value": 81,
+   "ppsf": 53.6,
+   "overall": 64,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -780,6 +922,13 @@
     "High Street Kensington Underground"
    ],
    "postcode": "SW7 4HJ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Foxtons, South Kensington",
+     "url": "https://www.rightmove.co.uk/properties/94214079"
+    }
+   ],
    "discount": 0.03,
    "discount_why": [
     "large agent",
@@ -800,10 +949,10 @@
    "note": "Dated pine kitchen with old white oven, coil hob and no dishwasher; tired carpets and magnolia decor; tight 789 sq ft, EPC C.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3965,
-   "value": 88,
+   "predicted": 3880,
+   "value": 83,
    "ppsf": 51.2,
-   "overall": 64,
+   "overall": 62,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -865,6 +1014,13 @@
     "West Kensington Underground"
    ],
    "postcode": "SW5 9EZ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "tlc Estate Agents, Chelsea",
+     "url": "https://www.rightmove.co.uk/properties/93406929"
+    }
+   ],
    "discount": 0.04,
    "discount_why": [
     "independent agent",
@@ -885,8 +1041,8 @@
    "note": "Marble-tiled bathrooms and private patio onto communal gardens, but dated cream kitchen, garden-level flat, tight 859 sq ft; EPC C.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3900,
-   "value": 69,
+   "predicted": 3860,
+   "value": 67,
    "ppsf": 50.3,
    "overall": 62,
    "tier": "main",
@@ -945,6 +1101,7 @@
     "Edgware Road (Bakerloo) Underground"
    ],
    "postcode": "W1H 5HB",
+   "source": "OnTheMarket",
    "discount": 0.04,
    "discount_why": [
     "independent agent",
@@ -965,106 +1122,97 @@
    "note": "Ex-local-authority style block with budget gloss kitchen, freestanding fridge and washer, marble-effect tiled bathrooms and staged short-let furniture.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3805,
-   "value": 79,
+   "predicted": 3785,
+   "value": 78,
    "ppsf": null,
    "overall": 62,
    "tier": "outside",
    "negotiable_only": false
   },
   {
-   "id": "16712090",
-   "price": 3600,
-   "lat": 51.48627471923828,
-   "lon": -0.16634100675582886,
-   "crow_km": 1.51,
-   "address": "Chelsea Manor Street, London SW3",
-   "baths": 3,
+   "id": "rm148712042",
+   "source": "Rightmove",
+   "price": 3500,
+   "lat": 51.49354,
+   "lon": -0.19577,
+   "crow_km": 1.56,
+   "address": "Longridge Road, London, SW5",
+   "baths": 2,
    "type": "Flat",
-   "agent": "eXp UK - London",
-   "added": "Added < 7 days",
-   "url": "https://www.onthemarket.com/details/16712090/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-4-480x320.jpg"
-   ],
-   "walk_m": 1884,
-   "walk_min": 23.6,
-   "description": "When calling please Quote Ref JB0670 *Available to move-in RIGHT AWAY* *Offered FURNISHED* Why live here? It ticks all the boxes - well looked after, great location, local transport, all 3 bedrooms are doubles, each with their own bathroom, own front door AND private patio perfect for a summer BBQ. Nestled in the heart of Chelsea, this beautifully presented three-bedroom, three-bathroom split-level maisonette is perfect for professional sharers or a family looking to live in such a prime location. With generous space spread over two levels, this brilliant home is sure to be popular! Three Double Bedrooms Three Modern Bathrooms \u2013 no fighting over the shower in the morning Separate Kitchen \u2013 ideal for sharers and those wanting to keep any cooking smells out of the living room Spacious Reception Room \u2013 With French Doors onto a private Terrace Split-Level Layout \u2013 Offering a sense of space and separation, ideal for flexible living Prime Chelsea Location \u2013 Moments from the King\u2019s Road, with world-class shopping, dining, and cultural attractions on your doorstep Excellent Transport Links \u2013 Easy access to Sloane Square & South Kensington Stations *Available to move-in RIGHT AWAY* *Offered FURNISHED * For more information and to book your viewing please call quoting Ref JB0670",
+   "agent": "Tower Quay Limited, London",
+   "added": "Reduced today",
+   "url": "https://www.rightmove.co.uk/properties/148712042",
+   "thumbs": [],
+   "walk_m": 1936,
+   "walk_min": 24.2,
+   "description": "Amazing flat coming on the market, set in this Period Townhouse is located in one of the most sought after area of Earls Court with fantastic access to central London and all amenities of High Street Kensington within walking distance. New refurbished 3 double bedrooms, kitchen separated from living room with an open arcade, 2 bathroom. Early viewings recommended! Furnished/Unfurnished. Available Now.",
    "features": [
-    "3 Double Bedrooms 3 Bathrooms",
-    "Quote Ref JB0670 When Calling",
-    "Well Finished",
-    "Check out the VIDEO TOUR",
-    "Own Front Door",
-    "Split-Level",
-    "Moments from Kings Road",
-    "Private Patio",
-    "Furnsihed",
-    "Available right away"
+    "Lovely three bedrooms",
+    "Private Garden",
+    "Fully fitted kitchen",
+    "Lower Ground",
+    "Two bathrooms",
+    "Furnished/Unfurnished",
+    "Moments from Earls Court Station"
    ],
    "letting": [
-    "Available now",
-    "Furnished",
-    "Deposit: \u00a34038"
+    "letAvailableDate: Now",
+    "deposit: 4038",
+    "letType: Long term",
+    "furnishType: Furnished or unfurnished, landlord is flexible"
    ],
-   "key_info": {
-    "Council tax": "Ask agent",
-    "Broadband": "Ultra-fast 5000Mbps *"
-   },
-   "sqft": 703,
+   "let_type": "Long term",
+   "key_info": {},
+   "sqft": 773,
    "photos": [
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/image-10-480x320.jpg",
-    "https://media.onthemarket.com/properties/16712090/1658778531/epc-0-480x320.png"
+    "https://media.rightmove.co.uk/dir/property-photo/7241f3ea7/148712042/7241f3ea7feab63ac5602b28eea473fa_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/fe8d40159/148712042/fe8d40159bf3d461bfa7958059eacf76_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/34c9ffda4/148712042/34c9ffda457197bb3556096a60699e61_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/9d1d0f5f0/148712042/9d1d0f5f07ad6cb251429c69baea018f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/edcdfbb96/148712042/edcdfbb96ec39591c6c5f180e95b7f82_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/0e8497b4d/148712042/0e8497b4d5344a54436c69d0ea512782_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/e3f3fa5ad/148712042/e3f3fa5ad0dbaf460e8689fa76a9f088_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/07ce6d4ef/148712042/07ce6d4ef1b1c64942c95ac100007e60_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/ba705a906/148712042/ba705a90627b3fc3a901db076bf17a84_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/32097183d/148712042/32097183de6081d249d8912aa4e1da98_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/df7787027/148712042/df7787027f53d65a4729247b00df116e_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/5f446b743/148712042/5f446b7435a2776361887ef1586cab72_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/e6386ef99/148712042/e6386ef9979dbe15f7d23d2ced60cada_max_656x437.jpeg"
    ],
    "floorplans": [
-    "https://media.onthemarket.com/properties/16712090/1658778531/floor-plan-0-1024x1024.jpg"
+    "https://media.rightmove.co.uk/property-floorplan/da32cf2f9/148712042/da32cf2f9f7629be37fa06a2ff2f4784.png"
    ],
    "stations": [
-    "South Kensington Underground",
-    "Sloane Square Underground"
+    "Earls Court Station",
+    "West Brompton Station"
    ],
-   "postcode": "SW3 5SA",
-   "discount": 0.02,
+   "postcode": "SW5 9SB",
+   "discount": 0.035,
    "discount_why": [
     "independent agent",
+    "already reduced",
     "new this week"
    ],
-   "expected": 3530,
-   "niceness": 50,
+   "expected": 3380,
+   "niceness": 45,
    "scores": {
-    "appliances": 5,
+    "appliances": 4,
     "fixtures": 5,
-    "furnishings": 6,
+    "furnishings": 4,
     "condition": 6,
-    "light_layout": 5,
-    "space": 2,
-    "outdoor_level": 6,
+    "light_layout": 4,
+    "space": 3,
+    "outdoor_level": 5,
     "epc_street": 6
    },
-   "note": "Tidy furnished maisonette with private patio and EPC C, but older wood kitchen, freestanding washer and tiny 703 sq ft rooms.",
-   "flags": [
-    "Bathrooms not shown"
-   ],
+   "note": "Lower-ground 773 sq ft flat, recently refurbished but basic: freestanding fridge, budget kitchen, black leather sofas, small bedrooms, private garden.",
+   "flags": [],
    "sqft_est": true,
-   "furnished": "Furnished",
-   "predicted": 3830,
-   "value": 70,
-   "ppsf": 60.3,
-   "overall": 60,
+   "furnished": "Furnished or unfurnished",
+   "predicted": 3795,
+   "value": 77,
+   "ppsf": 52.5,
+   "overall": 61,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -1136,6 +1284,13 @@
     "Kensington (Olympia) Underground"
    ],
    "postcode": "W14 8QN",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Broadway & West, London",
+     "url": "https://www.rightmove.co.uk/properties/95402865"
+    }
+   ],
    "discount": 0.03,
    "discount_why": [
     "independent agent"
@@ -1155,7 +1310,7 @@
    "note": "Newly renovated with marble-effect bathrooms and media wall, dark wood floors, chandeliers, gloss integrated kitchen; 1237 sq ft, porter, no outdoor space, EPC C.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 4065,
+   "predicted": 4070,
    "value": 47,
    "ppsf": 40.0,
    "overall": 60,
@@ -1163,89 +1318,106 @@
    "negotiable_only": false
   },
   {
-   "id": "20694304",
-   "price": 3879,
-   "lat": 51.494103,
-   "lon": -0.202681,
-   "crow_km": 1.99,
-   "address": "Kensington Westside, Earls Court, London, W14",
-   "baths": 2,
+   "id": "16712090",
+   "price": 3600,
+   "lat": 51.48627471923828,
+   "lon": -0.16634100675582886,
+   "crow_km": 1.51,
+   "address": "Chelsea Manor Street, London SW3",
+   "baths": 3,
    "type": "Flat",
-   "agent": "Foxtons - Earls Court",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/20694304/",
+   "agent": "eXp UK - London",
+   "added": "Added < 7 days",
+   "url": "https://www.onthemarket.com/details/16712090/",
    "thumbs": [
-    "https://media.onthemarket.com/properties/20694304/1659355236/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1659355236/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1659355236/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1656755477/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1656755477/image-4-480x320.jpg"
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-4-480x320.jpg"
    ],
-   "walk_m": 2274,
-   "walk_min": 28.4,
-   "description": "LONG LET. This excellent 3 bedroom apartment has been finished to the highest standards and offers fantastic bright and spacious rooms, wood floors throughout and a great position close to Earls Court. Ideally located within a modern development just moments from the local shops and amenities on Warwick road and is within easy reach of the wide open spaces of Holland Park. The closest stations are Kensington Olympia and Earls Court. Please use the reference KNCL0062607 when contacting Foxtons.",
+   "walk_m": 1884,
+   "walk_min": 23.6,
+   "description": "When calling please Quote Ref JB0670 *Available to move-in RIGHT AWAY* *Offered FURNISHED* Why live here? It ticks all the boxes - well looked after, great location, local transport, all 3 bedrooms are doubles, each with their own bathroom, own front door AND private patio perfect for a summer BBQ. Nestled in the heart of Chelsea, this beautifully presented three-bedroom, three-bathroom split-level maisonette is perfect for professional sharers or a family looking to live in such a prime location. With generous space spread over two levels, this brilliant home is sure to be popular! Three Double Bedrooms Three Modern Bathrooms \u2013 no fighting over the shower in the morning Separate Kitchen \u2013 ideal for sharers and those wanting to keep any cooking smells out of the living room Spacious Reception Room \u2013 With French Doors onto a private Terrace Split-Level Layout \u2013 Offering a sense of space and separation, ideal for flexible living Prime Chelsea Location \u2013 Moments from the King\u2019s Road, with world-class shopping, dining, and cultural attractions on your doorstep Excellent Transport Links \u2013 Easy access to Sloane Square & South Kensington Stations *Available to move-in RIGHT AWAY* *Offered FURNISHED * For more information and to book your viewing please call quoting Ref JB0670",
    "features": [
-    "Modern Development",
-    "Excellent Condition throughout",
-    "Bright, Substantial Accommodation",
-    "Wood floors",
-    "Versatile Reception room",
-    "Private Balcony",
-    "Well Proportioned bedrooms"
+    "3 Double Bedrooms 3 Bathrooms",
+    "Quote Ref JB0670 When Calling",
+    "Well Finished",
+    "Check out the VIDEO TOUR",
+    "Own Front Door",
+    "Split-Level",
+    "Moments from Kings Road",
+    "Private Patio",
+    "Furnsihed",
+    "Available right away"
    ],
    "letting": [
+    "Available now",
     "Furnished",
-    "Deposit: \u00a34475",
-    "Long term let"
+    "Deposit: \u00a34038"
    ],
    "key_info": {
-    "Council tax": "Band TBC",
-    "Broadband": "Ultra-fast 1000Mbps *"
+    "Council tax": "Ask agent",
+    "Broadband": "Ultra-fast 5000Mbps *"
    },
-   "sqft": 1027,
+   "sqft": 703,
    "photos": [
-    "https://media.onthemarket.com/properties/20694304/1659355236/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1659355236/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1659355236/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1656755477/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1656755477/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1656755477/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1656755477/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/20694304/1656755477/image-7-480x320.jpg"
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/image-10-480x320.jpg",
+    "https://media.onthemarket.com/properties/16712090/1658778531/epc-0-480x320.png"
    ],
    "floorplans": [
-    "https://media.onthemarket.com/properties/20694304/1656755477/floor-plan-0-1024x1024.png"
+    "https://media.onthemarket.com/properties/16712090/1658778531/floor-plan-0-1024x1024.jpg"
    ],
    "stations": [
-    "West Kensington Underground",
-    "Kensington (Olympia)"
+    "South Kensington Underground",
+    "Sloane Square Underground"
    ],
-   "postcode": "W14 8TW",
-   "discount": 0.025,
+   "postcode": "SW3 5SA",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "eXp UK, London",
+     "url": "https://www.rightmove.co.uk/properties/95490675"
+    }
+   ],
+   "discount": 0.02,
    "discount_why": [
-    "large agent",
-    "listed over 2 weeks"
+    "independent agent",
+    "new this week"
    ],
-   "expected": 3780,
-   "niceness": 54,
+   "expected": 3530,
+   "niceness": 50,
    "scores": {
     "appliances": 5,
     "fixtures": 5,
-    "furnishings": 5,
+    "furnishings": 6,
     "condition": 6,
-    "light_layout": 6,
-    "space": 5,
+    "light_layout": 5,
+    "space": 2,
     "outdoor_level": 6,
-    "epc_street": 4
+    "epc_street": 6
    },
-   "note": "Dated oak shaker kitchen with stainless oven and gas hob, plain white-tiled bathrooms, laminate floors; balcony, modern block on Warwick Rd.",
-   "flags": [],
+   "note": "Tidy furnished maisonette with private patio and EPC C, but older wood kitchen, freestanding washer and tiny 703 sq ft rooms.",
+   "flags": [
+    "Bathrooms not shown"
+   ],
+   "sqft_est": true,
    "furnished": "Furnished",
-   "predicted": 3960,
-   "value": 61,
-   "ppsf": 44.2,
+   "predicted": 3790,
+   "value": 67,
+   "ppsf": 60.3,
    "overall": 58,
-   "tier": "main",
+   "tier": "outside",
    "negotiable_only": false
   },
   {
@@ -1296,6 +1468,7 @@
     "West Kensington Underground"
    ],
    "postcode": "W14 0ST",
+   "source": "OnTheMarket",
    "discount": 0.04,
    "discount_why": [
     "independent agent",
@@ -1316,86 +1489,9 @@
    "note": "Shaker kitchen with granite worktops and built-in ovens, travertine bathroom with double vanity; cluttered tenant furnishings, no outdoor space shown.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3810,
+   "predicted": 3805,
    "value": 60,
    "ppsf": 45.2,
-   "overall": 58,
-   "tier": "main",
-   "negotiable_only": false
-  },
-  {
-   "id": "17562870",
-   "price": 3800,
-   "lat": 51.494549,
-   "lon": -0.205565,
-   "crow_km": 2.17,
-   "address": "Addison Bridge Place, Brook Green, London, W14",
-   "baths": 2,
-   "type": "Flat",
-   "agent": "Druce - Chelsea",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/17562870/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-0-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-1-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-2-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-3-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-4-480x320.jpeg"
-   ],
-   "walk_m": 2961,
-   "walk_min": 37.0,
-   "description": "This above average sized lateral flat has three very good-sized double bedrooms, ample storage, and benefits from an abundance of natural light throughout the flat. The property further benefits from a balcony and fully integrated modern kitchen. Heating and hot water is included in the rent. Addison Bridge Place is a very quiet road just a short walk from High Street Kensington , the overground at Kensington Olympia and the District Line at West Kensington. 3 bedrooms, 2 bathroom, reception room, kitchen, balcony, lift.",
-   "features": [
-    "Three Double Bedrooms Two Bathrooms Separate eat-in kitchen Balcony4th floor with lift Heating & hot water included"
-   ],
-   "letting": [],
-   "key_info": {
-    "Council tax": "Band F",
-    "Broadband": "Ultra-fast 1000Mbps *"
-   },
-   "sqft": 1011,
-   "photos": [
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-0-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-1-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-2-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-3-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-4-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-5-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-6-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/image-7-480x320.jpeg",
-    "https://media.onthemarket.com/properties/17562870/1558349929/epc-0-480x320.png"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/17562870/1558349929/floor-plan-0-1024x1024.jpeg"
-   ],
-   "stations": [
-    "Kensington (Olympia)",
-    "West Kensington Underground"
-   ],
-   "postcode": "W14 8XW",
-   "discount": 0.04,
-   "discount_why": [
-    "independent agent",
-    "listed over 2 weeks"
-   ],
-   "expected": 3650,
-   "niceness": 53,
-   "scores": {
-    "appliances": 4,
-    "fixtures": 5,
-    "furnishings": 5,
-    "condition": 5,
-    "light_layout": 7,
-    "space": 5,
-    "outdoor_level": 6,
-    "epc_street": 6
-   },
-   "note": "Bay-windowed mansion flat with high ceilings, plain white kitchen with freestanding washer, dated corner shower, balcony over rail tracks, lift, EPC C.",
-   "flags": [],
-   "furnished": null,
-   "predicted": 3830,
-   "value": 62,
-   "ppsf": 43.3,
    "overall": 58,
    "tier": "main",
    "negotiable_only": false
@@ -1461,6 +1557,17 @@
     "Edgware Road (Circle Line) Underground"
    ],
    "postcode": "W2 2BW",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Newington estates, London",
+     "url": "https://www.rightmove.co.uk/properties/95151453"
+    },
+    {
+     "agent": "Newington estates, London",
+     "url": "https://www.rightmove.co.uk/properties/95409054"
+    }
+   ],
    "discount": 0.03,
    "discount_why": [
     "independent agent"
@@ -1480,10 +1587,181 @@
    "note": "White gloss kitchen with freestanding fridge, washer and dishwasher, plain tiled bathrooms, cluttered tenant furniture; EPC C, lift.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3990,
+   "predicted": 3980,
    "value": 64,
    "ppsf": 37.1,
    "overall": 58,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "20694304",
+   "price": 3879,
+   "lat": 51.494103,
+   "lon": -0.202681,
+   "crow_km": 1.99,
+   "address": "Kensington Westside, Earls Court, London, W14",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Foxtons - Earls Court",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/20694304/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/20694304/1659355236/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1659355236/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1659355236/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1656755477/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1656755477/image-4-480x320.jpg"
+   ],
+   "walk_m": 2274,
+   "walk_min": 28.4,
+   "description": "LONG LET. This excellent 3 bedroom apartment has been finished to the highest standards and offers fantastic bright and spacious rooms, wood floors throughout and a great position close to Earls Court. Ideally located within a modern development just moments from the local shops and amenities on Warwick road and is within easy reach of the wide open spaces of Holland Park. The closest stations are Kensington Olympia and Earls Court. Please use the reference KNCL0062607 when contacting Foxtons.",
+   "features": [
+    "Modern Development",
+    "Excellent Condition throughout",
+    "Bright, Substantial Accommodation",
+    "Wood floors",
+    "Versatile Reception room",
+    "Private Balcony",
+    "Well Proportioned bedrooms"
+   ],
+   "letting": [
+    "Furnished",
+    "Deposit: \u00a34475",
+    "Long term let"
+   ],
+   "key_info": {
+    "Council tax": "Band TBC",
+    "Broadband": "Ultra-fast 1000Mbps *"
+   },
+   "sqft": 1027,
+   "photos": [
+    "https://media.onthemarket.com/properties/20694304/1659355236/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1659355236/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1659355236/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1656755477/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1656755477/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1656755477/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1656755477/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/20694304/1656755477/image-7-480x320.jpg"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/20694304/1656755477/floor-plan-0-1024x1024.png"
+   ],
+   "stations": [
+    "West Kensington Underground",
+    "Kensington (Olympia)"
+   ],
+   "postcode": "W14 8TW",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Foxtons, Earls Court",
+     "url": "https://www.rightmove.co.uk/properties/95412021"
+    }
+   ],
+   "discount": 0.025,
+   "discount_why": [
+    "large agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 3780,
+   "niceness": 54,
+   "scores": {
+    "appliances": 5,
+    "fixtures": 5,
+    "furnishings": 5,
+    "condition": 6,
+    "light_layout": 6,
+    "space": 5,
+    "outdoor_level": 6,
+    "epc_street": 4
+   },
+   "note": "Dated oak shaker kitchen with stainless oven and gas hob, plain white-tiled bathrooms, laminate floors; balcony, modern block on Warwick Rd.",
+   "flags": [],
+   "furnished": "Furnished",
+   "predicted": 3930,
+   "value": 60,
+   "ppsf": 44.2,
+   "overall": 57,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "17562870",
+   "price": 3800,
+   "lat": 51.494549,
+   "lon": -0.205565,
+   "crow_km": 2.17,
+   "address": "Addison Bridge Place, Brook Green, London, W14",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Druce - Chelsea",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/17562870/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-0-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-1-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-2-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-3-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-4-480x320.jpeg"
+   ],
+   "walk_m": 2961,
+   "walk_min": 37.0,
+   "description": "This above average sized lateral flat has three very good-sized double bedrooms, ample storage, and benefits from an abundance of natural light throughout the flat. The property further benefits from a balcony and fully integrated modern kitchen. Heating and hot water is included in the rent. Addison Bridge Place is a very quiet road just a short walk from High Street Kensington , the overground at Kensington Olympia and the District Line at West Kensington. 3 bedrooms, 2 bathroom, reception room, kitchen, balcony, lift.",
+   "features": [
+    "Three Double Bedrooms Two Bathrooms Separate eat-in kitchen Balcony4th floor with lift Heating & hot water included"
+   ],
+   "letting": [],
+   "key_info": {
+    "Council tax": "Band F",
+    "Broadband": "Ultra-fast 1000Mbps *"
+   },
+   "sqft": 1011,
+   "photos": [
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-0-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-1-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-2-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-3-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-4-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-5-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-6-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/image-7-480x320.jpeg",
+    "https://media.onthemarket.com/properties/17562870/1558349929/epc-0-480x320.png"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/17562870/1558349929/floor-plan-0-1024x1024.jpeg"
+   ],
+   "stations": [
+    "Kensington (Olympia)",
+    "West Kensington Underground"
+   ],
+   "postcode": "W14 8XW",
+   "source": "OnTheMarket",
+   "discount": 0.04,
+   "discount_why": [
+    "independent agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 3650,
+   "niceness": 53,
+   "scores": {
+    "appliances": 4,
+    "fixtures": 5,
+    "furnishings": 5,
+    "condition": 5,
+    "light_layout": 7,
+    "space": 5,
+    "outdoor_level": 6,
+    "epc_street": 6
+   },
+   "note": "Bay-windowed mansion flat with high ceilings, plain white kitchen with freestanding washer, dated corner shower, balcony over rail tracks, lift, EPC C.",
+   "flags": [],
+   "furnished": null,
+   "predicted": 3820,
+   "value": 61,
+   "ppsf": 43.3,
+   "overall": 57,
    "tier": "main",
    "negotiable_only": false
   },
@@ -1537,6 +1815,7 @@
     "West Kensington Underground"
    ],
    "postcode": "W14 9AX",
+   "source": "OnTheMarket",
    "discount": 0.03,
    "discount_why": [
     "independent agent"
@@ -1558,7 +1837,7 @@
     "Few photos"
    ],
    "furnished": "Furnished or unfurnished",
-   "predicted": 3750,
+   "predicted": 3740,
    "value": 57,
    "ppsf": 52.1,
    "overall": 56,
@@ -1634,6 +1913,13 @@
     "Barons Court Underground"
    ],
    "postcode": "W14 8UJ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Hamptons, Kensington",
+     "url": "https://www.rightmove.co.uk/properties/93113592"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -1657,8 +1943,8 @@
    ],
    "sqft_est": true,
    "furnished": "Unfurnished",
-   "predicted": 4075,
-   "value": 46,
+   "predicted": 4070,
+   "value": 45,
    "ppsf": 40.2,
    "overall": 56,
    "tier": "main",
@@ -1716,6 +2002,7 @@
     "Marble Arch Underground"
    ],
    "postcode": "W2 2QX",
+   "source": "OnTheMarket",
    "discount": 0.02,
    "discount_why": [
     "independent agent",
@@ -1736,12 +2023,105 @@
    "note": "Freestanding fridge and washer, no dishwasher, busy wallpaper, cheap divan beds, small rooms; EPC D on busy Edgware Road.",
    "flags": [],
    "furnished": null,
-   "predicted": 3780,
-   "value": 73,
+   "predicted": 3750,
+   "value": 71,
    "ppsf": null,
-   "overall": 55,
+   "overall": 54,
    "tier": "outside",
    "negotiable_only": false
+  },
+  {
+   "id": "rm89724579",
+   "source": "Rightmove",
+   "price": 4500,
+   "lat": 51.47971,
+   "lon": -0.17947,
+   "crow_km": 2.15,
+   "address": "Lots Road, Chelsea",
+   "baths": 2,
+   "type": "Apartment",
+   "agent": "Martin & Co, Chelsea Riverside",
+   "added": "Reduced > 14 days",
+   "url": "https://www.rightmove.co.uk/properties/89724579",
+   "thumbs": [],
+   "walk_m": 2884,
+   "walk_min": 36.0,
+   "description": "Modern high quality finish, three bedroom apartment available to let in SW10. The property comprises three double bedrooms, two bathrooms (one en-suite), large open plan kitchen living room and a private patio garden area. Wood flooring runs throughout and quality furniture has been provided.",
+   "features": [
+    "Duplex Apartment",
+    "Three Double Bedrooms",
+    "Two Bathrooms (One En-suite)",
+    "Open Plan Kitchen Living",
+    "Finished to a High Standard",
+    "Nest Heating System",
+    "Gas Central Heating",
+    "Wood Flooring Throughout",
+    "Ample Storage",
+    "Managed by Martin &amp; Co"
+   ],
+   "letting": [
+    "letAvailableDate: Ask agent",
+    "deposit: 6231",
+    "letType: Long term",
+    "furnishType: Furnished"
+   ],
+   "let_type": "Long term",
+   "key_info": {},
+   "sqft": 1252,
+   "photos": [
+    "https://media.rightmove.co.uk/dir/property-photo/b13253e6a/89724579/b13253e6a1c6478d76daef145e0d79dc_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/1e471df38/89724579/1e471df386fce8cde2893d7ad8a4b26f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/a21a13fce/89724579/a21a13fce8ed76cebd1fe4ee62196c2f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/cf93f0a38/89724579/cf93f0a386711f4349cf2348031e5a23_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/6cb2de3c1/89724579/6cb2de3c11a851be392c2aaadfe1cabc_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/e51c4a59e/89724579/e51c4a59eb8e9dbd7730271b11a0f6ac_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/b46d7e13d/89724579/b46d7e13d000cc335e5fbbd18204846d_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/6f8ce187f/89724579/6f8ce187f98d5292c55c4470317e4472_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/ab829d5f2/89724579/ab829d5f222ae57472ac991af7f53bf5_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/9fb18abb1/89724579/9fb18abb15cba43c633d591f6d53e1ec_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/e3956ea38/89724579/e3956ea3816c178079c1f17f6ee83a0e_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/6739fb4ec/89724579/6739fb4ec50960c2e8d3bb003ec94117_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/987556010/89724579/9875560108fecd996248cf11c455d53d_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/721a53f53/89724579/721a53f530d0035326949d72eadddac0_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/2fd4d8ea5/89724579/2fd4d8ea51bee4cbb1466dae4ca8e550_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/e2241fb42/89724579/e2241fb42cea413bcb1035836163bff7_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/ef64f4da8/89724579/ef64f4da81651a6c4ac3351993ff798a_max_656x437.jpeg"
+   ],
+   "floorplans": [
+    "https://media.rightmove.co.uk/property-floorplan/b877f0aba/89724579/b877f0abaa24d65366085aa278322fab.png"
+   ],
+   "stations": [
+    "Imperial Wharf Station",
+    "Fulham Broadway Station"
+   ],
+   "postcode": "SW10 0QF",
+   "discount": 0.055,
+   "discount_why": [
+    "independent agent",
+    "already reduced",
+    "listed over 2 weeks"
+   ],
+   "expected": 4250,
+   "niceness": 70,
+   "scores": {
+    "appliances": 8,
+    "fixtures": 8,
+    "furnishings": 7,
+    "condition": 9,
+    "light_layout": 5,
+    "space": 7,
+    "outdoor_level": 5,
+    "epc_street": 5
+   },
+   "note": "1,252 sq ft duplex finished to high spec: handleless kitchen with island and double ovens, marble bathrooms, fitted wardrobes; sunken patio, deep plan.",
+   "flags": [],
+   "furnished": "Furnished",
+   "predicted": 4070,
+   "value": 39,
+   "ppsf": 40.7,
+   "overall": 54,
+   "tier": "main",
+   "negotiable_only": true
   },
   {
    "id": "20679155",
@@ -1800,6 +2180,13 @@
     "Imperial Wharf"
    ],
    "postcode": "SW10 9UY",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Emoov, Chelmsford",
+     "url": "https://www.rightmove.co.uk/properties/95045295"
+    }
+   ],
    "discount": 0.035,
    "discount_why": [
     "independent agent",
@@ -1821,9 +2208,178 @@
    "note": "Freshly painted mansion flat with new carpet and bay window, but basic kitchen with freestanding white goods, dated bathroom tiling, on busy Fulham Road.",
    "flags": [],
    "furnished": "Part furnished",
-   "predicted": 3790,
+   "predicted": 3780,
    "value": 58,
    "ppsf": 43.0,
+   "overall": 52,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "rm94851948",
+   "source": "Rightmove",
+   "price": 3625,
+   "lat": 51.519765,
+   "lon": -0.166531,
+   "crow_km": 2.4,
+   "address": "Chapel Street, Marylebone, London, NW1",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Kinleigh Folkard & Hayward - Lettings, Marylebone",
+   "added": "Added > 14 days",
+   "url": "https://www.rightmove.co.uk/properties/94851948",
+   "thumbs": [],
+   "walk_m": 2963,
+   "walk_min": 37.0,
+   "description": "SHARERS WELCOME A bright and spacious three bedroom, two bathroom flat available to rent set on the second floor within a purpose-built block located close to Edgware Road Underground station. The property comprises a reception room, separate fully fitted kitchen, three double bedrooms, and two bathrooms. Further benefits include wooden floors throughout and lift access. Well located for access to Edgware Road Underground station whilst the many amenities and transport links of Baker Street and Marylebone High Street are also close by. Holding Deposit: \u00a3836.53 (1 week)* Tenancy Deposit: \u00a34,182.69 (5 weeks)* Council Tax Band: E *The deposit amounts are approximate and will vary depending on the final rent agreed. *If Chinese is your preferred language. Please get in touch via WeChat ID: KFH1977",
+   "features": [
+    "Three double bedrooms",
+    "Two bathrooms",
+    "Reception room",
+    "Separate kitchen",
+    "Second floor with lift access",
+    "Suitable for sharers"
+   ],
+   "letting": [
+    "letAvailableDate: 12/12/2026",
+    "deposit: 4182",
+    "letType: Long term",
+    "furnishType: Furnished"
+   ],
+   "let_type": "Long term",
+   "key_info": {},
+   "sqft": 800,
+   "photos": [
+    "https://media.rightmove.co.uk/dir/property-photo/3c2b4b05c/94851948/3c2b4b05cfdc1e4646793776123f5eb2_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/37f5993d4/94851948/37f5993d44550ea37bc5e61b4cd9471c_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/8d0bcb84f/94851948/8d0bcb84fa0fc75e5cd73b2edef2615f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/c1faeece5/94851948/c1faeece549427ade6695f0ae23b29c6_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/bec7c3b12/94851948/bec7c3b12827626ebfc9e74a40d8ce47_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/f84ed01aa/94851948/f84ed01aac5fa0a6653e18aeddd207c0_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/5c4f61ddb/94851948/5c4f61ddbd62fcd9332bbe0acc0a4830_max_656x437.jpeg"
+   ],
+   "floorplans": [
+    "https://media.rightmove.co.uk/property-floorplan/804b9c1df/94851948/804b9c1dfc24fda9e510bbf59cf5784d.jpeg"
+   ],
+   "stations": [
+    "Edgware Road (Circle, District, Hammersmith & City) Station",
+    "Edgware Road (Bakerloo) Station"
+   ],
+   "postcode": "NW1 5DP",
+   "also": [
+    {
+     "agent": "OpenRent, London",
+     "url": "https://www.rightmove.co.uk/properties/95244483"
+    }
+   ],
+   "discount": 0.025,
+   "discount_why": [
+    "large agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 3535,
+   "niceness": 46,
+   "scores": {
+    "appliances": 5,
+    "fixtures": 4,
+    "furnishings": 4,
+    "condition": 5,
+    "light_layout": 6,
+    "space": 3,
+    "outdoor_level": 5,
+    "epc_street": 5
+   },
+   "note": "Plain 800 sq ft ex-local-authority style block flat, 2nd floor with lift; white gloss kitchen, pine furniture, basic bathroom, bright reception.",
+   "flags": [
+    "Few photos"
+   ],
+   "furnished": "Furnished",
+   "predicted": 3670,
+   "value": 59,
+   "ppsf": 53.0,
+   "overall": 52,
+   "tier": "outside",
+   "negotiable_only": false
+  },
+  {
+   "id": "rm94775700",
+   "source": "Rightmove",
+   "price": 4000,
+   "lat": 51.492486,
+   "lon": -0.196387,
+   "crow_km": 1.64,
+   "address": "Nevern Square, \nEarls Court, SW5",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Chestertons, South Kensington",
+   "added": "Added > 14 days",
+   "url": "https://www.rightmove.co.uk/properties/94775700",
+   "thumbs": [],
+   "walk_m": 2101,
+   "walk_min": 26.3,
+   "description": "A beautifully proportioned three-bedroom apartment situated on the highly sought-after Nevern Square, in the heart of Earls Court. The property comprises three spacious double bedrooms, two bathrooms including an en-suite to the principal bedroom, and a separate fully fitted kitchen. The principal bedroom further benefits from direct access to a private balcony, creating a charming outdoor space and allowing an abundance of natural light into the room. Ideally located for the excellent selection of shops, restaurants and amenities in Earls Court, the property also enjoys the attractive open surroundings of Nevern Square. An excellent opportunity for professional sharers or a family seeking a spacious three-bedroom home in a prime West London location. Our China Desk is here for you, if Chinese is your preferred language, please get in touch via WeChat ( ChestertonsLettings )",
+   "features": [],
+   "letting": [
+    "letAvailableDate: Now",
+    "deposit: 4615",
+    "minimumTermInMonths: 12",
+    "letType: Long term",
+    "furnishType: Unfurnished"
+   ],
+   "let_type": "Long term",
+   "key_info": {},
+   "sqft": 1011,
+   "photos": [
+    "https://media.rightmove.co.uk/dir/property-photo/89cbc7a20/94775700/89cbc7a20d1c573ebf20ff689c977030_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/a28edb82a/94775700/a28edb82a3856851226810c88abdd298_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/f3c08f92b/94775700/f3c08f92bdd2f18d0fec7f7f4f636794_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/89cb67e5d/94775700/89cb67e5d4358fa4c155f95ce5ec4e40_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/65c886f50/94775700/65c886f50b7df52a20ea480d4849523d_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/20f4185af/94775700/20f4185af84695fafda4e20eb8af7862_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/138fe1f1c/94775700/138fe1f1cd9935a079322a8a45ae37dd_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/82005b826/94775700/82005b8267933d2c63d0a1865de1d4c9_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/702842275/94775700/702842275f46d594a80fc4ceab2002b5_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/a125b095d/94775700/a125b095d7c66aa5d77b91990e5a84f6_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/b3a48a236/94775700/b3a48a236fbac15fe161ba347856673d_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/da7465fcf/94775700/da7465fcffa2ff07804660eb2a6ce3e6_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/7fd256aa5/94775700/7fd256aa5e106fe095a4a2c58d292ed1_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/db95b41a0/94775700/db95b41a0aa8179124649fecd873dd34_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/08a3ae789/94775700/08a3ae789a6c6924e61fe88f79294be7_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/fca75206e/94775700/fca75206e3b949b8e530cafcbfed6a7f_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/898fbbd3d/94775700/898fbbd3d5c7eeeeb79ecd0f40b21ccf_max_656x437.jpeg"
+   ],
+   "floorplans": [
+    "https://media.rightmove.co.uk/property-floorplan/e3df93abd/94775700/e3df93abde423152c3bb80cc836b03de.png"
+   ],
+   "stations": [
+    "Earls Court Station",
+    "West Brompton Station"
+   ],
+   "postcode": "SW5 9NN",
+   "discount": 0.025,
+   "discount_why": [
+    "large agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 3900,
+   "niceness": 51,
+   "scores": {
+    "appliances": 4,
+    "fixtures": 4,
+    "furnishings": null,
+    "condition": 5,
+    "light_layout": 7,
+    "space": 5,
+    "outdoor_level": 5,
+    "epc_street": 7
+   },
+   "note": "Bright period flat on Nevern Square with large sashes, big reception and balcony; dated maple kitchen and plain white-tiled bathrooms, one narrow bedroom.",
+   "flags": [],
+   "sqft_est": true,
+   "furnished": "Unfurnished",
+   "predicted": 3925,
+   "value": 52,
+   "ppsf": 46.3,
    "overall": 52,
    "tier": "main",
    "negotiable_only": false
@@ -1891,6 +2447,17 @@
     "Fulham Broadway Underground"
    ],
    "postcode": "SW10 0LB",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Chestertons, Chelsea",
+     "url": "https://www.rightmove.co.uk/properties/94482042"
+    },
+    {
+     "agent": "Martin & Co, Chelsea Riverside",
+     "url": "https://www.rightmove.co.uk/properties/93924414"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -1911,182 +2478,9 @@
    "note": "Freshly refurbished white gloss kitchen with integrated oven, smart tiled bathrooms, glazed side return; lower ground, patio, busy Edith Grove, EPC C.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3850,
-   "value": 47,
+   "predicted": 3820,
+   "value": 45,
    "ppsf": 53.2,
-   "overall": 52,
-   "tier": "main",
-   "negotiable_only": false
-  },
-  {
-   "id": "13736704",
-   "price": 4498,
-   "lat": 51.496574,
-   "lon": -0.18748,
-   "crow_km": 0.91,
-   "address": "Cornwall Gardens, South Kensington, SW7",
-   "baths": 2,
-   "type": "Apartment",
-   "agent": "Russell Simpson - Chelsea",
-   "added": "Reduced < 14 days",
-   "url": "https://www.onthemarket.com/details/13736704/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-4-480x320.jpg"
-   ],
-   "walk_m": 1071,
-   "walk_min": 13.4,
-   "description": "Three bedroom flat with rounded tower reception on a prestigious address near Gloucester Road station Entering the flat on the third floor, the front hall leads through to spacious reception room. Occupying the tower at the corner of the building, with full-length sash windows set into a rounded bay, this creates a bright and beautiful room. Next door is a fitted kitchen. The property also contains three bedrooms, two of them with considerable built-in storage. In addition, there is a shared bathroom, a guest WC and additional storage space in the corridor. Residents have the right to access the private communal garden to the west of the building. Cornwall Gardens is a beautiful garden square in South Kensington, lined with Grade II listed white stucco townhouses. Over the years, the square has been home to numerous celebrated figures, including the playwright Sir Terence Rattigan, the actress Dame Diana Rigg, and the designer Sir Hardy Amies. From here, Gloucester Road underground station is a short walk away. In addition, the restaurants and shops of Kensington High Street are nearby. The open spaces of Hyde Park and Kensington Palace Gardens are also close, and so too the world-class cultural institutions of South Kensington.",
-   "features": [
-    "3 Bedrooms",
-    "2 Bathrooms",
-    "Part furnished",
-    "Communal Gardens",
-    "Lift"
-   ],
-   "letting": [
-    "Availability date: 16 Dec 2026",
-    "Unfurnished",
-    "Long term let"
-   ],
-   "key_info": {
-    "Council tax": "Band G",
-    "Broadband": "Ultra-fast 1000Mbps *"
-   },
-   "sqft": 830,
-   "photos": [
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/image-10-480x320.jpg",
-    "https://media.onthemarket.com/properties/13736704/1652531669/epc-graph-0-480x320.png"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/13736704/1652531669/floor-plan-0-1024x1024.jpg"
-   ],
-   "stations": [
-    "Gloucester Road Underground",
-    "High Street Kensington Underground"
-   ],
-   "postcode": "SW7 4BE",
-   "discount": 0.045,
-   "discount_why": [
-    "independent agent",
-    "already reduced"
-   ],
-   "expected": 4295,
-   "niceness": 60,
-   "scores": {
-    "appliances": 6,
-    "fixtures": 6,
-    "furnishings": 5,
-    "condition": 7,
-    "light_layout": 8,
-    "space": 3,
-    "outdoor_level": 6,
-    "epc_street": 8
-   },
-   "note": "Bright rounded bay reception with sash windows, bespoke joinery, modern handleless kitchen, travertine bath; only 830 sq ft, garden square, EPC C.",
-   "flags": [],
-   "furnished": "Part furnished",
-   "predicted": 4130,
-   "value": 40,
-   "ppsf": 62.1,
-   "overall": 50,
-   "tier": "main",
-   "negotiable_only": true
-  },
-  {
-   "id": "16373021",
-   "price": 4250,
-   "lat": 51.499248,
-   "lon": -0.194583,
-   "crow_km": 1.36,
-   "address": "Adam & Eve Mews, London, W8",
-   "baths": 2,
-   "type": "Apartment",
-   "agent": "Tate Residential - London",
-   "added": "Reduced < 14 days",
-   "url": "https://www.onthemarket.com/details/16373021/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-4-480x320.jpg"
-   ],
-   "walk_m": 2176,
-   "walk_min": 27.2,
-   "description": "Fabulous 3 double bedroom mews apartment with wood floors located in quiet cobbled mews just off Kensington High Street. The flat has a spacious reception room, private terrace which has direct access from both the living room and third bedroom. A good sized master bedroom with modern ensuite bathroom together with a second bedroom complete the living space. There is a large tiled bathroom and separate kitchen with natural light. Ideal for small family or professional couple who would like outside space. Council Tax Band: G",
-   "features": [
-    "3 double bedrooms",
-    "2 bathrooms",
-    "Brand new ensuite",
-    "Private Terrace"
-   ],
-   "letting": [
-    "Availability date: 8 Dec 2026",
-    "Unfurnished"
-   ],
-   "key_info": {
-    "Council tax": "Ask agent",
-    "Broadband": "Ultra-fast 1000Mbps *"
-   },
-   "sqft": 936,
-   "photos": [
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/16373021/1651775931/epc-0-480x320.png"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/16373021/1651775931/floor-plan-0-1024x1024.jpg"
-   ],
-   "stations": [
-    "High Street Kensington Underground",
-    "Earl's Court Underground"
-   ],
-   "postcode": "W8 6UJ",
-   "discount": 0.045,
-   "discount_why": [
-    "independent agent",
-    "already reduced"
-   ],
-   "expected": 4060,
-   "niceness": 57,
-   "scores": {
-    "appliances": 5,
-    "fixtures": 6,
-    "furnishings": null,
-    "condition": 6,
-    "light_layout": 6,
-    "space": 4,
-    "outdoor_level": 7,
-    "epc_street": 8
-   },
-   "note": "Clean white gloss kitchen with freestanding fridge and dishwasher, new ensuite but dated beige bathroom, orange laminate, private terrace, quiet mews, EPC C.",
-   "flags": [],
-   "furnished": "Unfurnished",
-   "predicted": 3960,
-   "value": 44,
-   "ppsf": 52.1,
    "overall": 50,
    "tier": "main",
    "negotiable_only": false
@@ -2154,6 +2548,13 @@
     "Holland Park Underground"
    ],
    "postcode": "W8 7PW",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Foxtons, Notting Hill",
+     "url": "https://www.rightmove.co.uk/properties/93397950"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -2174,8 +2575,8 @@
    "note": "Handleless white kitchen, mosaic bathrooms, but worn seagrass flooring and 1970s block; private brick balcony, EPC C, quiet street.",
    "flags": [],
    "furnished": "Unfurnished",
-   "predicted": 3910,
-   "value": 43,
+   "predicted": 3895,
+   "value": 42,
    "ppsf": 47.4,
    "overall": 50,
    "tier": "main",
@@ -2237,6 +2638,13 @@
     "Kensington (Olympia)"
    ],
    "postcode": "W14 0PR",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Marsh & Parsons, Brook Green",
+     "url": "https://www.rightmove.co.uk/properties/92295204"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -2259,7 +2667,7 @@
     "Few photos"
    ],
    "furnished": "Furnished",
-   "predicted": 3775,
+   "predicted": 3770,
    "value": 48,
    "ppsf": 47.6,
    "overall": 50,
@@ -2311,6 +2719,13 @@
     "Bayswater Underground"
    ],
    "postcode": "W2 4RQ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Druce, Notting Hill",
+     "url": "https://www.rightmove.co.uk/properties/94821567"
+    }
+   ],
    "discount": 0.045,
    "discount_why": [
     "independent agent",
@@ -2331,8 +2746,8 @@
    "note": "Tastefully furnished portered flat with good sofas and beds, but ordinary kitchen with freestanding dishwasher and washer, dated bathrooms, busy Bayswater Rd.",
    "flags": [],
    "furnished": null,
-   "predicted": 3965,
-   "value": 47,
+   "predicted": 3925,
+   "value": 45,
    "ppsf": 50.3,
    "overall": 50,
    "tier": "main",
@@ -2391,6 +2806,13 @@
     "Paddington Underground"
    ],
    "postcode": "W2 2NH",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Jeremy Jacob Letting Specialists, Kensington",
+     "url": "https://www.rightmove.co.uk/properties/93916656"
+    }
+   ],
    "discount": 0.04,
    "discount_why": [
     "independent agent",
@@ -2411,10 +2833,461 @@
    "note": "Dated white kitchen with freestanding oven, old marble-tiled bathroom, pink carpet and bare divans; 1291 sq ft third-floor walk-up.",
    "flags": [],
    "furnished": "Part furnished",
-   "predicted": 4025,
-   "value": 56,
+   "predicted": 4010,
+   "value": 55,
    "ppsf": 36.6,
    "overall": 50,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "rm94622952",
+   "source": "Rightmove",
+   "price": 3800,
+   "lat": 51.515749,
+   "lon": -0.164975,
+   "crow_km": 2.01,
+   "address": "Park West, Edgware Rd, London, W2",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Relo Redac Strattons, Central London Office",
+   "added": "Reduced < 7 days",
+   "url": "https://www.rightmove.co.uk/properties/94622952",
+   "thumbs": [],
+   "walk_m": 2470,
+   "walk_min": 30.9,
+   "description": "Situated on Edgware Road, Marble Arch, this spacious three-bedroom, two-bathroom apartment offers the perfect blend of convenience and charm. The property benefits from generously sized rooms, a bright and airy living space, and an excellent central London location with easy access to local amenities, transport links, shops, and restaurants. Available furnished or part-furnished, this attractive apartment is ideal for professionals, families, or sharers seeking comfortable living in a vibrant neighbourhood.",
+   "features": [
+    "Communal hot water",
+    "Communal heating",
+    "Lift",
+    "Porter/Concierge - 24 hours",
+    "Residential parking",
+    "Wooden flooring - throughout",
+    "Dishwasher",
+    "Electric hob",
+    "Washing machine"
+   ],
+   "letting": [
+    "letAvailableDate: Now",
+    "deposit: 4615",
+    "letType: Long term",
+    "furnishType: Part furnished"
+   ],
+   "let_type": "Long term",
+   "key_info": {},
+   "sqft": 926,
+   "photos": [
+    "https://media.rightmove.co.uk/dir/property-photo/fba37e4de/94622952/fba37e4deb817125d3d7fc842c60f4ea_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/bd3664e76/94622952/bd3664e76a1e9daee506cb4f02c27959_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/92d02c4d0/94622952/92d02c4d0e220196115f682ba8f4fd23_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/91982a378/94622952/91982a378086b91f6fe6a6fc6ba74a66_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/0255c76ce/94622952/0255c76cef4753901e86696b4ffa8afb_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/9a45ae448/94622952/9a45ae4486049c91d8cf900c0302bf17_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/7843463d5/94622952/7843463d545c250bfb5ad338de242daa_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/c69b71cd5/94622952/c69b71cd513d7e1f130d5f2b47ac47a4_max_656x437.jpeg",
+    "https://media.rightmove.co.uk/dir/property-photo/c2f86991f/94622952/c2f86991f16921d1d947149941dc08fe_max_656x437.jpeg"
+   ],
+   "floorplans": [],
+   "stations": [
+    "Edgware Road (Circle, District, Hammersmith & City) Station",
+    "Marble Arch Station"
+   ],
+   "postcode": "W2 2QJ",
+   "discount": 0.035,
+   "discount_why": [
+    "independent agent",
+    "already reduced",
+    "new this week"
+   ],
+   "expected": 3665,
+   "niceness": 42,
+   "scores": {
+    "appliances": 4,
+    "fixtures": 4,
+    "furnishings": 3,
+    "condition": 4,
+    "light_layout": 5,
+    "space": 4,
+    "outdoor_level": 5,
+    "epc_street": 4
+   },
+   "note": "Mansion block on busy Edgware Road with lift and porter; dated black gloss kitchen, freestanding washer, mismatched beds, scuffed laminate.",
+   "flags": [],
+   "furnished": "Part furnished",
+   "predicted": 3770,
+   "value": 57,
+   "ppsf": 47.5,
+   "overall": 50,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "16373021",
+   "price": 4250,
+   "lat": 51.499248,
+   "lon": -0.194583,
+   "crow_km": 1.36,
+   "address": "Adam & Eve Mews, London, W8",
+   "baths": 2,
+   "type": "Apartment",
+   "agent": "Tate Residential - London",
+   "added": "Reduced < 14 days",
+   "url": "https://www.onthemarket.com/details/16373021/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-4-480x320.jpg"
+   ],
+   "walk_m": 2176,
+   "walk_min": 27.2,
+   "description": "Fabulous 3 double bedroom mews apartment with wood floors located in quiet cobbled mews just off Kensington High Street. The flat has a spacious reception room, private terrace which has direct access from both the living room and third bedroom. A good sized master bedroom with modern ensuite bathroom together with a second bedroom complete the living space. There is a large tiled bathroom and separate kitchen with natural light. Ideal for small family or professional couple who would like outside space. Council Tax Band: G",
+   "features": [
+    "3 double bedrooms",
+    "2 bathrooms",
+    "Brand new ensuite",
+    "Private Terrace"
+   ],
+   "letting": [
+    "Availability date: 8 Dec 2026",
+    "Unfurnished"
+   ],
+   "key_info": {
+    "Council tax": "Ask agent",
+    "Broadband": "Ultra-fast 1000Mbps *"
+   },
+   "sqft": 936,
+   "photos": [
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/16373021/1651775931/epc-0-480x320.png"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/16373021/1651775931/floor-plan-0-1024x1024.jpg"
+   ],
+   "stations": [
+    "High Street Kensington Underground",
+    "Earl's Court Underground"
+   ],
+   "postcode": "W8 6UJ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Tate Residential Ltd, London",
+     "url": "https://www.rightmove.co.uk/properties/94248156"
+    }
+   ],
+   "discount": 0.045,
+   "discount_why": [
+    "independent agent",
+    "already reduced"
+   ],
+   "expected": 4060,
+   "niceness": 57,
+   "scores": {
+    "appliances": 5,
+    "fixtures": 6,
+    "furnishings": null,
+    "condition": 6,
+    "light_layout": 6,
+    "space": 4,
+    "outdoor_level": 7,
+    "epc_street": 8
+   },
+   "note": "Clean white gloss kitchen with freestanding fridge and dishwasher, new ensuite but dated beige bathroom, orange laminate, private terrace, quiet mews, EPC C.",
+   "flags": [],
+   "furnished": "Unfurnished",
+   "predicted": 3925,
+   "value": 41,
+   "ppsf": 52.1,
+   "overall": 49,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "13736704",
+   "price": 4498,
+   "lat": 51.496574,
+   "lon": -0.18748,
+   "crow_km": 0.91,
+   "address": "Cornwall Gardens, South Kensington, SW7",
+   "baths": 2,
+   "type": "Apartment",
+   "agent": "Russell Simpson - Chelsea",
+   "added": "Reduced < 14 days",
+   "url": "https://www.onthemarket.com/details/13736704/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-4-480x320.jpg"
+   ],
+   "walk_m": 1071,
+   "walk_min": 13.4,
+   "description": "Three bedroom flat with rounded tower reception on a prestigious address near Gloucester Road station Entering the flat on the third floor, the front hall leads through to spacious reception room. Occupying the tower at the corner of the building, with full-length sash windows set into a rounded bay, this creates a bright and beautiful room. Next door is a fitted kitchen. The property also contains three bedrooms, two of them with considerable built-in storage. In addition, there is a shared bathroom, a guest WC and additional storage space in the corridor. Residents have the right to access the private communal garden to the west of the building. Cornwall Gardens is a beautiful garden square in South Kensington, lined with Grade II listed white stucco townhouses. Over the years, the square has been home to numerous celebrated figures, including the playwright Sir Terence Rattigan, the actress Dame Diana Rigg, and the designer Sir Hardy Amies. From here, Gloucester Road underground station is a short walk away. In addition, the restaurants and shops of Kensington High Street are nearby. The open spaces of Hyde Park and Kensington Palace Gardens are also close, and so too the world-class cultural institutions of South Kensington.",
+   "features": [
+    "3 Bedrooms",
+    "2 Bathrooms",
+    "Part furnished",
+    "Communal Gardens",
+    "Lift"
+   ],
+   "letting": [
+    "Availability date: 16 Dec 2026",
+    "Unfurnished",
+    "Long term let"
+   ],
+   "key_info": {
+    "Council tax": "Band G",
+    "Broadband": "Ultra-fast 1000Mbps *"
+   },
+   "sqft": 830,
+   "photos": [
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/image-10-480x320.jpg",
+    "https://media.onthemarket.com/properties/13736704/1652531669/epc-graph-0-480x320.png"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/13736704/1652531669/floor-plan-0-1024x1024.jpg"
+   ],
+   "stations": [
+    "Gloucester Road Underground",
+    "High Street Kensington Underground"
+   ],
+   "postcode": "SW7 4BE",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Russell Simpson, Chelsea - Lettings",
+     "url": "https://www.rightmove.co.uk/properties/94394436"
+    }
+   ],
+   "discount": 0.045,
+   "discount_why": [
+    "independent agent",
+    "already reduced"
+   ],
+   "expected": 4295,
+   "niceness": 60,
+   "scores": {
+    "appliances": 6,
+    "fixtures": 6,
+    "furnishings": 5,
+    "condition": 7,
+    "light_layout": 8,
+    "space": 3,
+    "outdoor_level": 6,
+    "epc_street": 8
+   },
+   "note": "Bright rounded bay reception with sash windows, bespoke joinery, modern handleless kitchen, travertine bath; only 830 sq ft, garden square, EPC C.",
+   "flags": [],
+   "furnished": "Part furnished",
+   "predicted": 4050,
+   "value": 35,
+   "ppsf": 62.1,
+   "overall": 48,
+   "tier": "main",
+   "negotiable_only": true
+  },
+  {
+   "id": "19383395",
+   "price": 4500,
+   "lat": 51.480543,
+   "lon": -0.181741,
+   "crow_km": 2.08,
+   "address": "Ashburnham Mansions, Ashburnham Road, London",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Chestertons - Chelsea",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/19383395/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1622201549/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618726399/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618726399/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618726399/image-4-480x320.jpg"
+   ],
+   "walk_m": 2849,
+   "walk_min": 35.6,
+   "description": "A beautifully refurbished three-bedroom lateral apartment, presented in immaculate condition throughout. The property features a generous reception room with an open-plan, eat-in kitchen, three well-proportioned bedrooms, and two bathrooms. It also offers access to well-maintained communal gardens at the rear. Designed with a contemporary style, the apartment includes a range of high-quality features.",
+   "features": [],
+   "letting": [
+    "Availability date: 17 Jun 2026",
+    "Unfurnished",
+    "Long term let"
+   ],
+   "key_info": {
+    "Council tax": "Ask agent",
+    "Broadband": "Ultra-fast 1000Mbps *"
+   },
+   "sqft": 1098,
+   "photos": [
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1622201549/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618726399/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618726399/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618726399/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618726399/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-10-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1618209410/image-11-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1611535003/image-12-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1611535003/image-13-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1611535003/image-14-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1611535003/image-15-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1611535003/image-16-480x320.jpg",
+    "https://media.onthemarket.com/properties/19383395/1617717755/epc-0-480x320.png"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/19383395/1618726399/floor-plan-0-1024x1024.jpg"
+   ],
+   "stations": [
+    "Imperial Wharf",
+    "Fulham Broadway Underground"
+   ],
+   "postcode": "SW10 0PB",
+   "source": "OnTheMarket",
+   "discount": 0.025,
+   "discount_why": [
+    "large agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 4390,
+   "niceness": 68,
+   "scores": {
+    "appliances": 8,
+    "fixtures": 8,
+    "furnishings": null,
+    "condition": 8,
+    "light_layout": 7,
+    "space": 5,
+    "outdoor_level": 5,
+    "epc_street": 5
+   },
+   "note": "Fresh refurb: range cooker, American fridge, wine fridge, marble bathrooms, crittall en-suite, oak floors; 1098 sq ft, communal garden.",
+   "flags": [],
+   "furnished": "Unfurnished",
+   "predicted": 3985,
+   "value": 25,
+   "ppsf": 48.0,
+   "overall": 46,
+   "tier": "outside",
+   "negotiable_only": false
+  },
+  {
+   "id": "20745757",
+   "price": 3900,
+   "lat": 51.518276,
+   "lon": -0.16763,
+   "crow_km": 2.22,
+   "address": "Sussex Gardens, London W2",
+   "baths": 2,
+   "type": "Apartment",
+   "agent": "Newington London Estates - Marylebone",
+   "added": "Added < 14 days",
+   "url": "https://www.onthemarket.com/details/20745757/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-4-480x320.jpg"
+   ],
+   "walk_m": 2727,
+   "walk_min": 34.1,
+   "description": "A well-presented three-bedroom apartment offering bright and practical living accommodation within a popular purpose-built development. The property features a generous open-plan reception and dining room with a fitted kitchen, three well-proportioned bedrooms, a modern bathroom, and a separate shower room. Wooden flooring, good storage, and an abundance of natural light create a comfortable and welcoming living environment. Residents benefit from lift access and porter service. Ideally positioned close to Edgware Road Station, with Marble Arch, Paddington, Hyde Park, and Connaught Village all within easy reach, alongside a wide range of shops, caf\u00e9s, restaurants, and local amenities. EPC Rating: C",
+   "features": [
+    "3 Bedrooms",
+    "2 Bathrooms",
+    "Bright and spacious",
+    "Open-plan",
+    "Fitted kitchen",
+    "Wood flooring",
+    "Refurbished",
+    "Lift access",
+    "Porterage",
+    "Great location"
+   ],
+   "letting": [
+    "Available now",
+    "Furnished",
+    "Deposit: \u00a35400",
+    "Long term let"
+   ],
+   "key_info": {
+    "Council tax": "Band F",
+    "Broadband": "Ultra-fast 1800Mbps *"
+   },
+   "sqft": 721,
+   "photos": [
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/20745757/1658180015/epc-graph-0-480x320.png"
+   ],
+   "floorplans": [],
+   "stations": [
+    "Edgware Road (Circle Line) Underground",
+    "Edgware Road (Bakerloo) Underground"
+   ],
+   "postcode": "W2 1EU",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Newington estates, London",
+     "url": "https://www.rightmove.co.uk/properties/95408889"
+    }
+   ],
+   "discount": 0.03,
+   "discount_why": [
+    "independent agent"
+   ],
+   "expected": 3785,
+   "niceness": 48,
+   "scores": {
+    "appliances": 5,
+    "fixtures": 5,
+    "furnishings": 4,
+    "condition": 6,
+    "light_layout": 6,
+    "space": 2,
+    "outdoor_level": 5,
+    "epc_street": 5
+   },
+   "note": "Tidy white gloss kitchen with gas hob and wood floors, plain modern bathrooms, but only 721 sq ft for three bedrooms; lift and porter, EPC C.",
+   "flags": [],
+   "furnished": "Furnished",
+   "predicted": 3685,
+   "value": 43,
+   "ppsf": 63.0,
+   "overall": 46,
    "tier": "main",
    "negotiable_only": false
   },
@@ -2477,6 +3350,13 @@
     "Marble Arch Underground"
    ],
    "postcode": "W2 2RB",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Dexters, Hyde Park & Bayswater",
+     "url": "https://www.rightmove.co.uk/properties/93428025"
+    }
+   ],
    "discount": 0.03,
    "discount_why": [
     "large agent",
@@ -2501,10 +3381,205 @@
    ],
    "sqft_est": true,
    "furnished": "Furnished",
-   "predicted": 3730,
-   "value": 56,
+   "predicted": 3690,
+   "value": 53,
    "ppsf": 56.3,
-   "overall": 48,
+   "overall": 46,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "20676238",
+   "price": 4008,
+   "lat": 51.482678,
+   "lon": -0.177912,
+   "crow_km": 1.8,
+   "address": "Kings Road, Chelsea, London, SW10",
+   "baths": 2,
+   "type": "Maisonette",
+   "agent": "Foxtons - Sloane Square",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/20676238/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/20676238/1657335209/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1657335209/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1657335209/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-4-480x320.jpg"
+   ],
+   "walk_m": 2375,
+   "walk_min": 29.7,
+   "description": "LONG LET. A bright and beautifully presented 3 bedroom duplex flat which has been refurbished to an excellent standard and benefits from en-suite facilities and a private front patio. Ann Lane is a quiet residential location close to the many fashionable amenities of King's Road. For transport, the nearest underground station is Sloane Square (Circle and District lines). Please use the reference SLSQ0154869 when contacting Foxtons.",
+   "features": [
+    "Lovely 3 bedroom duplex flat",
+    "Main bedroom with en-suite",
+    "Spacious reception room",
+    "Modern kitchen with space to dine",
+    "Excellent location",
+    "Private front patio"
+   ],
+   "letting": [
+    "Furnished",
+    "Deposit: \u00a34625",
+    "Long term let"
+   ],
+   "key_info": {
+    "Council tax": "Band TBC",
+    "Broadband": "Ultra-fast 5000Mbps *"
+   },
+   "sqft": 907,
+   "photos": [
+    "https://media.onthemarket.com/properties/20676238/1657335209/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1657335209/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1657335209/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-10-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-11-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-12-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-13-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-14-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-15-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-16-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1656197876/image-17-480x320.jpg",
+    "https://media.onthemarket.com/properties/20676238/1659005080/epc-0-480x320.png"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/20676238/1656197876/floor-plan-0-1024x1024.png"
+   ],
+   "stations": [
+    "Imperial Wharf",
+    "Fulham Broadway Underground"
+   ],
+   "postcode": "SW10 0BN",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Foxtons, Sloane Square",
+     "url": "https://www.rightmove.co.uk/properties/95030166"
+    }
+   ],
+   "discount": 0.025,
+   "discount_why": [
+    "large agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 3910,
+   "niceness": 46,
+   "scores": {
+    "appliances": 4,
+    "fixtures": 5,
+    "furnishings": 3,
+    "condition": 5,
+    "light_layout": 6,
+    "space": 4,
+    "outdoor_level": 5,
+    "epc_street": 4
+   },
+   "note": "Dated beech kitchen with freestanding white goods, sparse basic furniture, one new marble shower room; above shops on Kings Road.",
+   "flags": [],
+   "furnished": "Furnished",
+   "predicted": 3800,
+   "value": 43,
+   "ppsf": 51.7,
+   "overall": 44,
+   "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "20383816",
+   "price": 3900,
+   "lat": 51.515749,
+   "lon": -0.164975,
+   "crow_km": 2.01,
+   "address": "Park West, Hyde Park Estate, London, W2",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Foxtons - Marylebone & Mayfair",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/20383816/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/20383816/1659089169/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1646881953/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659089169/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076781/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076783/image-4-480x320.jpg"
+   ],
+   "walk_m": 2470,
+   "walk_min": 30.9,
+   "description": "LONG LET. Superbly located close to a wide range of amenities this spacious 3 bedroom flat benefits from lift access and concierge services. The exhaustive amenities of Oxford Street are just moments away, while the attractions of Marylebone and Mayfair are also close by. Transport links include Marble Arch Underground Station (Central line) and a wealth of regular bus services. Please use the reference CHPK2265979 when contacting Foxtons.",
+   "features": [
+    "Generous 3 bedroom flat arranged on the 1st floor",
+    "Spacious reception/kitchen with space to dine",
+    "Benefits from 2 bathrooms",
+    "3 well proportioned bedrooms with neutral d\u00e9cor"
+   ],
+   "letting": [
+    "Furnished",
+    "Deposit: \u00a34500",
+    "Long term let"
+   ],
+   "key_info": {
+    "Council tax": "Band TBC",
+    "Broadband": "Ultra-fast 5000Mbps *"
+   },
+   "sqft": 774,
+   "photos": [
+    "https://media.onthemarket.com/properties/20383816/1659089169/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1646881953/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659089169/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076781/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076783/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076783/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076783/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076781/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1659076783/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/20383816/1650123031/epc-0-480x320.png"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/20383816/1658918645/floor-plan-0-1024x1024.png"
+   ],
+   "stations": [
+    "Edgware Road (Circle Line) Underground",
+    "Marble Arch Underground"
+   ],
+   "postcode": "W2 2RB",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Foxtons, Marylebone",
+     "url": "https://www.rightmove.co.uk/properties/93415368"
+    }
+   ],
+   "discount": 0.025,
+   "discount_why": [
+    "large agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 3800,
+   "niceness": 44,
+   "scores": {
+    "appliances": 4,
+    "fixtures": 5,
+    "furnishings": 3,
+    "condition": 5,
+    "light_layout": 5,
+    "space": 3,
+    "outdoor_level": 5,
+    "epc_street": 5
+   },
+   "note": "Budget refurb: freestanding fridge and washer, no dishwasher seen, laminate floors, plain tiled bathrooms, sparse cheap furniture; 774 sq ft, 1st floor with lift, EPC C.",
+   "flags": [],
+   "furnished": "Furnished",
+   "predicted": 3715,
+   "value": 44,
+   "ppsf": 58.9,
+   "overall": 44,
    "tier": "main",
    "negotiable_only": false
   },
@@ -2580,6 +3655,7 @@
     "Gloucester Road Underground"
    ],
    "postcode": "SW3 6SH",
+   "source": "OnTheMarket",
    "discount": 0.02,
    "discount_why": [
     "large agent",
@@ -2602,366 +3678,11 @@
    "flags": [],
    "sqft_est": true,
    "furnished": "Unfurnished",
-   "predicted": 4140,
-   "value": 34,
+   "predicted": 4055,
+   "value": 28,
    "ppsf": 62.7,
-   "overall": 46,
+   "overall": 43,
    "tier": "outside",
-   "negotiable_only": false
-  },
-  {
-   "id": "20676238",
-   "price": 4008,
-   "lat": 51.482678,
-   "lon": -0.177912,
-   "crow_km": 1.8,
-   "address": "Kings Road, Chelsea, London, SW10",
-   "baths": 2,
-   "type": "Maisonette",
-   "agent": "Foxtons - Sloane Square",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/20676238/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/20676238/1657335209/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1657335209/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1657335209/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-4-480x320.jpg"
-   ],
-   "walk_m": 2375,
-   "walk_min": 29.7,
-   "description": "LONG LET. A bright and beautifully presented 3 bedroom duplex flat which has been refurbished to an excellent standard and benefits from en-suite facilities and a private front patio. Ann Lane is a quiet residential location close to the many fashionable amenities of King's Road. For transport, the nearest underground station is Sloane Square (Circle and District lines). Please use the reference SLSQ0154869 when contacting Foxtons.",
-   "features": [
-    "Lovely 3 bedroom duplex flat",
-    "Main bedroom with en-suite",
-    "Spacious reception room",
-    "Modern kitchen with space to dine",
-    "Excellent location",
-    "Private front patio"
-   ],
-   "letting": [
-    "Furnished",
-    "Deposit: \u00a34625",
-    "Long term let"
-   ],
-   "key_info": {
-    "Council tax": "Band TBC",
-    "Broadband": "Ultra-fast 5000Mbps *"
-   },
-   "sqft": 907,
-   "photos": [
-    "https://media.onthemarket.com/properties/20676238/1657335209/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1657335209/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1657335209/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-10-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-11-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-12-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-13-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-14-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-15-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-16-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1656197876/image-17-480x320.jpg",
-    "https://media.onthemarket.com/properties/20676238/1659005080/epc-0-480x320.png"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/20676238/1656197876/floor-plan-0-1024x1024.png"
-   ],
-   "stations": [
-    "Imperial Wharf",
-    "Fulham Broadway Underground"
-   ],
-   "postcode": "SW10 0BN",
-   "discount": 0.025,
-   "discount_why": [
-    "large agent",
-    "listed over 2 weeks"
-   ],
-   "expected": 3910,
-   "niceness": 46,
-   "scores": {
-    "appliances": 4,
-    "fixtures": 5,
-    "furnishings": 3,
-    "condition": 5,
-    "light_layout": 6,
-    "space": 4,
-    "outdoor_level": 5,
-    "epc_street": 4
-   },
-   "note": "Dated beech kitchen with freestanding white goods, sparse basic furniture, one new marble shower room; above shops on Kings Road.",
-   "flags": [],
-   "furnished": "Furnished",
-   "predicted": 3835,
-   "value": 45,
-   "ppsf": 51.7,
-   "overall": 46,
-   "tier": "main",
-   "negotiable_only": false
-  },
-  {
-   "id": "19383395",
-   "price": 4500,
-   "lat": 51.480543,
-   "lon": -0.181741,
-   "crow_km": 2.08,
-   "address": "Ashburnham Mansions, Ashburnham Road, London",
-   "baths": 2,
-   "type": "Flat",
-   "agent": "Chestertons - Chelsea",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/19383395/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1622201549/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618726399/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618726399/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618726399/image-4-480x320.jpg"
-   ],
-   "walk_m": 2849,
-   "walk_min": 35.6,
-   "description": "A beautifully refurbished three-bedroom lateral apartment, presented in immaculate condition throughout. The property features a generous reception room with an open-plan, eat-in kitchen, three well-proportioned bedrooms, and two bathrooms. It also offers access to well-maintained communal gardens at the rear. Designed with a contemporary style, the apartment includes a range of high-quality features.",
-   "features": [],
-   "letting": [
-    "Availability date: 17 Jun 2026",
-    "Unfurnished",
-    "Long term let"
-   ],
-   "key_info": {
-    "Council tax": "Ask agent",
-    "Broadband": "Ultra-fast 1000Mbps *"
-   },
-   "sqft": 1098,
-   "photos": [
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1622201549/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618726399/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618726399/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618726399/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618726399/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-10-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1618209410/image-11-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1611535003/image-12-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1611535003/image-13-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1611535003/image-14-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1611535003/image-15-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1611535003/image-16-480x320.jpg",
-    "https://media.onthemarket.com/properties/19383395/1617717755/epc-0-480x320.png"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/19383395/1618726399/floor-plan-0-1024x1024.jpg"
-   ],
-   "stations": [
-    "Imperial Wharf",
-    "Fulham Broadway Underground"
-   ],
-   "postcode": "SW10 0PB",
-   "discount": 0.025,
-   "discount_why": [
-    "large agent",
-    "listed over 2 weeks"
-   ],
-   "expected": 4390,
-   "niceness": 68,
-   "scores": {
-    "appliances": 8,
-    "fixtures": 8,
-    "furnishings": null,
-    "condition": 8,
-    "light_layout": 7,
-    "space": 5,
-    "outdoor_level": 5,
-    "epc_street": 5
-   },
-   "note": "Fresh refurb: range cooker, American fridge, wine fridge, marble bathrooms, crittall en-suite, oak floors; 1098 sq ft, communal garden.",
-   "flags": [],
-   "furnished": "Unfurnished",
-   "predicted": 3995,
-   "value": 25,
-   "ppsf": 48.0,
-   "overall": 46,
-   "tier": "outside",
-   "negotiable_only": false
-  },
-  {
-   "id": "20745757",
-   "price": 3900,
-   "lat": 51.518276,
-   "lon": -0.16763,
-   "crow_km": 2.22,
-   "address": "Sussex Gardens, London W2",
-   "baths": 2,
-   "type": "Apartment",
-   "agent": "Newington London Estates - Marylebone",
-   "added": "Added < 14 days",
-   "url": "https://www.onthemarket.com/details/20745757/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-4-480x320.jpg"
-   ],
-   "walk_m": 2727,
-   "walk_min": 34.1,
-   "description": "A well-presented three-bedroom apartment offering bright and practical living accommodation within a popular purpose-built development. The property features a generous open-plan reception and dining room with a fitted kitchen, three well-proportioned bedrooms, a modern bathroom, and a separate shower room. Wooden flooring, good storage, and an abundance of natural light create a comfortable and welcoming living environment. Residents benefit from lift access and porter service. Ideally positioned close to Edgware Road Station, with Marble Arch, Paddington, Hyde Park, and Connaught Village all within easy reach, alongside a wide range of shops, caf\u00e9s, restaurants, and local amenities. EPC Rating: C",
-   "features": [
-    "3 Bedrooms",
-    "2 Bathrooms",
-    "Bright and spacious",
-    "Open-plan",
-    "Fitted kitchen",
-    "Wood flooring",
-    "Refurbished",
-    "Lift access",
-    "Porterage",
-    "Great location"
-   ],
-   "letting": [
-    "Available now",
-    "Furnished",
-    "Deposit: \u00a35400",
-    "Long term let"
-   ],
-   "key_info": {
-    "Council tax": "Band F",
-    "Broadband": "Ultra-fast 1800Mbps *"
-   },
-   "sqft": 721,
-   "photos": [
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/20745757/1658180015/epc-graph-0-480x320.png"
-   ],
-   "floorplans": [],
-   "stations": [
-    "Edgware Road (Circle Line) Underground",
-    "Edgware Road (Bakerloo) Underground"
-   ],
-   "postcode": "W2 1EU",
-   "discount": 0.03,
-   "discount_why": [
-    "independent agent"
-   ],
-   "expected": 3785,
-   "niceness": 48,
-   "scores": {
-    "appliances": 5,
-    "fixtures": 5,
-    "furnishings": 4,
-    "condition": 6,
-    "light_layout": 6,
-    "space": 2,
-    "outdoor_level": 5,
-    "epc_street": 5
-   },
-   "note": "Tidy white gloss kitchen with gas hob and wood floors, plain modern bathrooms, but only 721 sq ft for three bedrooms; lift and porter, EPC C.",
-   "flags": [],
-   "furnished": "Furnished",
-   "predicted": 3715,
-   "value": 45,
-   "ppsf": 63.0,
-   "overall": 46,
-   "tier": "main",
-   "negotiable_only": false
-  },
-  {
-   "id": "20383816",
-   "price": 3900,
-   "lat": 51.515749,
-   "lon": -0.164975,
-   "crow_km": 2.01,
-   "address": "Park West, Hyde Park Estate, London, W2",
-   "baths": 2,
-   "type": "Flat",
-   "agent": "Foxtons - Marylebone & Mayfair",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/20383816/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/20383816/1659089169/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1646881953/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659089169/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076781/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076783/image-4-480x320.jpg"
-   ],
-   "walk_m": 2470,
-   "walk_min": 30.9,
-   "description": "LONG LET. Superbly located close to a wide range of amenities this spacious 3 bedroom flat benefits from lift access and concierge services. The exhaustive amenities of Oxford Street are just moments away, while the attractions of Marylebone and Mayfair are also close by. Transport links include Marble Arch Underground Station (Central line) and a wealth of regular bus services. Please use the reference CHPK2265979 when contacting Foxtons.",
-   "features": [
-    "Generous 3 bedroom flat arranged on the 1st floor",
-    "Spacious reception/kitchen with space to dine",
-    "Benefits from 2 bathrooms",
-    "3 well proportioned bedrooms with neutral d\u00e9cor"
-   ],
-   "letting": [
-    "Furnished",
-    "Deposit: \u00a34500",
-    "Long term let"
-   ],
-   "key_info": {
-    "Council tax": "Band TBC",
-    "Broadband": "Ultra-fast 5000Mbps *"
-   },
-   "sqft": 774,
-   "photos": [
-    "https://media.onthemarket.com/properties/20383816/1659089169/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1646881953/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659089169/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076781/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076783/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076783/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076783/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076781/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1659076783/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/20383816/1650123031/epc-0-480x320.png"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/20383816/1658918645/floor-plan-0-1024x1024.png"
-   ],
-   "stations": [
-    "Edgware Road (Circle Line) Underground",
-    "Marble Arch Underground"
-   ],
-   "postcode": "W2 2RB",
-   "discount": 0.025,
-   "discount_why": [
-    "large agent",
-    "listed over 2 weeks"
-   ],
-   "expected": 3800,
-   "niceness": 44,
-   "scores": {
-    "appliances": 4,
-    "fixtures": 5,
-    "furnishings": 3,
-    "condition": 5,
-    "light_layout": 5,
-    "space": 3,
-    "outdoor_level": 5,
-    "epc_street": 5
-   },
-   "note": "Budget refurb: freestanding fridge and washer, no dishwasher seen, laminate floors, plain tiled bathrooms, sparse cheap furniture; 774 sq ft, 1st floor with lift, EPC C.",
-   "flags": [],
-   "furnished": "Furnished",
-   "predicted": 3750,
-   "value": 47,
-   "ppsf": 58.9,
-   "overall": 46,
-   "tier": "main",
    "negotiable_only": false
   },
   {
@@ -3027,6 +3748,13 @@
     "London Paddington"
    ],
    "postcode": "W2 6DQ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Foxtons, Marylebone",
+     "url": "https://www.rightmove.co.uk/properties/94722159"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -3049,103 +3777,12 @@
     "Text describes a 2-bed"
    ],
    "furnished": "Furnished",
-   "predicted": 3885,
+   "predicted": 3880,
    "value": 28,
    "ppsf": 48.5,
    "overall": 43,
    "tier": "main",
    "negotiable_only": true
-  },
-  {
-   "id": "17711101",
-   "price": 4550,
-   "lat": 51.49585,
-   "lon": -0.17964,
-   "crow_km": 0.46,
-   "address": "Queens Gate, London, SW7",
-   "baths": 2,
-   "type": "Flat",
-   "agent": "Draker KFH - Sloane Square Lettings",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/17711101/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-4-480x320.jpg"
-   ],
-   "walk_m": 640,
-   "walk_min": 8.0,
-   "description": "A recently refurbished three bedroom property situated in a white stucco fronted building moments from Hyde Park. The property, which is presented furnished, consists of a contemporary reception room with an open plan kitchen fitted with modern appliances. The sleeping accomdation features a spacious master bedroom, a main bathroom with a bathtub and overhead shower followed by a second bedroom with en-suite and walk-in shower and finally a third single bedroom. The property also benefits from two patio areas. The nearest underground stations are South Kensington and Gloucester Road, both are less than five minutes walk. *If Chinese is your preferred language. Please get in touch via WeChat ID: KFH1977",
-   "features": [
-    "Three bedroom apartment",
-    "Spacious reception room",
-    "Modern bathrooms",
-    "Patio",
-    "White stucco fronted building",
-    "Quick access to a wide range of local amenities",
-    "Hyde Park located 5 minutes walk away"
-   ],
-   "letting": [
-    "Available now",
-    "Furnished",
-    "Deposit: \u00a36300",
-    "Long term let"
-   ],
-   "key_info": {
-    "Council tax": "Band E"
-   },
-   "sqft": 796,
-   "photos": [
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-10-480x320.jpg",
-    "https://media.onthemarket.com/properties/17711101/1646919591/image-11-480x320.jpg"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/17711101/1646919591/floor-plan-0-1024x1024.jpg"
-   ],
-   "stations": [
-    "Gloucester Road Underground",
-    "South Kensington Underground"
-   ],
-   "postcode": "SW7 5JP",
-   "discount": 0.025,
-   "discount_why": [
-    "large agent",
-    "listed over 2 weeks"
-   ],
-   "expected": 4435,
-   "niceness": 53,
-   "scores": {
-    "appliances": 6,
-    "fixtures": 6,
-    "furnishings": 6,
-    "condition": 7,
-    "light_layout": 5,
-    "space": 3,
-    "outdoor_level": 4,
-    "epc_street": 5
-   },
-   "note": "Recently refurbished lower-ground flat with gloss grey kitchen, island hob and skylit reception, but only 796 sq ft and a tiny third bedroom.",
-   "flags": [],
-   "sqft_est": true,
-   "furnished": "Furnished",
-   "predicted": 4140,
-   "value": 32,
-   "ppsf": 66.9,
-   "overall": 42,
-   "tier": "outside",
-   "negotiable_only": false
   },
   {
    "id": "20738073",
@@ -3207,6 +3844,13 @@
     "Queensway Underground"
    ],
    "postcode": "W2 4JZ",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Wilfords London, Kensington",
+     "url": "https://www.rightmove.co.uk/properties/95366865"
+    }
+   ],
    "discount": 0.03,
    "discount_why": [
     "independent agent"
@@ -3226,8 +3870,8 @@
    "note": "Freshly painted and carpeted, wide windows and 22 ft reception, but plain white kitchen and basic beige bathrooms; 3rd floor portered block.",
    "flags": [],
    "furnished": "Unfurnished",
-   "predicted": 4025,
-   "value": 29,
+   "predicted": 4000,
+   "value": 27,
    "ppsf": 46.3,
    "overall": 42,
    "tier": "outside",
@@ -3296,6 +3940,13 @@
     "Royal Oak Underground"
    ],
    "postcode": "W2 4PH",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Mountgrange Heritage, Notting Hill",
+     "url": "https://www.rightmove.co.uk/properties/94315197"
+    }
+   ],
    "discount": 0.04,
    "discount_why": [
     "independent agent",
@@ -3316,10 +3967,108 @@
    "note": "Characterful period maisonette with shutters, roll-top bath, painted shaker kitchen and decked roof terrace; top floor without lift, EPC C.",
    "flags": [],
    "furnished": "Unfurnished",
-   "predicted": 3920,
-   "value": 21,
+   "predicted": 3900,
+   "value": 20,
    "ppsf": null,
-   "overall": 42,
+   "overall": 41,
+   "tier": "outside",
+   "negotiable_only": false
+  },
+  {
+   "id": "17711101",
+   "price": 4550,
+   "lat": 51.49585,
+   "lon": -0.17964,
+   "crow_km": 0.46,
+   "address": "Queens Gate, London, SW7",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Draker KFH - Sloane Square Lettings",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/17711101/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-4-480x320.jpg"
+   ],
+   "walk_m": 640,
+   "walk_min": 8.0,
+   "description": "A recently refurbished three bedroom property situated in a white stucco fronted building moments from Hyde Park. The property, which is presented furnished, consists of a contemporary reception room with an open plan kitchen fitted with modern appliances. The sleeping accomdation features a spacious master bedroom, a main bathroom with a bathtub and overhead shower followed by a second bedroom with en-suite and walk-in shower and finally a third single bedroom. The property also benefits from two patio areas. The nearest underground stations are South Kensington and Gloucester Road, both are less than five minutes walk. *If Chinese is your preferred language. Please get in touch via WeChat ID: KFH1977",
+   "features": [
+    "Three bedroom apartment",
+    "Spacious reception room",
+    "Modern bathrooms",
+    "Patio",
+    "White stucco fronted building",
+    "Quick access to a wide range of local amenities",
+    "Hyde Park located 5 minutes walk away"
+   ],
+   "letting": [
+    "Available now",
+    "Furnished",
+    "Deposit: \u00a36300",
+    "Long term let"
+   ],
+   "key_info": {
+    "Council tax": "Band E"
+   },
+   "sqft": 796,
+   "photos": [
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-10-480x320.jpg",
+    "https://media.onthemarket.com/properties/17711101/1646919591/image-11-480x320.jpg"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/17711101/1646919591/floor-plan-0-1024x1024.jpg"
+   ],
+   "stations": [
+    "Gloucester Road Underground",
+    "South Kensington Underground"
+   ],
+   "postcode": "SW7 5JP",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Draker KFH, Sloane Square",
+     "url": "https://www.rightmove.co.uk/properties/166010483"
+    }
+   ],
+   "discount": 0.025,
+   "discount_why": [
+    "large agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 4435,
+   "niceness": 53,
+   "scores": {
+    "appliances": 6,
+    "fixtures": 6,
+    "furnishings": 6,
+    "condition": 7,
+    "light_layout": 5,
+    "space": 3,
+    "outdoor_level": 4,
+    "epc_street": 5
+   },
+   "note": "Recently refurbished lower-ground flat with gloss grey kitchen, island hob and skylit reception, but only 796 sq ft and a tiny third bedroom.",
+   "flags": [],
+   "sqft_est": true,
+   "furnished": "Furnished",
+   "predicted": 4040,
+   "value": 26,
+   "ppsf": 66.9,
+   "overall": 40,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -3380,6 +4129,13 @@
     "Paddington"
    ],
    "postcode": "W2 3UN",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Dexters, Hyde Park & Bayswater",
+     "url": "https://www.rightmove.co.uk/properties/94015998"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -3404,10 +4160,10 @@
    ],
    "sqft_est": true,
    "furnished": "Part furnished",
-   "predicted": 4020,
-   "value": 27,
+   "predicted": 3990,
+   "value": 25,
    "ppsf": 46.8,
-   "overall": 40,
+   "overall": 38,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -3476,6 +4232,13 @@
     "Queensway Underground"
    ],
    "postcode": "W2 4NP",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Hamptons, Notting Hill",
+     "url": "https://www.rightmove.co.uk/properties/91873341"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -3496,11 +4259,105 @@
    "note": "Freshly refurbished with grey gloss integrated kitchen and marble-effect shower rooms, garden square views, but very small at 624 sq ft and EPC D.",
    "flags": [],
    "furnished": "Part furnished",
-   "predicted": 3750,
-   "value": 24,
+   "predicted": 3705,
+   "value": 20,
    "ppsf": 79.7,
-   "overall": 39,
+   "overall": 37,
    "tier": "main",
+   "negotiable_only": false
+  },
+  {
+   "id": "20395717",
+   "price": 4495,
+   "lat": 51.512731,
+   "lon": -0.189524,
+   "crow_km": 1.85,
+   "address": "Moscow Road, London W2",
+   "baths": 3,
+   "type": "Flat",
+   "agent": "Realty Logic - London",
+   "added": "Added > 14 days",
+   "url": "https://www.onthemarket.com/details/20395717/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-4-480x320.jpg"
+   ],
+   "walk_m": 2428,
+   "walk_min": 30.4,
+   "description": "Spacious 3-Bed, 3-Bath Flat with Concierge | 5 Mins to Hyde Park! The beautiful red-brick flat offers spacious rooms and two entrances in a concierge block. Perfect for students or working professionals to rent for the long term. Highlights: \u2022 3 Bedrooms & 3 Bathrooms \u2013 Plenty of privacy and no morning queues. \u2022 2 Living Rooms \u2013 Ideal for a dedicated home office, TV room, or extra lounge space. \u2022 2 Entrances \u2013 Adds great flexibility and privacy. \u2022 On-Site Concierge \u2013 Safe, secure, and easy parcel deliveries. \u2022 Unbeatable Spot \u2013 A 5-minute walk to Hyde Park, Queensway, and Bayswater stations. \u2022 Fantastic Local Vibe \u2013 Great coffee, food spots, and supermarkets right on your doorstep. Available NOW for long-term let. Perfect for respectful tenants looking for a place to call home.",
+   "features": [
+    "Spacious beautiful flat",
+    "Concierge 24/7",
+    "5 mins walk to Hyde Park",
+    "3 mins walk to Bayswater Station "
+   ],
+   "letting": [
+    "Available now",
+    "Furnished",
+    "Deposit: \u00a35173",
+    "Long term let",
+    "Contract length: 12 months",
+    "Min. term: 12 months"
+   ],
+   "key_info": {
+    "Council tax": "Band C",
+    "Broadband": "Ultra-fast 1000Mbps *"
+   },
+   "sqft": 1600,
+   "photos": [
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-5-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-6-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-7-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-8-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-9-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-10-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-11-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-12-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-13-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-14-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-15-480x320.jpg",
+    "https://media.onthemarket.com/properties/20395717/1646578068/image-16-480x320.jpg"
+   ],
+   "floorplans": [],
+   "stations": [
+    "Bayswater Underground",
+    "Queensway Underground"
+   ],
+   "postcode": "W2 4SN",
+   "source": "OnTheMarket",
+   "discount": 0.04,
+   "discount_why": [
+    "independent agent",
+    "listed over 2 weeks"
+   ],
+   "expected": 4315,
+   "niceness": 40,
+   "scores": {
+    "appliances": 3,
+    "fixtures": 3,
+    "furnishings": 4,
+    "condition": 3,
+    "light_layout": 3,
+    "space": 8,
+    "outdoor_level": 3,
+    "epc_street": 5
+   },
+   "note": "Large 1600 sq ft but dated: old beech kitchen with freestanding washer, magnolia walls, frosted grilled windows at basement level, tired bathrooms.",
+   "flags": [],
+   "furnished": "Furnished",
+   "predicted": 4055,
+   "value": 34,
+   "ppsf": 32.4,
+   "overall": 37,
+   "tier": "outside",
    "negotiable_only": false
   },
   {
@@ -3574,6 +4431,13 @@
     "Earl's Court Underground"
    ],
    "postcode": "W8 6AB",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "OpenRent, London",
+     "url": "https://www.rightmove.co.uk/properties/95587881"
+    }
+   ],
    "discount": 0.02,
    "discount_why": [
     "independent agent",
@@ -3596,102 +4460,9 @@
     "Bathrooms not shown"
    ],
    "furnished": "Furnished or unfurnished",
-   "predicted": 3925,
-   "value": 22,
+   "predicted": 3875,
+   "value": 19,
    "ppsf": 62.4,
-   "overall": 38,
-   "tier": "outside",
-   "negotiable_only": false
-  },
-  {
-   "id": "20395717",
-   "price": 4495,
-   "lat": 51.512731,
-   "lon": -0.189524,
-   "crow_km": 1.85,
-   "address": "Moscow Road, London W2",
-   "baths": 3,
-   "type": "Flat",
-   "agent": "Realty Logic - London",
-   "added": "Added > 14 days",
-   "url": "https://www.onthemarket.com/details/20395717/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-4-480x320.jpg"
-   ],
-   "walk_m": 2428,
-   "walk_min": 30.4,
-   "description": "Spacious 3-Bed, 3-Bath Flat with Concierge | 5 Mins to Hyde Park! The beautiful red-brick flat offers spacious rooms and two entrances in a concierge block. Perfect for students or working professionals to rent for the long term. Highlights: \u2022 3 Bedrooms & 3 Bathrooms \u2013 Plenty of privacy and no morning queues. \u2022 2 Living Rooms \u2013 Ideal for a dedicated home office, TV room, or extra lounge space. \u2022 2 Entrances \u2013 Adds great flexibility and privacy. \u2022 On-Site Concierge \u2013 Safe, secure, and easy parcel deliveries. \u2022 Unbeatable Spot \u2013 A 5-minute walk to Hyde Park, Queensway, and Bayswater stations. \u2022 Fantastic Local Vibe \u2013 Great coffee, food spots, and supermarkets right on your doorstep. Available NOW for long-term let. Perfect for respectful tenants looking for a place to call home.",
-   "features": [
-    "Spacious beautiful flat",
-    "Concierge 24/7",
-    "5 mins walk to Hyde Park",
-    "3 mins walk to Bayswater Station "
-   ],
-   "letting": [
-    "Available now",
-    "Furnished",
-    "Deposit: \u00a35173",
-    "Long term let",
-    "Contract length: 12 months",
-    "Min. term: 12 months"
-   ],
-   "key_info": {
-    "Council tax": "Band C",
-    "Broadband": "Ultra-fast 1000Mbps *"
-   },
-   "sqft": 1600,
-   "photos": [
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-5-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-6-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-7-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-8-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-9-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-10-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-11-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-12-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-13-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-14-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-15-480x320.jpg",
-    "https://media.onthemarket.com/properties/20395717/1646578068/image-16-480x320.jpg"
-   ],
-   "floorplans": [],
-   "stations": [
-    "Bayswater Underground",
-    "Queensway Underground"
-   ],
-   "postcode": "W2 4SN",
-   "discount": 0.04,
-   "discount_why": [
-    "independent agent",
-    "listed over 2 weeks"
-   ],
-   "expected": 4315,
-   "niceness": 40,
-   "scores": {
-    "appliances": 3,
-    "fixtures": 3,
-    "furnishings": 4,
-    "condition": 3,
-    "light_layout": 3,
-    "space": 8,
-    "outdoor_level": 3,
-    "epc_street": 5
-   },
-   "note": "Large 1600 sq ft but dated: old beech kitchen with freestanding washer, magnolia walls, frosted grilled windows at basement level, tired bathrooms.",
-   "flags": [],
-   "furnished": "Furnished",
-   "predicted": 4020,
-   "value": 32,
-   "ppsf": 32.4,
    "overall": 36,
    "tier": "outside",
    "negotiable_only": false
@@ -3751,6 +4522,13 @@
     "West Brompton"
    ],
    "postcode": "SW5 9HN",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Marsh & Parsons, Earls Court",
+     "url": "https://www.rightmove.co.uk/properties/95340777"
+    }
+   ],
    "discount": 0.02,
    "discount_why": [
     "large agent",
@@ -3772,95 +4550,10 @@
    "note": "Tidy mansion flat with busy decor, walnut/black gloss kitchen, beige tiled bath, bunk-bed third room; 818 sq ft on busy Old Brompton Road, lift, EPC C.",
    "flags": [],
    "furnished": "Furnished",
-   "predicted": 3895,
-   "value": 17,
+   "predicted": 3845,
+   "value": 13,
    "ppsf": 64.7,
-   "overall": 34,
-   "tier": "outside",
-   "negotiable_only": false
-  },
-  {
-   "id": "20727954",
-   "price": 4500,
-   "lat": 51.494529,
-   "lon": -0.192625,
-   "crow_km": 1.32,
-   "address": "Cromwell Road, London SW5",
-   "baths": 2,
-   "type": "Flat",
-   "agent": "Dexters - Earls Court",
-   "added": "Added < 14 days",
-   "url": "https://www.onthemarket.com/details/20727954/",
-   "thumbs": [
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-4-480x320.jpg"
-   ],
-   "walk_m": 1625,
-   "walk_min": 20.3,
-   "description": "A fantastic three double bedroom flat located on Cromwell Road. The apartment consists of three large bedrooms, two bathrooms, a light and airy reception and separate kitchen that is fully equipped. This flat is located close to all local amenities of both Earls Court Road and Gloucester Road, with the nearby supermarkets such as Sainsbury's, Tesco 24hour only 0.4 miles away. Security Deposit: \u00a36,230 Council Tax Band: Not yet available",
-   "features": [
-    "Three Double Bedrooms",
-    "Two Bathrooms",
-    "Period Conversion",
-    "Fourth Floor",
-    "Plenty Of Storage",
-    "Furnished"
-   ],
-   "letting": [
-    "Furnished",
-    "Deposit: \u00a36230"
-   ],
-   "key_info": {
-    "Council tax": "Band TBC"
-   },
-   "sqft": 988,
-   "photos": [
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-0-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-1-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-2-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-3-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/image-4-480x320.jpg",
-    "https://media.onthemarket.com/properties/20727954/1657684624/epc-graph-0-480x320.png",
-    "https://media.onthemarket.com/properties/20727954/1657684624/epc-graph-1-480x320.png"
-   ],
-   "floorplans": [
-    "https://media.onthemarket.com/properties/20727954/1657684624/floor-plan-0-1024x1024.jpg"
-   ],
-   "stations": [
-    "Earl's Court Underground",
-    "Gloucester Road Underground"
-   ],
-   "postcode": "SW5 0SE",
-   "discount": 0.015,
-   "discount_why": [
-    "large agent"
-   ],
-   "expected": 4430,
-   "niceness": 39,
-   "scores": {
-    "appliances": 3,
-    "fixtures": 4,
-    "furnishings": 3,
-    "condition": 4,
-    "light_layout": 5,
-    "space": 5,
-    "outdoor_level": 3,
-    "epc_street": 3
-   },
-   "note": "Tiny kitchen alcove with freestanding fridge and washer, cheap pine beds and mismatched table, grey laminate, fourth floor on busy Cromwell Road, EPC E.",
-   "flags": [
-    "Bathrooms not shown",
-    "Few photos"
-   ],
-   "sqft_est": true,
-   "furnished": "Furnished",
-   "predicted": 3945,
-   "value": 19,
-   "ppsf": 53.8,
-   "overall": 29,
+   "overall": 32,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -3925,6 +4618,7 @@
     "London Victoria"
    ],
    "postcode": "SW1V 1AA",
+   "source": "OnTheMarket",
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -3950,6 +4644,98 @@
    "value": 9,
    "ppsf": 51.5,
    "overall": 28,
+   "tier": "outside",
+   "negotiable_only": false
+  },
+  {
+   "id": "20727954",
+   "price": 4500,
+   "lat": 51.494529,
+   "lon": -0.192625,
+   "crow_km": 1.32,
+   "address": "Cromwell Road, London SW5",
+   "baths": 2,
+   "type": "Flat",
+   "agent": "Dexters - Earls Court",
+   "added": "Added < 14 days",
+   "url": "https://www.onthemarket.com/details/20727954/",
+   "thumbs": [
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-4-480x320.jpg"
+   ],
+   "walk_m": 1625,
+   "walk_min": 20.3,
+   "description": "A fantastic three double bedroom flat located on Cromwell Road. The apartment consists of three large bedrooms, two bathrooms, a light and airy reception and separate kitchen that is fully equipped. This flat is located close to all local amenities of both Earls Court Road and Gloucester Road, with the nearby supermarkets such as Sainsbury's, Tesco 24hour only 0.4 miles away. Security Deposit: \u00a36,230 Council Tax Band: Not yet available",
+   "features": [
+    "Three Double Bedrooms",
+    "Two Bathrooms",
+    "Period Conversion",
+    "Fourth Floor",
+    "Plenty Of Storage",
+    "Furnished"
+   ],
+   "letting": [
+    "Furnished",
+    "Deposit: \u00a36230"
+   ],
+   "key_info": {
+    "Council tax": "Band TBC"
+   },
+   "sqft": 988,
+   "photos": [
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-0-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-1-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-2-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-3-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/image-4-480x320.jpg",
+    "https://media.onthemarket.com/properties/20727954/1657684624/epc-graph-0-480x320.png",
+    "https://media.onthemarket.com/properties/20727954/1657684624/epc-graph-1-480x320.png"
+   ],
+   "floorplans": [
+    "https://media.onthemarket.com/properties/20727954/1657684624/floor-plan-0-1024x1024.jpg"
+   ],
+   "stations": [
+    "Earl's Court Underground",
+    "Gloucester Road Underground"
+   ],
+   "postcode": "SW5 0SE",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Dexters, Earls Court",
+     "url": "https://www.rightmove.co.uk/properties/95313267"
+    }
+   ],
+   "discount": 0.015,
+   "discount_why": [
+    "large agent"
+   ],
+   "expected": 4430,
+   "niceness": 39,
+   "scores": {
+    "appliances": 3,
+    "fixtures": 4,
+    "furnishings": 3,
+    "condition": 4,
+    "light_layout": 5,
+    "space": 5,
+    "outdoor_level": 3,
+    "epc_street": 3
+   },
+   "note": "Tiny kitchen alcove with freestanding fridge and washer, cheap pine beds and mismatched table, grey laminate, fourth floor on busy Cromwell Road, EPC E.",
+   "flags": [
+    "Bathrooms not shown",
+    "Few photos"
+   ],
+   "sqft_est": true,
+   "furnished": "Furnished",
+   "predicted": 3890,
+   "value": 15,
+   "ppsf": 53.8,
+   "overall": 27,
    "tier": "outside",
    "negotiable_only": false
   },
@@ -4010,6 +4796,17 @@
     "London Victoria"
    ],
    "postcode": "SW1V 1AA",
+   "source": "OnTheMarket",
+   "also": [
+    {
+     "agent": "Marsh & Parsons, Pimlico & Westminster",
+     "url": "https://www.rightmove.co.uk/properties/94224765"
+    },
+    {
+     "agent": "Chestertons, Westminster & Pimlico",
+     "url": "https://www.rightmove.co.uk/properties/93421803"
+    }
+   ],
    "discount": 0.025,
    "discount_why": [
     "large agent",
@@ -4033,7 +4830,7 @@
     "Few photos"
    ],
    "furnished": "Furnished",
-   "predicted": 3720,
+   "predicted": 3715,
    "value": 5,
    "ppsf": 53.7,
    "overall": 24,

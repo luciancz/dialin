@@ -6,7 +6,7 @@ DATA = os.path.join(HERE, "data")
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 BASE = "https://www.onthemarket.com"
 
-def get(url, tries=3):
+def get(url, tries=5):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA})
@@ -14,7 +14,7 @@ def get(url, tries=3):
                 return r.read().decode("utf-8", "replace")
         except Exception as e:
             err = e
-            time.sleep(2 * (i + 1))
+            time.sleep(4 * (i + 1))
     print("FAILED", url, err, file=sys.stderr)
     return None
 
